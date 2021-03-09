@@ -1,0 +1,30 @@
+
+# Ignore everything
+*
+
+# Except for stuff,
+!.gitignore
+!LICENSE
+!TODO.md
+!README.md
+
+# Source files,
+!src/
+!src/*.cpp
+!src/*.hpp
+
+# Display script,
+!Display.py
+
+# Test files,
+!Tests/
+!Tests/*
+!jsonl/
+!jsonl/*
+!Summary/
+!Summary/*
+
+# pdf file
+!pdf/
+!pdf/*.tex
+!pdf/*.pdf

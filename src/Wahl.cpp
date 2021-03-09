@@ -1,0 +1,306 @@
+#include"Wahl.hpp"
+#include"Searcher.hpp" // Searcher_Wrapper, queue, priority_queue, single_invariant, double_invariant, p_extremal_invariant and their hashes
+#include"Algorithms.hpp"
+#include<fstream> // ifstream
+#include"Writer.hpp" // export_jsonl, less_by_n, less_by_length, stable_sort
+
+#ifdef WAHL_MULTITHREAD
+#include<chrono> // milliseconds
+#include<thread> // thread, sleep_for
+#endif
+
+
+Wahl::Wahl(int argc, char** argv) {
+    std::ifstream f;
+    f.open(argv[1]);
+    if (f.fail()) {
+        std::cout << "Error while opening file \"" << argv[1] << "\". (Does it exist?)." << std::endl;
+        return;
+    }
+    reader.parse(f);
+    f.close();
+
+    // debugx(reader.tests_no);
+
+    total_tests = reader.get_test_numbers(number_tests);
+    current_test = 0;
+    std::cout << "Total tests: " << total_tests << std::endl;
+
+
+#ifdef WAHL_MULTITHREAD
+    int threads = reader.threads;
+    std::vector<std::thread> spawns;
+    std::vector<Searcher_Wrapper> searchers(threads);
+    for (Searcher_Wrapper& searcher : searchers) {
+        searcher.parent = this;
+    }
+    spawns.reserve(threads);
+    for (int i = 0; i < threads; ++i) {
+        spawns.emplace_back(&Searcher_Wrapper::search,&searchers[i]);
+    }
+#ifdef PRINT_STATUS
+#ifdef WAHL_MULTITHREAD_STATUS_ANSI
+    std::cout << std::fixed;
+    std::cout.precision(1);
+    std::cout << "\e[s\e[?25l";
+    while (current_test < total_tests + (long long)threads) {
+        std::cout << "\e[u";
+        for (int i = 0; i < threads; ++i) {
+            std::cout << "Thread " << i << ": " << searchers[i].current_test << '\n';
+        }
+        std::cout << double(std::min((long long)current_test,total_tests))*100./double(total_tests) << "% " << std::min((long long)current_test,total_tests) << "/" << total_tests;
+        std::cout.flush();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+    for (int i = 0; i < threads; ++i) {
+        spawns[i].join();
+    }
+    std::cout << "\e[?25h";
+    std::cout << '\r' << 100. << "% " << total_tests << '/' << total_tests << std::endl;
+#else // ndef WAHL_MULTITHREAD_STATUS_ANSI
+
+    std::cout << std::fixed;
+    std::cout.precision(1);
+    while (current_test < total_tests + (long long)threads) {
+        long long mintest = total_tests;
+        for (int i = 0; i < threads; ++i) {
+            mintest = std::min(mintest,(long long)searchers[i].current_test);
+        }
+        std::cout << '\r' << double(mintest)*100./double(total_tests) << "% " << mintest << "/" << total_tests;
+        std::cout.flush();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+    for (int i = 0; i < threads; ++i) {
+        spawns[i].join();
+    }
+    std::cout << '\r' << 100. << "% " << total_tests << '/' << total_tests << std::endl;
+
+#endif // WAHL_MULTITHREAD_STATUS_ANSI
+
+#else // ndef PRINT_STATUS
+    for(int i = 0; i < threads; ++i) {
+        spawns[i].join();
+    }
+#endif // PRINT_STATUS
+
+#ifdef OVERFLOW_CHECK
+    
+    std::ofstream error_file(ERROR_FILE);
+    for (Searcher_Wrapper& searcher : searchers) {
+        error_file << searcher.err.rdbuf();
+    }
+    error_file.close();
+
+#endif // OVERFLOW_CHECK
+
+    Write(searchers);
+
+#else // ndef WAHL_MULTITHREAD
+    Searcher_Wrapper searcher;
+    searcher.parent = this;
+#ifdef PRINT_STATUS
+    std::cout << std::fixed;
+    std::cout.precision(1);
+    searcher.search();
+    std::cout << std::endl;
+#else // ndef PRINT_STATUS
+    searcher.search();
+#endif // PRINT_STATUS 
+
+#ifdef OVERFLOW_CHECK
+
+    std::ofstream error_file(ERROR_FILE);
+    error_file << searcher.err.rdbuf();
+    error_file.close();
+
+#endif // OVERFLOW_CHECK
+
+    Write(searcher);
+
+#endif // WAHL_MULTITHREAD
+
+}
+
+void Wahl::Write(std::vector<Searcher_Wrapper>& searchers) {
+    // If keep_first is not global, we can push all examples from all threads in any order, and after sorting the result is deterministic.
+    std::vector<Example> example_vector;
+    size_t total_examples = 0;
+    for (Searcher_Wrapper& searcher : searchers) total_examples += searcher.results.size();
+    example_vector.reserve(total_examples);
+
+    if (reader.keep_first != Reader::keep_global_) {
+        for (Searcher_Wrapper& searcher : searchers) {
+            while(!searcher.results.empty()) {
+                example_vector.push_back(std::move(searcher.results.front()));
+                searcher.results.pop();
+            }
+        }
+    }
+    else {
+        // Keep a priority_queue of pairs, the first item being the test number, the second being the id of the searcher.
+        // The top item in the queue will have the smallest test number, so it shall be processed, along with all examples of the same test number
+        // After processing all examples of the given test number, add to the queue the next test number of the same searcher.
+        std::priority_queue<std::pair<long long,int>, std::vector<std::pair<long long,int>>, std::greater<std::pair<long long,int>>> q;
+
+        // Only the first example of each type will be added.
+        std::unordered_set<single_invariant,ill_hash> single_found;
+        std::unordered_set<double_invariant,illll_hash> double_found;
+        std::unordered_set<P_extremal_invariant,ill_hash> p_extremal_found;
+        std::set<single_QHD_invariant> single_QHD_found;
+        std::set<double_QHD_invariant> double_QHD_found;
+
+        for (int i = 0; i < searchers.size(); ++i) {
+            if (!searchers[i].results.empty()) {
+                q.emplace(searchers[i].results.front().test,i);
+            }
+        }
+
+        while (!q.empty()) {
+            const auto p = q.top();
+            q.pop();
+            const long long& test = p.first;
+            auto& searcher_queue = searchers[p.second].results;
+            while (!searcher_queue.empty() and searcher_queue.front().test == test) {
+                auto& ex = searcher_queue.front();
+
+                // In case of seeing an extremal resolution, add the next example too.
+                bool next_paired = false;
+
+                if (ex.type == Example::single_) {
+                    auto key = std::make_tuple(ex.K2,ex.n[0],std::min(ex.a[0],ex.n[0]-ex.a[0]));
+                    if (contains(single_found,key)) {
+                        searcher_queue.pop();
+                        continue;
+                    }
+                    else {
+                        single_found.insert(key);
+                    }
+                }
+                else if (ex.type == Example::p_extremal_) {
+                    auto Delta = ex.Delta;
+                    auto Omega = ex.Omega;
+                    auto Omega_unif = algs::gcd_invmod(Delta,Omega).second;
+                    Omega = std::min(Omega,Omega_unif);
+                    auto key = std::make_tuple(ex.K2,Delta,Omega);
+
+                    next_paired = ex.worm_hole and !ex.worm_hole_conjecture_counterexample;
+
+                    if (contains(p_extremal_found,key)) {
+                        searcher_queue.pop();
+                        if (next_paired) {
+                            // Skip the next one too.
+                            searcher_queue.pop();
+                        }
+                        continue;
+                    }
+                    else {
+                        p_extremal_found.insert(key);
+                    }
+                }
+                else if (ex.type == Example::double_) {
+                    auto unif_inv = Writer::uniformize_double_by_n(ex.n,ex.a);
+                    auto key = std::make_tuple(ex.K2,std::get<0>(unif_inv),std::get<1>(unif_inv),std::get<2>(unif_inv),std::get<3>(unif_inv));
+                    if (contains(double_found,key)) {
+                        searcher_queue.pop();
+                        continue;
+                    }
+                    else {
+                        double_found.insert(key);
+                    }
+                }
+                else if (ex.type >= Example::QHD_single_a_ and ex.type <= Example::QHD_single_j_) {
+                    auto key = std::make_tuple(ex.K2,(char)ex.type,ex.p,ex.q,ex.r);
+                    if (contains(single_QHD_found,key)) {
+                        searcher_queue.pop();
+                        continue;
+                    }
+                    else {
+                        single_QHD_found.insert(key);
+                    }
+                }
+                else if (ex.type >= Example::QHD_double_a_ and ex.type <= Example::QHD_partial_j_) {
+                    auto key = std::make_tuple(ex.K2,(char)ex.type,ex.p,ex.q,ex.r,ex.n[1],std::min(ex.a[1],ex.n[1] - ex.a[1]));
+                    if (contains(double_QHD_found,key)) {
+                        searcher_queue.pop();
+                        continue;
+                    }
+                    else {
+                        double_QHD_found.insert(key);
+                    }
+                }
+                example_vector.push_back(std::move(ex));
+                searcher_queue.pop();
+                if (next_paired) {
+                    // Add the next one too.
+                    example_vector.push_back(std::move(searcher_queue.front()));
+                    searcher_queue.pop();
+                }
+            }
+            if (!searcher_queue.empty()) {
+                q.emplace(searcher_queue.front().test,p.second);
+            }
+        }
+    }
+    std::cout << "Done! Found " << example_vector.size() << " examples." << std::endl;
+    Write(example_vector);
+}
+
+
+void Wahl::Write(Searcher_Wrapper& searcher) {
+
+    // Move all the results into a vector and also create another vector of references to it. We will sort the second one to export to the jsonl and summary files. Also, use the un sorted vector to recover the pairs of examples given by worm holes.
+    std::vector<Example> example_vector;
+    example_vector.reserve(searcher.results.size());
+    while (!searcher.results.empty()) {
+        example_vector.push_back(std::move(searcher.results.front()));
+        searcher.results.pop();
+    }
+    std::cout << "Done! Found " << example_vector.size() << " examples." << std::endl;
+    Write(example_vector);
+}
+
+void Wahl::Write(std::vector<Example>& example_vector) {
+
+    std::vector<Example*> ptr_example_vector;
+    ptr_example_vector.reserve(example_vector.size());
+    for (Example& ex : example_vector) ptr_example_vector.push_back(&ex);
+
+    if (reader.summary_sort == Reader::sort_by_n_) {
+        std::stable_sort(ptr_example_vector.begin(),ptr_example_vector.end(),
+            [] (const Example* a, const Example* b) -> bool {
+                return Writer::less_by_n(*a,*b);
+            }
+        );
+    }
+    else if (reader.summary_sort == Reader::sort_by_length_) {
+        std::stable_sort(ptr_example_vector.begin(),ptr_example_vector.end(),
+            [] (const Example* a, const Example* b) -> bool {
+                return Writer::less_by_length(*a,*b);
+            }
+        );
+    }
+
+    for (int i = 0; i < ptr_example_vector.size(); ++i) {
+        ptr_example_vector[i]->export_id = i;
+    }
+
+    for (int i = 0; i < example_vector.size(); ++i) {
+        auto& ex = example_vector[i];
+        if (ex.type == Example::p_extremal_ and ex.worm_hole and !ex.worm_hole_conjecture_counterexample) {
+            // wormhole found. This example is paired with the next one in example_vector
+            ex.worm_hole_id = example_vector[i+1].export_id;
+            example_vector[i+1].worm_hole_id = ex.export_id;
+            
+            // Skip next example as it's already paired with this one.
+            i++;
+        }
+    }
+    Writer::export_jsonl(reader,ptr_example_vector);
+    
+    if (reader.summary_style == Reader::plain_text_) {
+        Writer::export_summary_text(reader,ptr_example_vector);
+    }
+    else if (reader.summary_style == Reader::latex_table_) {
+        Writer::export_summary_latex(reader,ptr_example_vector);
+    }
+}
