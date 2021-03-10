@@ -10,7 +10,7 @@
 // #define NDEBUG
 
 // uncomment for single thread executable, or use flag -D WAHL_MULTITHREAD
-#define WAHL_MULTITHREAD
+// #define WAHL_MULTITHREAD
 #define WAHL_MAX_THREADS 16
 
 
@@ -20,7 +20,7 @@
 #define PRINT_STATUS
 
 // If multithread, we can print a nicer status if we allow ANSI escape characters
-#define WAHL_MULTITHREAD_STATUS_ANSI
+// #define WAHL_MULTITHREAD_STATUS_ANSI
 
 // Add some sort of overflow check in calculating continued fractions.
 // TODO: If it happens, use Boost multiprecision instead of ll.

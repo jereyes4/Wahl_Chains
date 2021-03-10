@@ -190,8 +190,8 @@ Reader::Reader() {
     summary_sort = sort_by_n_;
     nef_check = skip_;
     effective_check = skip_;
-    obstruction_check = no_;
-    keep_first = keep_local_;
+    obstruction_check = skip_;
+    keep_first = keep_global_;
     section_input_mode = by_self_intersection_;
     only_do_pretest = false;
     search_single_chain = true;
