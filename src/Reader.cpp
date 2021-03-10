@@ -199,7 +199,7 @@ Reader::Reader() {
     search_single_QHD = false;
     search_double_QHD = false;
     summary_include_gcd = false;
-    latex_include_subsection = true;
+    latex_include_subsection = false;
     line_no = 0;
     curve_no = 0;
     tests_no = 1;
@@ -394,6 +394,36 @@ void Reader::parse_option(const vector<string>& tokens) {
         }
         else {
             error("Invalid argument for \'Summary_Style\': " + tokens[1]);
+        }
+        return;
+    }
+    else if (tokens[0] == "Summary_Include_GCD:") {
+        if (tokens.size() != 2) {
+            error("Option \'Summary_Include_GCD\' must take exactly one argument.");
+        }
+        if (tokens[1] == "Y") {
+            summary_include_gcd = true;
+        }
+        else if (tokens[1] == "N") {
+            summary_include_gcd = false;
+        }
+        else {
+            error("Invalid argument for \'Summary_Include_GCD\': " + tokens[1]);
+        }
+        return;
+    }
+    else if (tokens[0] == "LaTeX_Include_Subsection:") {
+        if (tokens.size() != 2) {
+            error("Option \'LaTeX_Include_Subsection\' must take exactly one argument.");
+        }
+        if (tokens[1] == "Y") {
+            latex_include_subsection = true;
+        }
+        else if (tokens[1] == "N") {
+            latex_include_subsection = false;
+        }
+        else {
+            error("Invalid argument for \'LaTeX_Include_Subsection\': " + tokens[1]);
         }
         return;
     }
