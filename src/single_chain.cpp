@@ -225,6 +225,7 @@ void Searcher::explore_single_candidate(vector<int>& chain) {
             admissible = algs::reduce(chain,reduced_self_int,reduced_chain,ignore);
             ignore.clear();
             if (!admissible) continue;
+            if (reduced_self_int[start] == -2) continue;
 
             // size after reducing chain.
             int local_size = reduced_chain.size();

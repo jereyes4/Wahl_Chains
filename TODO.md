@@ -60,16 +60,15 @@
 
 ## 1 QHD, 1 cadena (QHD_double_chain.cpp + double_chain.cpp)
 - [ ] Filtrar separaciones del grafo y extraer tenedores y cadenas.
+  - [ ] Caso general.
+  - [ ] Posible caso con extra blowups sobre el tenedor a partir de tenedor cícliclo.
+  - [ ] Posible caso con extra blowups sobre el tenedor a partir de una o dos cadenas.
   - [x] Optimizar: evitar repeteciones (fácil).
   - [ ] Optimizar: evitar repeteciones (dificil).
 - ### No resolución parcial:
-  - [ ] Posible caso con extra blowups sobre el tenedor a partir de tenedor cícliclo.
-  - [ ] Posible caso con extra blowups sobre el tenedor a partir de una o dos cadenas.
-  - [ ] Testeo de blowups extra sobre la cadena.
+  - [x] Testeo de blowups extra sobre la cadena.
   - [ ] Verificación QHD + Wahl + cálculo de invariantes.
 - ### Resolución parcial:
-  - [ ] Posible caso con extra blowups sobre el tenedor a partir de tenedor cíclico.
-  - [ ] Posible caso con extra blowups sobre el tenedor a partir de una cadena.
   - [ ] Contracción de ramas de tenedores.
   - ### Caso separación en un blowup.
     - [ ] Testear todas las separaciones en un blowup.

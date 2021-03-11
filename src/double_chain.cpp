@@ -352,6 +352,7 @@ void Searcher::explore_double_candidate(vector<int> (&chain)[2]) {
                 admissible = algs::reduce(chain[0],reduced_self_int,reduced_chain[0],ignore);
                 ignore.clear();
                 if (!admissible) continue;
+                if (reduced_self_int[start] == -2) continue;
 
                 // size after reducing chain.
                 int local_size = reduced_chain[0].size();
@@ -418,7 +419,7 @@ void Searcher::explore_double_candidate(vector<int> (&chain)[2]) {
     }
     else { // Delta != 0, Case 2,3.
 
-        // We can always assume delta > 0 by swapping the chains. This reduces the third case to the second case. keep track of swaps since we must return chain as it was before.
+        // We can always assume Delta > 0 by swapping the chains. This reduces the third case to the second case. keep track of swaps since we must return chain as it was before.
         bool swapped = false;
         if (Delta < 0) {
             Delta = -Delta;
@@ -439,6 +440,7 @@ void Searcher::explore_double_candidate(vector<int> (&chain)[2]) {
                 reduced_self_int = G.self_int;
                 bool admissible = algs::reduce(chain[0],reduced_self_int,reduced_chain[0],ignore);
                 if (!admissible) continue;
+                if (reduced_self_int[reduced_chain[0][0]] == -2) continue;
 
                 // Every possibility with blow ups will result in the same first chain, so check beforehand if it is Wahl.
                 for (int extra_n = 0; extra_n < Delta; ++extra_n) {
@@ -519,11 +521,11 @@ void Searcher::explore_double_candidate(vector<int> (&chain)[2]) {
                     reduced_self_int = G.self_int;
 
                     ignore.insert({A,B});
-                    bool admissible = algs::reduce(chain[0],reduced_self_int,reduced_chain[0],ignore);
-                    admissible = admissible && algs::reduce(chain[1],reduced_self_int,reduced_chain[1],ignore);
+                    bool admissible = algs::reduce(chain[0],reduced_self_int,reduced_chain[0],ignore)
+                                    && algs::reduce(chain[1],reduced_self_int,reduced_chain[1],ignore);
                     ignore.clear();
                     if (!admissible) continue;
-
+                    if (reduced_self_int[reduced_chain[0][0]] == -2 or reduced_self_int[reduced_chain[1][0]] == -2) continue;
 
                     // self intersections
                     int A2 = reduced_self_int[A];

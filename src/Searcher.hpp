@@ -266,6 +266,7 @@ public:
     // Function can split into the regular double chain version.
     void search_for_QHD3_single_chain();
 
+    // Reduces the fork here, so it just uses G.self_int
     void verify_QHD3_single_candidate(
         const std::vector<int> (&fork)[3], int extra_id = -1,
         int extra_n = 0, int extra_orig = -1, int extra_pos = -1
@@ -283,6 +284,12 @@ public:
     );
 
     void explore_QHD3_partial_resolution(std::vector<int> (&fork)[3], int extra_branch_orig, bool skip_first_branch);
+
+    void verify_QHD3_double_candidate(
+        const std::vector<int> (&fork)[3], const std::vector<int>& chain,
+        const std::vector<int>& local_self_int,
+        int extra_n[2], int extra_orig[2], int extra_pos[2], int extra_id = -1
+    );
 
     //////////////////////////////////////////////////////
 
