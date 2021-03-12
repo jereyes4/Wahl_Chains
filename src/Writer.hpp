@@ -207,6 +207,16 @@ namespace Writer {
         f << '}';
     }
 
+    template<size_t n>
+    static void json_export_array(std::ostream& f, const char* name, const int var[n]) {
+        f << '\"' << name << "\":[";
+        for (int i = 0; i < n; ++i) {
+            f << var[i];
+            if (i != n-1) f << ',';
+        }
+        f << ']';
+    }
+
     static void json_export_vector(std::ostream& f, const char* name, const std::vector<int>& var) {
         f << '\"' << name << "\":[";
         for (auto iter = var.begin(); iter != var.end(); ++iter) {
@@ -500,6 +510,8 @@ namespace Writer {
             f << ',';
             json_export_number(f,"r",example.r);
             f << ',';
+            json_export_array<3>(f,"perm",example.branch_permutation);
+            f << ',';
             json_export_vector(f,"selfint",example.self_int);
             f << ',';
             json_export_vector(f,"disc",example.discrepancies);
@@ -563,6 +575,8 @@ namespace Writer {
             json_export_number(f,"q",example.q);
             f << ',';
             json_export_number(f,"r",example.r);
+            f << ',';
+            json_export_array<3>(f,"perm",example.branch_permutation);
             f << ',';
             json_export_vector(f,"chain",example.chain[1]);
             f << ',';

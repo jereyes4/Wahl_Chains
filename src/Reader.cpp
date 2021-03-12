@@ -204,6 +204,7 @@ Reader::Reader() {
     curve_no = 0;
     tests_no = 1;
     tests_start_index = 0;
+    max_test_number = 1;
     K.self_int = 0;
     fixed_curves.resize(1);
     try_curves.resize(1);
@@ -318,7 +319,11 @@ void Reader::parse(istream& input) {
         default:;
         }
     }
-    // assert(curve_no == self_int.size());
+    
+    if (tests_no > 1 and tests_start_index + tests_no > max_test_number) {
+        warning("Test range exedes number of tests given by curve options. Redundant tests are ignored.");
+        tests_no = std::max(1,max_test_number - tests_start_index);
+    }
     for (int i = 0; i < curve_no; ++i) {
         if (contains(adj_list[i],i)) {
             error("Curve \'" + curve_name[i] + "\' still has singularities.");
@@ -336,6 +341,10 @@ void Reader::parse_option(const vector<string>& tokens) {
             if (!safe_stoi(tokens[1],value) or value < 1) {
                 error("Invalid number for option \'Tests\': " + tokens[1]);
             }
+            if (value > MAX_TESTS) {
+                warning("Number of tests cannot exceed " + to_string(MAX_TESTS) + ". Further test ignored.");
+                value = MAX_TESTS;
+            }
             tests_no = value;
             fixed_curves.resize(tests_no);
             try_curves.resize(tests_no);
@@ -350,6 +359,11 @@ void Reader::parse_option(const vector<string>& tokens) {
             }
             if (!safe_stoi(tokens[3],finish) or finish < start) {
                 error("Invalid number for option \'Tests\': " + tokens[3]);
+            }
+            if (finish > MAX_TESTS) {
+                warning("Tests cannot exceed " + to_string(MAX_TESTS) + ". Range clamped to [1," + to_string(MAX_TESTS) + "].");
+                start = std::min(start,MAX_TESTS);
+                finish = MAX_TESTS;
             }
             tests_no = finish - start + 1;
             tests_start_index = start - 1;
@@ -609,7 +623,7 @@ void Reader::parse_option(const vector<string>& tokens) {
             error("Option \'Threads\' must take exactly one argument.");
         }
         int value;
-        if (!safe_stoi(tokens[1],value) or value < 1 or value > WAHL_MAX_THREADS) {
+        if (!safe_stoi(tokens[1],value) or value < 1 or value > MAX_THREADS) {
             error("Invalid number for option \'Threads\': " + tokens[1]);
         }
 #ifdef WAHL_MULTITHREAD
@@ -687,6 +701,8 @@ void Reader::parse_fiber(const vector<string>& def_tokens, const vector<string>&
             adj_list[initial_index + i].insert(initial_index + neighbor);
         }
     }
+
+    max_test_number = std::max(max_test_number,(int)def_tokens.size() - 1);
     string option = def_tokens.size() == 1 ? "T" : def_tokens.back();
     for (int t = 0; t < tests_no; ++t) {
         if (def_tokens.size() > t + 1 + tests_start_index) {
@@ -745,6 +761,7 @@ void Reader::parse_section(const vector<string>& def_tokens, const vector<string
         self_int.emplace_back(2*intersections[this_id] - 2 - current_section_argument - K.exceptional_intersection(intersections));
     }
 
+    max_test_number = std::max(max_test_number,(int)def_tokens.size() - 1);
     string option = def_tokens.size() == 1 ? "T" : def_tokens.back();
     for (int t = 0; t < tests_no; ++t) {
         if (def_tokens.size() > t + 1 + tests_start_index) {
@@ -813,6 +830,7 @@ void Reader::parse_merge(const vector<string>& def_tokens, const vector<string>&
     }
     K.blowup(this_id, intersections);
     
+    max_test_number = std::max(max_test_number,(int)def_tokens.size() - 1);
     string option = def_tokens.size() == 1 ? "T" : def_tokens.back();
     for (int t = 0; t < tests_no; ++t) {
         if (def_tokens.size() > t + 1 + tests_start_index) {

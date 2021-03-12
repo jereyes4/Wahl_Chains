@@ -983,7 +983,7 @@ void Searcher::verify_double_candidate(const vector<int> (&chain)[2], const vect
     }
 
     // Found example
-    // Local stuff such as Wahl_chain, bd_linked_list can be std::moved
+    // Local stuff such as discrepancies be std::moved
     Example example = Example();
     example.test = current_test;
     example.type = Example::double_;

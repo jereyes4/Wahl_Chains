@@ -101,6 +101,7 @@ Following is the full list of settings and their possible options:
 
 - `Tests`: Takes a range of positive numbers, for example "`2 - 5`". It determines a range of tests to be performed on the configuration. The difference between these tests is determined by the options given later for each curve.  
   Can also take a single number `n`, which is effectively equivalent to the range "`1 - n`".  
+  Values are clamped below the hard limit of `100`, given by the macro `MAX_TESTS` in `config.hpp`.
   Defaults to `1`.
 - `Output`: Takes the name of the file where a database of examples will be exported. It will be of extension `.jsonl`. For example if one writes
 
@@ -162,7 +163,7 @@ Following is the full list of settings and their possible options:
   
   When an example is obtained such that its invariants were already found, it gets immediately discarded. This means that if any check is set to `print` and the first example found did not pass the test, but the second example did, then only the less interesting example is included in the results. Thus an option other than `global` still has some merit.  
   Defaults to `global`.
-- `Threads`: The amount of threads to spawn with multi thread support. Has a hard limit of `16`, given by the macro `WAHL_MAX_THREADS` in `config.hpp`.  
+- `Threads`: The amount of threads to spawn with multi thread support. Has a hard limit of `16`, given by the macro `MAX_THREADS` in `config.hpp`.  
   Defaults to `1`.
 - `Sections_Input`: Determines the meaning of the parameter when adding curves. Takes two options:
   - `By_Self_Intersection`: The parameter for sections correspond to their self intersection in the original surface $Y$.

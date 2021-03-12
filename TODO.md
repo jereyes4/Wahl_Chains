@@ -67,7 +67,7 @@
   - [ ] Optimizar: evitar repeteciones (dificil).
 - ### No resolución parcial:
   - [x] Testeo de blowups extra sobre la cadena.
-  - [ ] Verificación QHD + Wahl + cálculo de invariantes.
+  - [x] Verificación QHD + Wahl + cálculo de invariantes.
 - ### Resolución parcial:
   - [ ] Contracción de ramas de tenedores.
   - ### Caso separación en un blowup.

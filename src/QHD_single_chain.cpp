@@ -159,10 +159,13 @@ void Searcher::verify_QHD3_single_candidate(const vector<int> (&fork)[3], int ex
     example.p = data.p;
     example.q = data.q;
     example.r = data.r;
+    for (int i = 0; i < 3; ++i) {
+        example.branch_permutation[i] = data.which_branch[i];
+    }
     example.extra_n[0] = extra_n;
     example.extra_orig[0] = extra_orig;
     example.extra_pos[0] = extra_pos;
-    example.chain[0].reserve(reduced_fork[0].size() + reduced_fork[1].size() + reduced_fork[1].size());
+    example.chain[0].reserve(reduced_fork[0].size() + reduced_fork[1].size() + reduced_fork[2].size());
     for (int i = 0; i < 3; ++i) {
         example.chain[0].insert(example.chain[0].end(),reduced_fork[i].begin(),reduced_fork[i].end());
     }

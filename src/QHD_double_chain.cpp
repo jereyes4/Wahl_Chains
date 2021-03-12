@@ -168,6 +168,8 @@ void Searcher::search_for_QHD3_double_chain() {
                 if (cyclic) {
                     // Case 4
                     if (contains(G.disconnections[chain[0]],chain.back())) continue;
+
+                    
                 }
                 else {
                     // Case 6
@@ -210,7 +212,7 @@ void Searcher::search_for_QHD3_double_chain() {
         the self intersection of that curve in the fork, reduce the fork and test for QHD.
 
 */
-void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>& chain, int extra_id = -1, int extra_n = 0, int extra_orig = -1, int extra_pos = -1) {
+void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>& chain, int extra_id, int extra_n, int extra_orig, int extra_pos) {
 
     static thread_local vector<int> location;
 
@@ -451,6 +453,108 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
     }
 }
 
-void Searcher::verify_QHD3_double_candidate(const std::vector<int> (&fork)[3], const std::vector<int>& chain, const std::vector<int>& local_self_int, int extra_n[2], int extra_orig[2], int extra_pos[2], int extra_id = -1) {
+void Searcher::verify_QHD3_double_candidate(const std::vector<int> (&fork)[3], const std::vector<int>& chain, const std::vector<int>& local_self_int, int extra_n[2], int extra_orig[2], int extra_pos[2], int extra_id) {
+    auto QHD_invariants = algs::get_QHD_type(fork,local_self_int);
+    if (QHD_invariants.type == algs::QHD_Type::none) return;
+
+    auto chain_invariants = algs::get_wahl_numbers(chain,local_self_int);
+
+#ifdef OVERFLOW_CHECK
+    if (chain_invariants.second == -1){
+        *err <<  "Overflow:\n"
+                "   Test: " << current_test << ".\n"
+                "   Chain:";
+        for (int x : chain) *err << ' ' << x;
+        *err << '\n';
+        return;
+    }
+#endif
+
+    if (chain_invariants.first == 0) return;
+    double_QHD_invariant unif_invariants(
+        current_K2,
+        QHD_invariants.type,
+        QHD_invariants.p,
+        QHD_invariants.q,
+        QHD_invariants.r,
+        chain_invariants.first,
+        std::min(chain_invariants.second, chain_invariants.first - chain_invariants.second)
+    );
+    if (reader_copy.keep_first != Reader::no_ and contains(double_QHD_found,unif_invariants)) return;
+    static thread_local vector<long long> discrepancies;
+    discrepancies.resize(local_self_int.size(),0);
+    long long QHD_denominator = algs::get_QHD_discrepancies(fork,local_self_int,QHD_invariants,discrepancies);
+    algs::get_discrepancies(chain_invariants.first,chain_invariants.second,chain,discrepancies);
+
+
+    static thread_local vector<int> location;
+    location.assign(local_self_int.size(),-1);
+    for (int i = 0; i < 3; ++i) for (int curve : fork[i]) location[curve] = 0;
+    for (int curve : chain) location[curve] = 1;
+    long long n[2] = {QHD_denominator,chain_invariants.first};
     
+    pair<bool,bool> nef_result;
+    if (reader_copy.nef_check != Reader::no_) {
+        int borders[2] = {extra_id,chain.back()};
+        nef_result = double_is_nef(local_self_int,discrepancies,location,n,extra_n,extra_orig,extra_pos,borders);
+    }
+    if (reader_copy.nef_check == Reader::skip_ and !nef_result.first) {
+        return;
+    }
+
+    bool effective = false;
+    if (reader_copy.effective_check != Reader::no_) {
+        effective = double_is_effective(local_self_int,discrepancies,location,n);
+    }
+    if (reader_copy.effective_check == Reader::skip_ and !effective) {
+        return;
+    }
+
+    // Example found
+    Example example = Example();
+
+    example.test = current_test;
+    example.type = Example::Type(Example::QHD_double_a_ + QHD_invariants.type - 1);
+    example.K2 = current_K2;
+    example.complete_fibers = current_complete_fibers;
+    example.used_curves.insert(curve_translate.begin(),curve_translate.end());
+    for (int exceptional : reader_copy.K.used_components) {
+        if (temp_self_int[exceptional] == INT_MAX) {
+            example.blown_down_exceptionals.insert(exceptional);
+        }
+    }
+    example.blowups = G.connections;
+    example.n[0] = n[0];
+    example.n[1] = n[1];
+    example.a[1] = chain_invariants.second;
+    example.p = QHD_invariants.p;
+    example.q = QHD_invariants.q;
+    example.r = QHD_invariants.r;
+    for (int i = 0; i < 3; ++i) {
+        example.branch_permutation[i] = QHD_invariants.which_branch[i];
+    }
+    example.extra_n[0] = extra_n[0];
+    example.extra_n[1] = extra_n[1];
+    example.extra_orig[0] = extra_orig[0];
+    example.extra_orig[1] = extra_orig[1];
+    example.extra_pos[0] = extra_pos[0];
+    example.extra_pos[1] = extra_pos[1];
+    
+    example.chain[0].reserve(fork[0].size() + fork[1].size() + fork[2].size());
+    for (int i = 0; i < 3; ++i) {
+        example.chain[0].insert(example.chain[0].end(),fork[i].begin(),fork[i].end());
+    }
+    example.chain[1] = chain;
+    example.self_int = local_self_int;
+    example.discrepancies = std::move(discrepancies);
+    example.no_obstruction = current_no_obstruction;
+    example.nef = nef_result.first;
+    example.nef_warning = nef_result.second;
+    example.effective = effective;
+
+    results->push(std::move(example));
+
+    if (reader_copy.keep_first != Reader::no_) {
+        double_QHD_found.insert(unif_invariants);
+    }
 }

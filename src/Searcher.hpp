@@ -90,6 +90,7 @@ struct Example {
     int p;
     int q;
     int r;
+    int branch_permutation[3];
     int extra_n[2];
     int extra_orig[2];
     int extra_pos[2];

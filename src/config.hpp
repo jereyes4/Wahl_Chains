@@ -11,8 +11,6 @@
 
 // uncomment for single thread executable, or use flag -D WAHL_MULTITHREAD
 // #define WAHL_MULTITHREAD
-#define WAHL_MAX_THREADS 16
-
 
 // Status is printed in Wahl::Wahl() if compiled with multithread support.
 // Status is printed in Searcher::search() if compiled without multithread.
@@ -31,6 +29,9 @@
 // I guess really only useful when Keep_first is set to No.
 // #define NO_REPEATED_SEARCH
 
+// Some hard limits
+#define MAX_TESTS 100
+#define MAX_THREADS 16
 
 #define DEFAULT_OUTPUT_NAME "OUT"
 #define DEFAULT_SUMMARY_NAME "SUMMARY"

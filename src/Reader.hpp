@@ -137,6 +137,7 @@ public:
 
     int tests_no;
     int tests_start_index;
+    int max_test_number;
     int line_no;
     int curve_no;
     int current_section_argument;
