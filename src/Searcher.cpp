@@ -262,7 +262,7 @@ void Searcher::search() {
             last_time = this_time;
         }
 #endif
-        *wrapper_current_test = current_test = parent->get_test();
+        *wrapper_current_test = current_test = parent->get_test(current_test);
         while (test_index < parent->number_tests.size() and
             parent->number_tests[test_index] + test_start <= current_test) {
             test_start += parent->number_tests[test_index];

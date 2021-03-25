@@ -35,7 +35,7 @@ class Wahl;
 
 // The indexes of self_int and discrepancies are the curves id, not the positions they appear in the chains.
 // Discrepancies are actually negative integers corresponding to numerators. The denominator is n[0] or n[1], depending on where the curve belongs. If the curve is not included in any chain or it is blown down, it is set to 0.
-struct Example {
+struct alignas(64) Example {
 
     // Order very important! arithmetics are done with subjacent chars.
     enum Type : char{
@@ -110,7 +110,7 @@ struct Example {
     bool effective;
 };
 
-class Searcher {
+class alignas(64) Searcher {
 public:
     Searcher() : test_index(0), test_start(0), current_test(0){}
 
@@ -301,7 +301,7 @@ public:
 
 // A Wrapper to try to use the least amount of shared memory possible. Build everything on 'local stack'.
 // Is this useful? IDK.
-class Searcher_Wrapper {
+class alignas(64) Searcher_Wrapper {
 public:
     std::queue<Example> results;
     Wahl *parent;

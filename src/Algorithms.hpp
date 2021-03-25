@@ -43,16 +43,16 @@ namespace algs {
         return a/gcd(a,b)*b;
     }
 
-    // Assigns to result the resolution of the singularity represented by q/m
-    static void to_chain(long long q, long long m, std::vector<int>& result) {
+    // Assigns to result the resolution of the singularity represented by m/q
+    static void to_chain(long long m, long long q, std::vector<int>& result) {
         result.resize(0);
-        while (q%m) {
-            result.push_back(-1-q/m);
-            auto temp = m;
-            m = m - q%m;
-            q = temp;
+        while (m%q) {
+            result.push_back(-1-m/q);
+            auto temp = q;
+            q = q - m%q;
+            m = temp;
         }
-        result.push_back(-q/m);
+        result.push_back(-m/q);
     }
 
     // Returns the fraction representing the singularity using curves from [start, end].

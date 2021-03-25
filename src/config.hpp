@@ -29,9 +29,17 @@
 // I guess really only useful when Keep_first is set to No.
 // #define NO_REPEATED_SEARCH
 
-// Some hard limits
+//////////////////////////////////////////////////////////
+// Some hard limits. Keep MAX_THREADS and BULK_SIZE a power of two.
+
 #define MAX_TESTS 100
 #define MAX_THREADS 16
+
+// On multithread mode, avoid cache incoherence by giving threads bulks of tests.
+// The last MAX_THREADS*BULK_SIZE tests are checked one by one to avoid idle threads.
+#define BULK_SIZE 512
+
+//////////////////////////////////////////////////////////
 
 #define DEFAULT_OUTPUT_NAME "OUT"
 #define DEFAULT_SUMMARY_NAME "SUMMARY"
