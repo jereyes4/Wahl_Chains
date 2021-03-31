@@ -20,6 +20,7 @@ public:
 #else
         // The last bunch if tests should be done one by one, not in bulk.
         if (total_tests < BULK_SIZE*MAX_THREADS) {
+            // If there are too little tests, ignore bulks.
             return current_test.fetch_add(1,std::memory_order_relaxed);
         }
 

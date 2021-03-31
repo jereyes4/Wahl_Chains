@@ -78,7 +78,14 @@ void Searcher::search_for_double_chain_inner_loop() {
                     chain[0].emplace_back(cycle[0][(i+j+1)%G.size]);
                 }
                 G.blowup(a,b);
-                explore_p_extremal_resolution(chain[0]);
+
+                if constexpr (chain_search) {
+                    explore_p_extremal_resolution(chain[0]);
+                }
+
+                if constexpr (QHD_search) {
+                    get_fork_from_one_chain_for_double(chain[0]);
+                }
 
                 // We can avoid checking the same pair twice if we only
                 // move from chain[0] to chain[1] i times.
@@ -89,9 +96,15 @@ void Searcher::search_for_double_chain_inner_loop() {
                     const int c = chain[0].back();
                     const int d = chain[1].back();
                     G.blowup(c,d);
-                    explore_double_candidate(chain);
+                    if constexpr (chain_search) {
+                        explore_double_candidate(chain);
+                    }
+                    if constexpr (QHD_search) {
+                        get_fork_from_two_chains_for_double(chain);
+                    }
                     G.revert();
                 }
+
                 G.revert();
             }
         }
@@ -132,7 +145,12 @@ void Searcher::search_for_double_chain_inner_loop() {
                     for (int j = 0; j < cycle[1].size(); ++j) {
                         chain[1].emplace_back(cycle[1][(i2+j+1)%cycle[1].size()]);
                     }
-                    explore_double_candidate(chain);
+                    if constexpr (chain_search) {
+                        explore_double_candidate(chain);
+                    }
+                    if constexpr (QHD_search) {
+                        get_fork_from_two_chains_for_double(chain);
+                    }
                     G.revert();
                 }
                 G.revert();
@@ -151,7 +169,13 @@ void Searcher::search_for_double_chain_inner_loop() {
         if (seen.check_and_add(chain[0])) return;
 #endif
         
-        explore_p_extremal_resolution(chain[0]);
+        if constexpr (chain_search) {
+            explore_p_extremal_resolution(chain[0]);
+        }
+
+        if constexpr (QHD_search) {
+            get_fork_from_one_chain_for_double(chain[0]);
+        }
 
         chain[1].resize(0);
         for (int i = 1; i < G.size; ++i) {
@@ -160,7 +184,12 @@ void Searcher::search_for_double_chain_inner_loop() {
             const int a = chain[0].back();
             const int b = chain[1].back();
             G.blowup(a,b);
-            explore_double_candidate(chain);
+            if constexpr (chain_search) {
+                explore_double_candidate(chain);
+            }
+            if constexpr (QHD_search) {
+                get_fork_from_two_chains_for_double(chain);
+            }
             G.revert();
         }
     }
@@ -203,7 +232,14 @@ void Searcher::search_for_double_chain_inner_loop() {
                 for (int j = 0; j < cycle[1].size(); ++j){
                     chain[1].emplace_back(cycle[1][(i+j+1)%cycle[1].size()]);
                 }
-                explore_double_candidate(chain);
+
+                if constexpr (chain_search) {
+                    explore_double_candidate(chain);
+                }
+                if constexpr (QHD_search) {
+                    get_fork_from_two_chains_for_double(chain);
+                }
+                
                 G.revert();
             }
             return;
@@ -227,7 +263,12 @@ void Searcher::search_for_double_chain_inner_loop() {
         if (seen.check_and_add(chain[0],chain[1])) return;
 #endif
 
-        explore_double_candidate(chain);
+        if constexpr (chain_search) {
+            explore_double_candidate(chain);
+        }
+        if constexpr (QHD_search) {
+            get_fork_from_two_chains_for_double(chain);
+        }
     }
 }
 

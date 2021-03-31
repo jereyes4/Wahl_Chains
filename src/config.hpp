@@ -90,6 +90,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::pair<T,S>& p) {
 #endif
 
 #ifndef WAHL_MULTITHREAD
+// on single thread, disable thread_local storages.
 #define thread_local
 #endif
 

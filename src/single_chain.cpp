@@ -73,38 +73,7 @@ void Searcher::search_for_single_chain_inner_loop() {
                     explore_single_candidate(chain);
                 }
                 if constexpr(QHD_search) {
-                    // Playing a bit with fire: These changes kinda invalidate G
-                    // if left unchecked.
-
-                    static thread_local vector<int> fork[3];
-
-                    // Add a new curve with new id corresponding to the new (-2) we will add
-                    int new_id = G.size;
-                    G.self_int.emplace_back(-2);
-                    fork[0].resize(2);
-                    fork[0][1] = new_id;
-                    for (int frame_index = 1; frame_index < G.size - 1; ++frame_index) {
-                        int frame_cand = chain[frame_index];
-                        if (!G.disconnections[frame_cand].empty()) {
-                            fork[0][0] = frame_cand;
-                            fork[1].resize(frame_index+1);
-                            fork[2].resize(G.size - frame_index);
-                            for (int i = 0; i <= frame_index; ++i) {
-                                fork[1][frame_index - i] = chain[i];
-                            }
-                            for (int i = frame_index; i < G.size; ++i) {
-                                fork[2][i - frame_index] = chain[i];
-                            }
-                            for (int other : G.disconnections[frame_cand]) {
-                                if (other == chain[0] or other == chain.back()) continue;
-                                G.self_int[other]--;
-                                verify_QHD3_single_candidate(fork,new_id,1,frame_cand,other);
-                                G.self_int[other]++;
-                            }
-                        }
-                    }
-
-                    G.self_int.pop_back();
+                    get_fork_from_one_chain_for_single(chain);
                 }
                 G.revert();
                 chain.resize(0);
@@ -126,42 +95,11 @@ void Searcher::search_for_single_chain_inner_loop() {
             if (seen.check_and_add(chain)) return;
 #endif
 
-            if constexpr(chain_search) {
+            if constexpr (chain_search) {
                 explore_single_candidate(chain);
             }
-            if constexpr(QHD_search) {
-                // Playing a bit with fire: These changes kinda invalidate G
-                // if left unchecked.
-
-                static thread_local vector<int> fork[3];
-
-                // Add a new curve with new id corresponding to the new (-2) we will add
-                int new_id = G.size;
-                G.self_int.emplace_back(-2);
-                fork[0].resize(2);
-                fork[0][1] = new_id;
-                for (int frame_index = 1; frame_index < G.size - 1; ++frame_index) {
-                    int frame_cand = chain[frame_index];
-                    if (!G.disconnections[frame_cand].empty()) {
-                        fork[0][0] = frame_cand;
-                        fork[1].resize(frame_index+1);
-                        fork[2].resize(G.size - frame_index);
-                        for (int i = 0; i <= frame_index; ++i) {
-                            fork[1][frame_index - i] = chain[i];
-                        }
-                        for (int i = frame_index; i < G.size; ++i) {
-                            fork[2][i - frame_index] = chain[i];
-                        }
-                        for (int other : G.disconnections[frame_cand]) {
-                            if (other == chain[0] or other == chain.back()) continue;
-                            G.self_int[other]--;
-                            verify_QHD3_single_candidate(fork,new_id,1,frame_cand,other);
-                            G.self_int[other]++;
-                        }
-                    }
-                }
-
-                G.self_int.pop_back();
+            if constexpr (QHD_search) {
+                get_fork_from_one_chain_for_single(chain);
             }
         }
     }

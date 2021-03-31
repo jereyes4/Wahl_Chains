@@ -104,6 +104,42 @@ void Searcher::search_for_QHD3_single_chain() {
     } while(G.next_candidate_QHD3());
 }
 
+void Searcher::get_fork_from_one_chain_for_single(const vector<int>& chain) {
+
+    // Playing a bit with fire: These changes kinda invalidate G
+    // if left unchecked.
+
+    static thread_local vector<int> fork[3];
+
+    // Add a new curve with new id corresponding to the new (-2) we will be adding
+    const int new_id = G.size;
+    G.self_int.emplace_back(-2);
+    fork[0].resize(2);
+    fork[0][1] = new_id;
+    for (int frame_index = 1; frame_index < chain.size() - 1; ++frame_index) {
+        int frame_cand = chain[frame_index];
+        if (!G.disconnections[frame_cand].empty()) {
+            fork[0][0] = frame_cand;
+            fork[1].resize(frame_index+1);
+            fork[2].resize(chain.size() - frame_index);
+            for (int i = 0; i <= frame_index; ++i) {
+                fork[1][frame_index - i] = chain[i];
+            }
+            for (int i = frame_index; i < chain.size(); ++i) {
+                fork[2][i - frame_index] = chain[i];
+            }
+            for (int other : G.disconnections[frame_cand]) {
+                if (other == chain[0] or other == chain.back()) continue;
+                G.self_int[other]--;
+                verify_QHD3_single_candidate(fork,new_id,1,frame_cand,other);
+                G.self_int[other]++;
+            }
+        }
+    }
+
+    G.self_int.pop_back();
+}
+
 void Searcher::verify_QHD3_single_candidate(const vector<int> (&fork)[3], int extra_id, int extra_n, int extra_orig, int extra_pos) {
 
     static thread_local std::vector<int> reduced_self_int;

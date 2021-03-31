@@ -44,7 +44,7 @@ using std::unordered_set;
     4. Graph is the disjoint union of a cyclic prefork and a chain:
         If the ends of the chain were connected, discard the case, as it was taken care in 3.
         Blowup every possible intersection of the cycle in the prefork to make a fork.
-        If an end of the fork was connected to an end of the chain, discard the case as it was taken care in 1. or 2.
+        If an end of the fork was connected to an end of the chain, but no (-2) was appended at the frame, discard the case as it was taken care in 1. or 2.
         If the intersection blown up included the central framing, blowup again over the (-1) as to append a (-2) to the missing branch.
         Test for QHD + Wahl.
 
@@ -61,6 +61,13 @@ using std::unordered_set;
     7. Otherwise, the graph has at least 3 components, discard.
 
     There may be many repetitions anyways.
+
+    1. [x]
+    2. [x]
+    3. [x]
+    4. [x]
+    5. [x]
+    6. [x]
 */
 
 void Searcher::search_for_QHD3_double_chain() {
@@ -70,7 +77,7 @@ void Searcher::search_for_QHD3_double_chain() {
 #endif
 
     G.begin_search();
-    do { 
+    do {
         if (G.frame == -1) {
             if (reader_copy.search_double_chain) {
                 search_for_double_chain_inner_loop<true,true>();
@@ -83,6 +90,8 @@ void Searcher::search_for_QHD3_double_chain() {
         G.reset_extraction();
 
         static thread_local vector<int> fork[3];
+        static thread_local vector<int> chain;
+
         bool cyclic = G.extract_fork(fork);
         if ((!cyclic and fork[0].size() + fork[1].size() + fork[2].size() - 2 == G.size)
             or (cyclic and fork[0].size() + fork[2].size() - 1 == G.size)) {
@@ -94,17 +103,175 @@ void Searcher::search_for_QHD3_double_chain() {
             if (cyclic) {
                 // Case 1
 
+                /*
+                Start with fork[0] full and fork[1] empty. and sequentially pass curves from the first to the latter.
+                At each point:
+                    Test for partial resolution
+                    Iterate through fork[0] and fork[2] to make a new chain.
+                Be careful with adding (-2) curves to the central framing. There must be at most one.
+                */
+
+                fork[1].resize(1);
+                const int new_index = G.size;
+                while(fork[0].size() > 0) {
+                    int which_branch_extra = -1;
+                    int extra_n = 0;
+                    int extra_id = -1;
+                    int extra_orig = -1;
+                    int extra_pos = -1;
+                    G.blowup(fork[0].back(),fork[1].back());
+                    if (fork[1].size() == 1) {
+                        which_branch_extra = 1;
+                        extra_n = 1;
+                        extra_id = new_index;
+                        extra_orig = fork[0][0];
+                        extra_pos = fork[0].back();
+                        fork[1].emplace_back(new_index);
+                        G.self_int.emplace_back(-2);
+                        G.self_int[fork[0][0]]--;
+                        G.self_int[fork[0].back()]--;
+                    }
+                    else if (fork[0].size() == 1) {
+                        which_branch_extra = 1;
+                        extra_n = 1;
+                        extra_id = new_index;
+                        extra_orig = fork[0][0];
+                        extra_pos = fork[1].back();
+                        fork[0].emplace_back(new_index);
+                        G.self_int.emplace_back(-2);
+                        G.self_int[fork[0][0]]--;
+                        G.self_int[fork[1].back()]--;
+                    }
+                    explore_QHD3_partial_resolution(fork,extra_id,extra_n,extra_orig,extra_pos);
+
+                    // Extract chain from fork[2]
+                    while (fork[2].size() > 2) {
+                        chain.emplace_back(fork[2].back());
+                        fork[2].pop_back();
+                        G.blowup(chain.back(),fork[2].back());
+
+                        /*
+                        TODO: verify this didn't come from some other cycle
+                        */
+
+                       explore_QHD3_double_candidate(fork,chain,extra_id,extra_n,extra_orig,extra_pos);
+                       G.revert();
+                    }
+
+                    if (!extra_n) {
+                        // blowup at the end: append a -2 to the central framing.
+                        chain.emplace_back(fork[2].back());
+                        fork[2].pop_back();
+                        G.blowup(chain.back(),fork[2].back());
+                        
+                        fork[2].emplace_back(new_index);
+                        G.self_int.emplace_back(-2);
+                        G.self_int[chain.back()]--;
+                        explore_QHD3_double_candidate(fork,chain,new_index,1,fork[0][0],chain.back());
+                        G.self_int[chain.back()]++;
+                        G.self_int.pop_back();
+                        fork[2].pop_back();
+
+                        G.revert();
+                    }
+
+                    // insert the elements from the chain back into the fork
+                    fork[2].insert(fork[2].end(),chain.rbegin(),chain.rend());
+                    chain.clear();
+
+                    // Extract chain from fork[0]
+                    while (fork[0].size() > 2) {
+                        chain.emplace_back(fork[0].back());
+                        fork[0].pop_back();
+                        G.blowup(chain.back(),fork[0].back());
+
+                        /*
+                        TODO: verify this didn't come from some other cycle
+                        */
+
+                       explore_QHD3_double_candidate(fork,chain,extra_id,extra_n,extra_orig,extra_pos);
+                       G.revert();
+                    }
+
+                    if (!extra_n) {
+                        // blowup at the end: append a (-2) to the central framing.
+                        chain.emplace_back(fork[0].back());
+                        fork[0].pop_back();
+                        G.blowup(chain.back(),fork[0].back());
+                        
+                        fork[0].emplace_back(new_index);
+                        G.self_int.emplace_back(-2);
+                        G.self_int[chain.back()]--;
+                        explore_QHD3_double_candidate(fork,chain,new_index,1,fork[0][0],chain.back());
+                        G.self_int[chain.back()]++;
+                        G.self_int.pop_back();
+                        fork[0].pop_back();
+
+                        G.revert();
+                    }
+
+                    // insert the elements from the chain back into the fork
+                    fork[0].insert(fork[0].end(),chain.rbegin(),chain.rend());
+                    chain.clear();
+
+                    // undo extra blowup at central frame if there was one
+                    if (extra_n) {
+                        G.self_int[extra_pos]++;
+                        G.self_int.pop_back();
+                        fork[which_branch_extra].pop_back();
+                    }
+                    G.revert();
+                    fork[1].emplace_back(fork[0].back());
+                    fork[0].pop_back();
+                }
             }
             else {
                 // Case 2
                 if (contains(G.disconnections[fork[0].back()],fork[1].back())) continue;
                 if (contains(G.disconnections[fork[0].back()],fork[2].back())) continue;
                 if (contains(G.disconnections[fork[1].back()],fork[2].back())) continue;
+
+                explore_QHD3_partial_resolution(fork);
+
+                const int new_index = G.size;
+
+                for (int branch = 0; branch < 3; ++branch) {
+                    while(fork[branch].size() > 2) {
+                        chain.emplace_back(fork[branch].back());
+                        fork[branch].pop_back();
+                        G.blowup(chain.back(),fork[branch].back());
+
+                        /*
+                        TODO: verify this didn't come from some other cycle
+                        */
+
+                       explore_QHD3_double_candidate(fork,chain);
+                       G.revert();
+                    }
+
+                    // blowup at the end: append a -2 to the central framing.
+                    chain.emplace_back(fork[branch].back());
+                    fork[branch].pop_back();
+                    G.blowup(chain.back(),fork[branch].back());
+                    
+                    fork[branch].emplace_back(new_index);
+                    G.self_int.emplace_back(-2);
+                    G.self_int[chain.back()]--;
+                    explore_QHD3_double_candidate(fork,chain,new_index,1,fork[0][0],chain.back());
+                    G.self_int[chain.back()]++;
+                    G.self_int.pop_back();
+                    fork[branch].pop_back();
+
+                    G.revert();
+
+                    // insert the elements from the chain back into the fork
+                    fork[branch].insert(fork[branch].end(),chain.rbegin(),chain.rend());
+                    chain.clear();
+                }
             }
         }
         else {
             // Cases 3 - 7
-            static thread_local vector<int> chain;
             G.extract_chain(chain);
             if (chain.empty()) {
                 // Cases 3,5,7
@@ -119,6 +286,77 @@ void Searcher::search_for_QHD3_double_chain() {
                     // Cases 3,5
                     if (cyclic) {
                         // Case 3
+
+                        // new index for the possible extra (-2) curve.
+                        const int new_index = G.size;
+                        for (int i = 0; i < cycle.size(); ++i) {
+                            int a = cycle[i];
+                            int b = cycle[(i+1)%cycle.size()];
+
+                            if (
+                                contains(G.disconnections[a],fork[2].back())
+                                or contains(G.disconnections[b],fork[2].back())
+                            ) {
+                                // Taken care in case 1 or 2.
+                                continue;
+                            }
+
+                            G.blowup(a,b);
+                            // blowup at a.b, chain starts at b.
+                            for (int j = 0; j < cycle.size(); ++j) {
+                                chain.push_back(cycle[(i+j+1)%cycle.size()]);
+                            }
+
+                            {
+                                // start with fork[0] full and fork[1] empty (except for frame), and sequentially pass curves to it
+                                fork[1].resize(1);
+                                G.blowup(fork[0].back(),fork[1].back());
+
+                                fork[1].emplace_back(new_index);
+                                G.self_int.emplace_back(-2);
+                                G.self_int[fork[0].back()]--;
+                                explore_QHD3_double_candidate(fork,chain,new_index,1,fork[0][0],fork[0].back());
+                                G.self_int[fork[0].back()]++;
+                                G.self_int.pop_back();
+                                fork[1].pop_back();
+
+                                G.revert();
+
+                                while(fork[0].size() > 2) {
+                                    fork[1].emplace_back(fork[0].back());
+                                    fork[0].pop_back();
+                                    G.blowup(fork[0].back(),fork[1].back());
+                                    if (
+                                        !contains(G.disconnections[fork[0].back()],chain[0])
+                                        and !contains(G.disconnections[fork[0].back()],chain.back())
+                                        and !contains(G.disconnections[fork[1].back()],chain[0])
+                                        and !contains(G.disconnections[fork[1].back()],chain.back())
+                                    ) {
+                                        explore_QHD3_double_candidate(fork,chain);
+                                    }
+                                    G.revert();
+                                }
+
+                                fork[1].emplace_back(fork[0].back());
+                                fork[0].pop_back();
+                                // fork[0] now only has the frame
+
+                                G.blowup(fork[0].back(),fork[1].back());
+                                
+                                fork[0].emplace_back(new_index);
+                                G.self_int.emplace_back(-2);
+                                G.self_int[fork[1].back()]--;
+                                explore_QHD3_double_candidate(fork,chain,new_index,1,fork[0][0],fork[1].back());
+                                G.self_int[fork[1].back()]++;
+                                G.self_int.pop_back();
+                                fork[0].pop_back();
+
+                                G.revert();
+                            }
+
+                            G.revert();
+                            chain.resize(0);
+                        }
                     }
                     else {
                         // Case 5
@@ -168,8 +406,55 @@ void Searcher::search_for_QHD3_double_chain() {
                 if (cyclic) {
                     // Case 4
                     if (contains(G.disconnections[chain[0]],chain.back())) continue;
+                    if (contains(G.disconnections[chain[0]],fork[2].back())) continue;
+                    if (contains(G.disconnections[chain.back()],fork[2].back())) continue;
 
+                    // start with fork[0] full and fork[1] empty (except for frame), and sequentially pass curves to it
+                    fork[1].resize(1);
+                    G.blowup(fork[0].back(),fork[1].back());
+
+                    // new index for the (-2) curve.
+                    int new_index = G.size;
+                    fork[1].emplace_back(new_index);
+                    G.self_int.emplace_back(-2);
+                    G.self_int[fork[0].back()]--;
+                    explore_QHD3_double_candidate(fork,chain,new_index,1,fork[1][0],fork[0].back());
+                    G.self_int[fork[0].back()]++;
+                    G.self_int.pop_back();
+                    fork[1].pop_back();
+
+                    G.revert();
+
+                    while(fork[0].size() > 2) {
+                        fork[1].emplace_back(fork[0].back());
+                        fork[0].pop_back();
+                        G.blowup(fork[0].back(),fork[1].back());
+                        if (
+                            !contains(G.disconnections[fork[0].back()],chain[0])
+                            and !contains(G.disconnections[fork[0].back()],chain.back())
+                            and !contains(G.disconnections[fork[1].back()],chain[0])
+                            and !contains(G.disconnections[fork[1].back()],chain.back())
+                        ) {
+                            explore_QHD3_double_candidate(fork,chain);
+                        }
+                        G.revert();
+                    }
+
+                    fork[1].emplace_back(fork[0].back());
+                    fork[0].pop_back();
+                    // fork[0] now only has the frame
+
+                    G.blowup(fork[0].back(),fork[1].back());
                     
+                    fork[0].emplace_back(new_index);
+                    G.self_int.emplace_back(-2);
+                    G.self_int[fork[1].back()]--;
+                    explore_QHD3_double_candidate(fork,chain,new_index,1,fork[0][0],fork[1].back());
+                    G.self_int[fork[1].back()]++;
+                    G.self_int.pop_back();
+                    fork[0].pop_back();
+
+                    G.revert();
                 }
                 else {
                     // Case 6
@@ -194,6 +479,82 @@ void Searcher::search_for_QHD3_double_chain() {
     } while(G.next_candidate_QHD3());
 }
 
+
+void Searcher::get_fork_from_one_chain_for_double(const vector<int>& chain) {
+
+    // Actually this is (almost) the same as the one for single chain.
+
+    static thread_local vector<int> fork[3];
+
+    // Add a new curve with new id corresponding to the new (-2) we will add
+    const int new_id = G.size;
+    G.self_int.emplace_back(-2);
+    fork[0].resize(2);
+    fork[0][1] = new_id;
+    for (int frame_index = 1; frame_index < chain.size() - 1; ++frame_index) {
+        int frame_cand = chain[frame_index];
+        if (!G.disconnections[frame_cand].empty()) {
+            fork[0][0] = frame_cand;
+            fork[1].resize(frame_index+1);
+            fork[2].resize(chain.size() - frame_index);
+            for (int i = 0; i <= frame_index; ++i) {
+                fork[1][frame_index - i] = chain[i];
+            }
+            for (int i = frame_index; i < chain.size(); ++i) {
+                fork[2][i - frame_index] = chain[i];
+            }
+            for (int other : G.disconnections[frame_cand]) {
+                if (other == chain[0] or other == chain.back()) continue;
+                G.self_int[other]--;
+                explore_QHD3_partial_resolution(fork,new_id,1,frame_cand,other);
+                G.self_int[other]++;
+            }
+        }
+    }
+
+    G.self_int.pop_back();
+}
+
+
+void Searcher::get_fork_from_two_chains_for_double(vector<int> (&chain)[2]) {
+
+    // Actually this is quite similar to the one for single chain.
+
+    static thread_local vector<int> fork[3];
+
+    // Add a new curve with new id corresponding to the new (-2) we will add
+    const int new_id = G.size;
+    G.self_int.emplace_back(-2);
+    fork[0].resize(2);
+    fork[0][1] = new_id;
+    for (int chain_index = 0; chain_index < 2; ++chain_index) {
+        for (int frame_index = 1; frame_index < chain[chain_index].size() - 1; ++frame_index) {
+            int frame_cand = chain[chain_index][frame_index];
+            if (!G.disconnections[frame_cand].empty()) {
+                fork[0][0] = frame_cand;
+                fork[1].resize(frame_index+1);
+                fork[2].resize(chain[chain_index].size() - frame_index);
+                for (int i = 0; i <= frame_index; ++i) {
+                    fork[1][frame_index - i] = chain[chain_index][i];
+                }
+                for (int i = frame_index; i < chain[chain_index].size(); ++i) {
+                    fork[2][i - frame_index] = chain[chain_index][i];
+                }
+                for (int other : G.disconnections[frame_cand]) {
+                    if (other == chain[0][0] or other == chain[0].back()) continue;
+                    if (other == chain[1][0] or other == chain[1].back()) continue;
+                    G.self_int[other]--;
+                    explore_QHD3_double_candidate(fork,chain[1-chain_index],new_id,1,frame_cand,other);
+                    G.self_int[other]++;
+                }
+            }
+        }
+    }
+
+    G.self_int.pop_back();
+}
+
+
 /*
     This is similar to the double chain algorithm, but quite a bit simpler.
     Since all borders of the fork are (-3) or lower, we can only append (-2) curves the chain.
@@ -212,6 +573,7 @@ void Searcher::search_for_QHD3_double_chain() {
         the self intersection of that curve in the fork, reduce the fork and test for QHD.
 
 */
+
 void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>& chain, int extra_id, int extra_n, int extra_orig, int extra_pos) {
 
     static thread_local vector<int> location;
@@ -452,6 +814,12 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
         return;
     }
 }
+
+
+void Searcher::explore_QHD3_partial_resolution( std::vector<int> (&fork)[3], int extra_id = -1, int extra_n = 0, int extra_orig = -1, int extra_pos = -1) {
+    
+}
+
 
 void Searcher::verify_QHD3_double_candidate(const std::vector<int> (&fork)[3], const std::vector<int>& chain, const std::vector<int>& local_self_int, int extra_n[2], int extra_orig[2], int extra_pos[2], int extra_id) {
     auto QHD_invariants = algs::get_QHD_type(fork,local_self_int);

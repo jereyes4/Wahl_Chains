@@ -59,17 +59,16 @@
 - [x] Chequeo Q-ef.
 
 ## 1 QHD, 1 cadena (QHD_double_chain.cpp + double_chain.cpp)
-- [ ] Filtrar separaciones del grafo y extraer tenedores y cadenas.
-  - [ ] Caso general.
-  - [ ] Posible caso con extra blowups sobre el tenedor a partir de tenedor cícliclo.
-  - [ ] Posible caso con extra blowups sobre el tenedor a partir de una o dos cadenas.
+- [x] Filtrar separaciones del grafo y extraer tenedores y cadenas.
+  - [x] Caso general.
+  - [x] Posible caso con extra blowups sobre el tenedor a partir de tenedor cícliclo.
+  - [x] Posible caso con extra blowups sobre el tenedor a partir de una o dos cadenas.
   - [x] Optimizar: evitar repeteciones (fácil).
   - [ ] Optimizar: evitar repeteciones (dificil).
 - ### No resolución parcial:
   - [x] Testeo de blowups extra sobre la cadena.
   - [x] Verificación QHD + Wahl + cálculo de invariantes.
 - ### Resolución parcial:
-  - [ ] Contracción de ramas de tenedores.
   - ### Caso separación en un blowup.
     - [ ] Testear todas las separaciones en un blowup.
     - [ ] Compensar con blowups extra sobre la cadena.
