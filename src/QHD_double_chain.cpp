@@ -7,6 +7,8 @@ using std::vector;
 using std::pair;
 using std::unordered_set;
 
+constexpr bool ignore_partial_resolution = true;
+
 /*
     Search for one QHD3 fork and a Wahl chain, or two Wahl chains.
 
@@ -482,6 +484,8 @@ void Searcher::search_for_QHD3_double_chain() {
 
 void Searcher::get_fork_from_one_chain_for_double(const vector<int>& chain) {
 
+    if constexpr (ignore_partial_resolution) return;
+    
     // Actually this is (almost) the same as the one for single chain.
 
     static thread_local vector<int> fork[3];
@@ -606,12 +610,14 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
             // Ignore the cases when this can be obtained by partial resolution
             if (
                 extra_pos != start and extra_pos != end
-                and !contains(G.disconnections[start],fork[0].back())
-                and !contains(G.disconnections[start],fork[1].back())
-                and !contains(G.disconnections[start],fork[2].back())
-                and !contains(G.disconnections[end],fork[0].back())
-                and !contains(G.disconnections[end],fork[1].back())
-                and !contains(G.disconnections[end],fork[2].back())
+                and (ignore_partial_resolution
+                    or !contains(G.disconnections[start],fork[0].back())
+                    and !contains(G.disconnections[start],fork[1].back())
+                    and !contains(G.disconnections[start],fork[2].back())
+                    and !contains(G.disconnections[end],fork[0].back())
+                    and !contains(G.disconnections[end],fork[1].back())
+                    and !contains(G.disconnections[end],fork[2].back())
+                )
             ) {
                 static thread_local vector<int> reduced_self_int_2;
                 reduced_self_int_2 = reduced_self_int;
@@ -634,9 +640,11 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
             // Cases obtained by partial resolution
             if (
                 extra_pos == start
-                or contains(G.disconnections[start],fork[0].back())
-                or contains(G.disconnections[start],fork[1].back())
-                or contains(G.disconnections[start],fork[2].back())
+                or !(ignore_partial_resolution
+                    or contains(G.disconnections[start],fork[0].back())
+                    and contains(G.disconnections[start],fork[1].back())
+                    and contains(G.disconnections[start],fork[2].back())
+                )
             ) continue;
 
             // If there are multiple connections to a curve, we only check that curve once.
@@ -743,9 +751,12 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
                 // Always partial resolution
                 continue;
             }
-            if (contains(G.disconnections[start],fork[0].back())
-                or contains(G.disconnections[start],fork[1].back())
-                or contains(G.disconnections[start],fork[2].back())) {
+            if (!(ignore_partial_resolution
+                    or contains(G.disconnections[start],fork[0].back())
+                    and contains(G.disconnections[start],fork[1].back())
+                    and contains(G.disconnections[start],fork[2].back()))
+                )
+            {
                 // Always partial resolution
                 continue;
             }
@@ -816,8 +827,10 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
 }
 
 
-void Searcher::explore_QHD3_partial_resolution( std::vector<int> (&fork)[3], int extra_id = -1, int extra_n = 0, int extra_orig = -1, int extra_pos = -1) {
-    
+void Searcher::explore_QHD3_partial_resolution(std::vector<int> (&fork)[3], int extra_id, int extra_n, int extra_orig, int extra_pos) {
+    for (int i = 0; i < 2; ++i) {
+        
+    }
 }
 
 
