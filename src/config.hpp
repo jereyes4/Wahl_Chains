@@ -21,7 +21,7 @@
 #define STATUS_WAIT 1000
 
 // If multithread, we can print a nicer status if we allow ANSI escape characters
-#define WAHL_MULTITHREAD_STATUS_ANSI
+// #define WAHL_MULTITHREAD_STATUS_ANSI
 
 // Add some sort of overflow check in calculating continued fractions.
 // TODO: If it happens, use Boost multiprecision instead of ll.
