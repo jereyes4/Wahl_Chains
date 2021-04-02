@@ -91,7 +91,8 @@ namespace algs {
 
     // Follows notation of https://arxiv.org/pdf/0902.2277.pdf
     // The branches are ordered anticlockwise starting from the leftmost.
-    // Order very important! arithmetics are done with subjacent chars.
+
+    // Order of this enum is very important! arithmetics are done with subjacent chars.
     enum QHD_Type : char {
         none,
         type_a,
@@ -756,7 +757,7 @@ namespace algs {
                     {-6, -2*q-3, 1},
                     {-3 * q - 9, - (q+3) * (q+1), p - (q+4) * (p+1)}
                 };
-                long long V[3] = {p + 2, 4, 2*q + 5};
+                long long V[3] = {2*p + 3, 4, 2*q + 5};
                 long long R[3];
                 long long d = solve<3>(M,V,R);
                 assert(d);

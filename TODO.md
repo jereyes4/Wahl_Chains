@@ -136,7 +136,7 @@
   - [x] Tipo b.
   - [x] Tipo c.
   - [x] Tipo d.
-  - [ ] Tipo e.
+  - [x] Tipo e.
   - [x] Tipo f.
   - [x] Tipo g.
   - [x] Tipo h.
