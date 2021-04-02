@@ -630,7 +630,7 @@ namespace Writer {
     // Writes a summary in a text file. (*) means that even though it says that the example is nef, it requires inspection. (**) means a counter example to the wormhole conjecture. 
     static void export_summary_text(const Reader& reader, const std::vector<Example*>& ptr_examples) {
 
-        std::string filename = reader.output_filename + ".txt";
+        std::string filename = reader.summary_filename + ".txt";
         std::ofstream f(filename);
         if (f.fail()) {
             std::cout << "Error while opening file \"" << filename << "\"." << std::endl;
