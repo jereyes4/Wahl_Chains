@@ -69,7 +69,7 @@ Wahl::Wahl(int argc, char** argv) {
     while (mintest < total_tests) {
         mintest = total_tests;
         for (int i = 0; i < threads; ++i) {
-            mintest = std::min(mintest,searchers[i].current_test);
+            mintest = std::min(mintest,(long long) searchers[i].current_test);
         }
         std::cout << '\r' << double(mintest)*100./double(total_tests) << "% " << mintest << "/" << total_tests;
         std::cout.flush();
