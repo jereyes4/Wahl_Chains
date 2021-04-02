@@ -102,7 +102,9 @@ void Searcher::search_for_QHD3_double_chain() {
             if (seen.check_and_add(fork)) continue;
 #endif
             // Cases 1 and 2.
+            chain.clear();
             if (cyclic) {
+                
                 // Case 1
 
                 /*
@@ -130,18 +132,16 @@ void Searcher::search_for_QHD3_double_chain() {
                         extra_pos = fork[0].back();
                         fork[1].emplace_back(new_index);
                         G.self_int.emplace_back(-2);
-                        G.self_int[fork[0][0]]--;
                         G.self_int[fork[0].back()]--;
                     }
                     else if (fork[0].size() == 1) {
-                        which_branch_extra = 1;
+                        which_branch_extra = 0;
                         extra_n = 1;
                         extra_id = new_index;
                         extra_orig = fork[0][0];
                         extra_pos = fork[1].back();
                         fork[0].emplace_back(new_index);
                         G.self_int.emplace_back(-2);
-                        G.self_int[fork[0][0]]--;
                         G.self_int[fork[1].back()]--;
                     }
                     explore_QHD3_partial_resolution(fork,extra_id,extra_n,extra_orig,extra_pos);
@@ -228,6 +228,7 @@ void Searcher::search_for_QHD3_double_chain() {
                 }
             }
             else {
+                
                 // Case 2
                 if (contains(G.disconnections[fork[0].back()],fork[1].back())) continue;
                 if (contains(G.disconnections[fork[0].back()],fork[2].back())) continue;
@@ -236,7 +237,6 @@ void Searcher::search_for_QHD3_double_chain() {
                 explore_QHD3_partial_resolution(fork);
 
                 const int new_index = G.size;
-
                 for (int branch = 0; branch < 3; ++branch) {
                     while(fork[branch].size() > 2) {
                         chain.emplace_back(fork[branch].back());
@@ -287,6 +287,7 @@ void Searcher::search_for_QHD3_double_chain() {
 #endif
                     // Cases 3,5
                     if (cyclic) {
+                        
                         // Case 3
 
                         // new index for the possible extra (-2) curve.
@@ -361,6 +362,7 @@ void Searcher::search_for_QHD3_double_chain() {
                         }
                     }
                     else {
+                        
                         // Case 5
                         if (contains(G.disconnections[fork[0].back()],fork[1].back())) continue;
                         if (contains(G.disconnections[fork[0].back()],fork[2].back())) continue;
@@ -406,6 +408,7 @@ void Searcher::search_for_QHD3_double_chain() {
 #endif
                 // Cases 4,6
                 if (cyclic) {
+                    
                     // Case 4
                     if (contains(G.disconnections[chain[0]],chain.back())) continue;
                     if (contains(G.disconnections[chain[0]],fork[2].back())) continue;
@@ -459,6 +462,7 @@ void Searcher::search_for_QHD3_double_chain() {
                     G.revert();
                 }
                 else {
+                    
                     // Case 6
                     if (contains(G.disconnections[fork[0].back()],fork[1].back())) continue;
                     if (contains(G.disconnections[fork[0].back()],fork[2].back())) continue;
@@ -485,7 +489,7 @@ void Searcher::search_for_QHD3_double_chain() {
 void Searcher::get_fork_from_one_chain_for_double(const vector<int>& chain) {
 
     if constexpr (ignore_partial_resolution) return;
-    
+
     // Actually this is (almost) the same as the one for single chain.
 
     static thread_local vector<int> fork[3];
@@ -579,7 +583,7 @@ void Searcher::get_fork_from_two_chains_for_double(vector<int> (&chain)[2]) {
 */
 
 void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>& chain, int extra_id, int extra_n, int extra_orig, int extra_pos) {
-
+    
     static thread_local vector<int> location;
 
     location.assign(G.self_int.size(),0);
@@ -588,7 +592,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
         Delta -= G.self_int[curve];
         location[curve] = 1;
     }
-
+    
     if (Delta < 0) return;
 
     static thread_local vector<int> reduced_fork[3];
@@ -597,6 +601,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
     static thread_local unordered_set<int> ignore;
 
     if (Delta == 0) {
+        reduced_self_int = G.self_int;
         bool admissible = algs::reduce(fork[0],reduced_self_int,reduced_fork[0],ignore)
                         && algs::reduce(fork[1],reduced_self_int,reduced_fork[1],ignore)
                         && algs::reduce(fork[2],reduced_self_int,reduced_fork[2],ignore);
@@ -609,9 +614,9 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
             const int end = chain.back();
             // Ignore the cases when this can be obtained by partial resolution
             if (
-                extra_pos != start and extra_pos != end
-                and (ignore_partial_resolution
-                    or !contains(G.disconnections[start],fork[0].back())
+                ignore_partial_resolution
+                or (extra_pos != start and extra_pos != end
+                    and !contains(G.disconnections[start],fork[0].back())
                     and !contains(G.disconnections[start],fork[1].back())
                     and !contains(G.disconnections[start],fork[2].back())
                     and !contains(G.disconnections[end],fork[0].back())
@@ -639,17 +644,18 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
 
             // Cases obtained by partial resolution
             if (
-                extra_pos == start
-                or !(ignore_partial_resolution
+                !ignore_partial_resolution
+                and (extra_pos == start
                     or contains(G.disconnections[start],fork[0].back())
-                    and contains(G.disconnections[start],fork[1].back())
-                    and contains(G.disconnections[start],fork[2].back())
+                    or contains(G.disconnections[start],fork[1].back())
+                    or contains(G.disconnections[start],fork[2].back())
                 )
             ) continue;
 
             // If there are multiple connections to a curve, we only check that curve once.
             int last_seen = -1;
             for (int A : G.disconnections[end]) if (location[A] == 1 and A != last_seen and A != start) {
+
                 last_seen = A;
                 static thread_local vector<int> reduced_self_int_2;
                 reduced_self_int_2 = reduced_self_int;
@@ -747,7 +753,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
             const int end = reduced_chain.back();
 
             // Now we skip those coming from partial resolutions.
-            if (start == extra_pos) {
+            if (!ignore_partial_resolution and start == extra_pos) {
                 // Always partial resolution
                 continue;
             }
@@ -805,7 +811,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
                 else if (last == A) continue;
                 last_last = last;
                 last = A;
-                if (A == fork[0].back() or A == fork[1].back() or A == fork[2].back()) {
+                if (!ignore_partial_resolution and (A == fork[0].back() or A == fork[1].back() or A == fork[2].back())) {
                     // Skip, since this is a partial resolution.
                     continue;
                 }
@@ -829,7 +835,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
 
 void Searcher::explore_QHD3_partial_resolution(std::vector<int> (&fork)[3], int extra_id, int extra_n, int extra_orig, int extra_pos) {
     for (int i = 0; i < 2; ++i) {
-        
+        // TODO
     }
 }
 

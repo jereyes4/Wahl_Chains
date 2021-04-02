@@ -72,6 +72,7 @@
   - ### Caso separación en un blowup.
     - [ ] Testear todas las separaciones en un blowup.
     - [ ] Compensar con blowups extra sobre la cadena.
+    - [ ] Rehabilitar pruning que ignora casos de no resolución parcial que se reducen a resolución parcial.
   - ### Caso separación en más de un blowup.
     - [ ] Recuperar todas las posibilidades para el tenedor a partir de la información en otras ramas.
       - [ ] Tipo a.
@@ -85,8 +86,8 @@
       - [ ] Tipo i.
       - [ ] Tipo j.
   - [ ] Verificación QHD + Wahl + cálculo de invariantes.
-- [ ] Chequeo nef.
-- [ ] Chequeo Q-ef.
+- [x] Chequeo nef.
+- [x] Chequeo Q-ef.
 
 ## Output (Wahl.cpp + Writer.hpp)
 - [x] Juntar y ordenar ejemplos.
@@ -135,7 +136,7 @@
   - [x] Tipo b.
   - [x] Tipo c.
   - [x] Tipo d.
-  - [x] Tipo e.
+  - [ ] Tipo e.
   - [x] Tipo f.
   - [x] Tipo g.
   - [x] Tipo h.
@@ -147,6 +148,6 @@
 - [x] 1 cadena.
 - [x] 2 cadenas.
 - [x] 2 cadenas - resolución extremal.
-- [ ] 1 QHD.
-- [ ] 1 QHD + 1 cadena.
+- [x] 1 QHD.
+- [x] 1 QHD + 1 cadena.
 - [ ] 1 QHD + 1 cadena - resolución parcial.

@@ -765,7 +765,7 @@ namespace Writer {
     // Writes a summary in a tex file as a longtable. \dagger means that even though it says that the example is nef, it requires inspection. \ddagger means a counter example to the wormhole conjecture. 
     static void export_summary_latex(const Reader& reader, const std::vector<Example*>& ptr_examples) {
 
-        std::string filename = reader.output_filename + ".tex";
+        std::string filename = reader.summary_filename + ".tex";
         std::ofstream f(filename);
         if (f.fail()) {
             std::cout << "Error while opening file \"" << filename << "\"." << std::endl;

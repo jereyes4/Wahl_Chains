@@ -9,7 +9,7 @@
 
 // #define NDEBUG
 
-// uncomment for single thread executable, or use flag -D WAHL_MULTITHREAD
+// Uncomment for multi thread executable, or use flag -D WAHL_MULTITHREAD
 // #define WAHL_MULTITHREAD
 
 // Status is printed in Wahl::Wahl() if compiled with multithread support.
@@ -17,8 +17,11 @@
 // It uses \r.
 #define PRINT_STATUS
 
+// time to wait between status updates, in milliseconds
+#define STATUS_WAIT 1000
+
 // If multithread, we can print a nicer status if we allow ANSI escape characters
-// #define WAHL_MULTITHREAD_STATUS_ANSI
+#define WAHL_MULTITHREAD_STATUS_ANSI
 
 // Add some sort of overflow check in calculating continued fractions.
 // TODO: If it happens, use Boost multiprecision instead of ll.
@@ -86,7 +89,9 @@ inline std::ostream& operator<<(std::ostream& os, const std::pair<T,S>& p) {
 #endif
 
 #ifdef NO_MULTITHREAD
+#ifdef WAHL_MULTITHREAD
 #undef WAHL_MULTITHREAD
+#endif
 #endif
 
 #ifndef WAHL_MULTITHREAD

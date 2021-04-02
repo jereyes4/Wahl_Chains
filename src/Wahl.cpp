@@ -42,20 +42,23 @@ Wahl::Wahl(int argc, char** argv) {
 #ifdef WAHL_MULTITHREAD_STATUS_ANSI
     std::cout << std::fixed;
     std::cout.precision(1);
-    std::cout << "\e[s\e[?25l";
+    std::cout << "\e[s";
     while (current_test < total_tests + (long long)threads) {
-        std::cout << "\e[u";
+        std::cout << "\e[u\e[?25l";
+        long long mintest = total_tests;
         for (int i = 0; i < threads; ++i) {
-            std::cout << "Thread " << i << ": " << searchers[i].current_test << '\n';
+            long long searcher_test = searchers[i].current_test;
+            mintest = std::min(mintest, searcher_test);
+            std::cout << "Thread " << i << ": " << searcher_test << '\n';
         }
-        std::cout << double(std::min((long long)current_test,total_tests))*100./double(total_tests) << "% " << std::min((long long)current_test,total_tests) << "/" << total_tests;
+        std::cout << double(mintest)*100./double(total_tests) << "% " << mintest << "/" << total_tests;
+        std::cout << "\e[?25h";
         std::cout.flush();
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(STATUS_WAIT));
     }
     for (int i = 0; i < threads; ++i) {
         spawns[i].join();
     }
-    std::cout << "\e[?25h";
     std::cout << '\r' << 100. << "% " << total_tests << '/' << total_tests << std::endl;
 #else // ndef WAHL_MULTITHREAD_STATUS_ANSI
 
@@ -68,7 +71,7 @@ Wahl::Wahl(int argc, char** argv) {
         }
         std::cout << '\r' << double(mintest)*100./double(total_tests) << "% " << mintest << "/" << total_tests;
         std::cout.flush();
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(STATUS_WAIT));
     }
     for (int i = 0; i < threads; ++i) {
         spawns[i].join();

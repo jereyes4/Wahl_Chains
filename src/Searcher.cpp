@@ -256,7 +256,7 @@ void Searcher::search() {
         //print here status.
         static auto last_time = std::chrono::steady_clock::now();
         auto this_time = std::chrono::steady_clock::now();
-        if (this_time - last_time >= std::chrono::milliseconds(500)) {
+        if (this_time - last_time >= std::chrono::milliseconds(STATUS_WAIT)) {
             std::cout << '\r' << double(std::min((long long)current_test,parent->total_tests))*100./double(parent->total_tests) << "% " << std::min((long long)current_test,parent->total_tests) << "/" << parent->total_tests;
             std::cout.flush();
             last_time = this_time;
@@ -350,7 +350,7 @@ void Searcher::search() {
         // K is the K^2 of the resulting X
         int K = K2 - 3*curve_number - sum_self_int + double_singularities/2;
         current_K2 = K;
-
+        
         if (!contains(reader_copy.search_for,K)) continue;
         G.reset();
         curve_dict.clear();

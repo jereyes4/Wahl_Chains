@@ -23,8 +23,8 @@
 !Tests/*
 !jsonl/
 !jsonl/*
-!Summary/
-!Summary/*
+!summary/
+!summary/*
 
 # pdf file
 !pdf/
