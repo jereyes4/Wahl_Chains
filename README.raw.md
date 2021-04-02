@@ -336,6 +336,8 @@ Several test files are provided in this repository as examples of test files.
 
 This checks for $\mathbb Q$ effectiveness of $K_S$. Assuming there are no fibers with triple points, this does the following: Consider only those fibers whose every curve is either included on the configuration or contracted. For each fiber, calculate the minimum discrepancy of all curves in the fiber, and take minimum again so this value is at most $-1/2$. Sum over all these values. Then $K_S$ is considered effective if this sum is at most $-1$.
 
+As long as every complete fiber is of type `In`, this should not give false positives.
+
 # Nef check
 
 This checks for nef-ness of $K_S$. It assumes that $K_S$ is effective, so to verify that for each exceptional $(-1)$-curve, the sum of discrepancies over all curves it intersects is at most $-1$.  
