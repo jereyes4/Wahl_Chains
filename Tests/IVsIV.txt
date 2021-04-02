@@ -1,0 +1,57 @@
+
+Output: jsonl/IVsIV
+Summary_Output: summary/IVsIV
+Summary_Style: LaTeX_Table
+
+Single_Chain: Y
+Double_Chain: Y
+Single_QHD: Y
+Double_QHD: Y
+Keep_First: global
+Search_For: 1 2 3 4 5 6 7 8 9
+
+Nef_Check: print
+Effective_Check: print
+Obstruction_Check: print
+
+Summary_Include_GCD: Y
+
+Threads: 4
+
+Tests: 1
+
+#Three concurrent lines A,B,C (IV) and a triple line L (IV*)
+#S_A, S_B, S_C are general lines through the corresponding intersections
+#One might want to make them concurrent.
+
+#T is a general line through the intersection of A,B,C. We might also want to make it concurrent with the other double sections.
+
+#As usual, a IV is defined first as a I3 and then collapse the three intersections.
+Fibers:
+    IV* Fix
+        L E_1 E_2 E_4 E_5 E_7 E_8
+    I3 Fix
+        A B C
+Name:
+    G Try
+        A B C
+Sections:
+    E_3 Try
+        E_2 A
+    E_6 Try
+        E_5 B
+    E_9 Try
+        E_8 C
+Sections(0):
+    S_A Try
+        E_1 B C
+    S_B Try
+        E_4 A C S_A
+    S_C Try
+        E_7 A B S_A S_B
+Sections(1):
+    T Try
+        G L S_A S_B S_C
+Name:
+    Int Try
+        S_A S_B S_C

@@ -1,0 +1,66 @@
+
+Output: jsonl/Exp_9111
+Summary_Output: summary/Exp_9111
+Summary_Style: LaTeX_Table
+
+Single_Chain: Y
+Double_Chain: Y
+Single_QHD: Y
+Double_QHD: Y
+Keep_First: global
+Search_For: 1 2 3 4 5 6 7 8 9
+
+Nef_Check: print
+Effective_Check: print
+Obstruction_Check: print
+
+Summary_Include_GCD: Y
+
+Threads: 4
+Tests: 2
+
+Fibers:
+    I9 Fix Dis
+        A E_1 E_2 B E_4 E_5 C E_7 E_8
+    I1 Fix Fix
+        F_1
+    I1 Try Fix
+        F_2
+    I1 Try Try
+        F_3
+Name:
+    G_1 Try
+        F_1 F_1
+    G_2 Try
+        F_2 F_2
+    G_3 Try
+        F_3 F_3
+Sections:
+    E_3 Try
+        E_2 F_1 F_2 F_3
+    E_6 Try
+        E_5 F_1 F_2 F_3
+    E_9 Try
+        E_8 F_1 F_2 F_3
+Sections(1):
+    H Try
+        A B C F_1 F_1 F_1 F_2 F_2 F_2 F_3 F_3 F_3
+Sections(0):
+    T_1 Try
+        C E_7 G_1 F_2 F_2 F_3 F_3 E_3 H
+    S_1 Try
+        E_1 C G_1 F_2 F_2 F_3 F_3 H
+    R_1 Try
+        B E_7 G_1 F_2 F_2 F_3 F_3 H
+    T_2 Try
+        C E_7 F_1 F_1 G_2 F_3 F_3 E_3 S_1 R_1 H
+    S_2 Try
+        E_1 C F_1 F_1 G_2 F_3 F_3 T_1 R_1 H
+    R_2 Try
+        B E_7 F_1 F_1 G_2 F_3 F_3 T_1 S_1 H
+    T_3 Try
+        C E_7 F_1 F_1 F_2 F_2 G_3 E_3 S_1 R_1 S_2 R_2 H
+    S_3 Try
+        E_1 C F_1 F_1 F_2 F_2 G_3 T_1 R_1 T_2 R_2 H
+    R_3 Try
+        B E_7 F_1 F_1 F_2 F_2 G_3 T_1 S_1 T_2 S_2 H

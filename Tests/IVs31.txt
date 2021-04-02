@@ -1,0 +1,73 @@
+
+Output: jsonl/IVs31
+Summary_Output: summary/IVs31
+Summary_Style: LaTeX_Table
+
+Single_Chain: Y
+Double_Chain: Y
+Single_QHD: Y
+Double_QHD: Y
+Keep_First: global
+Search_For: 1 2 3 4 5 6 7 8 9
+
+Nef_Check: print
+Effective_Check: print
+Obstruction_Check: print
+
+Summary_Include_GCD: Y
+
+Threads: 4
+
+Tests: 3
+
+#Three non concurrent lines A,B,C (I_3) and a triple line L (IV*)
+
+#For example,
+#A = X
+#B = Y
+#C = X + Y + Z
+#L = Z
+
+#In this case, the node of I1 is (-1,-1,3).
+
+#R_A is the double section through (-1,-1,3) and A inter L. Same for R_B and R_C
+
+#S_A is the double section from B inter C to A inter L. Same for S_B and S_C
+
+
+Fibers:
+    IV* Dis Fix Fix
+        L E_1 E_2 E_4 E_5 E_7 E_8
+    I3  Fix Dis Fix
+        A B C
+    I1  Fix Fix Ign
+        F
+Name:
+    G Try
+        F F
+    AB Try
+        A B
+    BC Try
+        B C
+    AC Try
+        A C
+Sections:
+    E_3 Try
+        E_2 A F
+    E_6 Try
+        E_5 B F
+    E_9 Try
+        E_8 C F
+Sections(0):
+    S_A Try
+        E_1 BC F F
+    S_B Try
+        E_4 AC F F S_A
+    S_C Try
+        E_7 AB F F S_A S_B
+    R_A Try
+        E_1 B C G S_B S_C
+    R_B Try
+        E_4 A C G S_A S_C
+    R_C Try
+        E_7 A B G S_A S_B

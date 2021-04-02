@@ -1,0 +1,97 @@
+
+Output: jsonl/Chilean
+Summary_Output: summary/Chilean
+Summary_Style: LaTeX_Table
+
+Single_Chain: Y
+Double_Chain: Y
+Single_QHD: Y
+Double_QHD: Y
+Keep_First: global
+Search_For: 1 2 3 4 5 6 7 8 9
+
+Nef_Check: print
+Effective_Check: print
+Obstruction_Check: print
+
+Summary_Include_GCD: Y
+
+Threads: 4
+
+Tests: 20
+
+
+# https://arxiv.org/pdf/2008.09627.pdf
+
+Fibers:
+    I3 Fix
+        F_1 F_2 F_3
+    I3 Fix
+        F_4 F_5 F_6
+    I3 Try
+        F_7 F_8 F_9
+    I3 Try
+        F_A F_B F_C
+Sections:
+    E_1 Ign Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix
+        F_1 F_2 F_4 F_5 F_7 F_8 F_A F_C
+    E_2 Ign Ign Ign Ign Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix
+        F_1 F_2 F_4 F_6 F_7 F_9 F_A F_B
+    E_3 Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix
+        F_1 F_2 F_5 F_6 F_8 F_9 F_B F_C
+    E_4 Ign Ign Fix Fix Ign Fix Fix Fix Fix Fix Ign Fix Fix Fix Fix Fix Fix Fix Fix Fix
+        F_1 F_3 F_4 F_5 F_7 F_9 F_B F_C
+    E_5 Ign Ign Ign Ign Ign Ign Ign Fix Fix Fix Ign Ign Ign Fix Fix Fix Fix Fix Fix Fix
+        F_1 F_3 F_4 F_6 F_8 F_9 F_A F_C
+    E_6 Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Fix Fix Fix Fix
+        F_1 F_3 F_5 F_6 F_7 F_8 F_A F_B
+    E_7 Ign Ign Ign Fix Ign Ign Fix Ign Fix Fix Ign Ign Fix Ign Fix Fix Ign Fix Fix Fix
+        F_2 F_3 F_4 F_5 F_8 F_9 F_A F_B
+    E_8 Ign Ign Ign Ign Ign Ign Ign Ign Ign Fix Ign Ign Ign Ign Ign Fix Ign Ign Fix Fix
+        F_2 F_3 F_4 F_6 F_7 F_8 F_B F_C
+    E_9 Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Fix
+        F_2 F_3 F_5 F_6 F_7 F_9 F_A F_C
+Sections(0):
+    G_1 Try
+        F_1 F_2 F_3 F_4 F_5 F_6 F_7 F_8 F_9 F_A F_B F_C E_7 F_1 F_6 F_7 F_C
+    G_2 Try
+        F_1 F_2 F_3 F_4 F_5 F_6 F_7 F_8 F_9 F_A F_B F_C G_1 E_9 F_1 F_5 F_8 F_B
+    G_3 Try
+        F_1 F_2 F_3 F_4 F_5 F_6 F_7 F_8 F_9 F_A F_B F_C G_1 G_2 E_8 F_1 F_4 F_9 F_A
+    G_4 Try
+        F_1 F_2 F_3 F_4 F_5 F_6 F_7 F_8 F_9 F_A F_B F_C G_1 G_2 G_3 E_4 F_2 F_6 F_8 F_A
+    G_5 Try
+        F_1 F_2 F_3 F_4 F_5 F_6 F_7 F_8 F_9 F_A F_B F_C G_1 G_2 G_3 G_4 E_5 F_2 F_5 F_7 F_B
+    G_6 Try
+        F_1 F_2 F_3 F_4 F_5 F_6 F_7 F_8 F_9 F_A F_B F_C G_1 G_2 G_3 G_4 G_5 E_6 F_2 F_4 F_9 F_C
+    G_7 Try
+        F_1 F_2 F_3 F_4 F_5 F_6 F_7 F_8 F_9 F_A F_B F_C G_1 G_2 G_3 G_4 G_5 G_6 E_1 F_3 F_6 F_9 F_B
+    G_8 Try
+        F_1 F_2 F_3 F_4 F_5 F_6 F_7 F_8 F_9 F_A F_B F_C G_1 G_2 G_3 G_4 G_5 G_6 G_7 E_3 F_3 F_5 F_7 F_A
+    G_9 Try
+        F_1 F_2 F_3 F_4 F_5 F_6 F_7 F_8 F_9 F_A F_B F_C G_1 G_2 G_3 G_4 G_5 G_6 G_7 G_8 E_2 F_3 F_4 F_8 F_C
+Merge:
+    P_{12} Try
+        F_1 F_2 G_7 G_8 G_9
+    P_{13} Try
+        F_1 F_3 G_4 G_5 G_6
+    P_{23} Try
+        F_2 F_3 G_1 G_2 G_3
+    P_{45} Try
+        F_4 F_5 G_1 G_4 G_7
+    P_{46} Try
+        F_4 F_6 G_3 G_5 G_9
+    P_{56} Try
+        F_5 F_6 G_2 G_6 G_8
+    P_{78} Try
+        F_7 F_8 G_3 G_6 G_7
+    P_{79} Try
+        F_7 F_9 G_2 G_4 G_9
+    P_{89} Try
+        F_8 F_9 G_1 G_5 G_8
+    P_{AB} Try
+        F_A F_B G_1 G_6 G_9
+    P_{AC} Try
+        F_A F_C G_2 G_5 G_7
+    P_{BC} Try
+        F_B F_C G_3 G_4 G_8

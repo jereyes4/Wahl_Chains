@@ -1,0 +1,53 @@
+
+Output: jsonl/1s41
+Summary_Output: summary/1s41
+Summary_Style: LaTeX_Table
+
+Single_Chain: Y
+Double_Chain: Y
+Single_QHD: Y
+Double_QHD: Y
+Keep_First: global
+Search_For: 1 2 3 4 5 6 7 8 9
+
+Nef_Check: print
+Effective_Check: print
+Obstruction_Check: print
+
+Summary_Include_GCD: Y
+
+Threads: 4
+
+Tests: 3
+
+#I_1* : XY(X-Y)
+#I_4 : Z(XY - Y^2 + XZ)
+#I_1 : Z(XY - Y^2 + XZ) + 1/16 XY(X-Y)
+
+
+Fibers:
+    I1* Try Fix Fix
+        E_1 E_2 Y L X E_3
+    I4  Fix Dis Fix
+        Z E_6 C E_8
+    I1  Fix Fix Ign
+        F
+Name:
+    G Try
+        F F
+Sections:
+    E_4 Try
+        E_3 C F
+    E_5 Try
+        Z X F
+    E_7 Try
+        E_6 C F
+    E_9 Try
+        E_8 C F
+Sections(0):
+    W Try
+        G E_1 C Z
+    R Try
+        G X L E_6 C
+    S Try
+        G X Y E_8 C

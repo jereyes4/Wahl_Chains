@@ -1,0 +1,55 @@
+
+Output: jsonl/2s22
+Summary_Output: summary/2s22
+Summary_Style: LaTeX_Table
+
+Single_Chain: Y
+Double_Chain: Y
+Single_QHD: Y
+Double_QHD: Y
+Keep_First: global
+Search_For: 1 2 3 4 5 6 7 8 9
+
+Nef_Check: print
+Effective_Check: print
+Obstruction_Check: print
+
+Summary_Include_GCD: Y
+
+Threads: 4
+
+Tests: 2
+
+#A = X
+#B = X+Z
+#C = Z
+
+#Pencil = Y^2Z - X(X+Z)(X+aZ)
+
+#I_2 fibers: Y^2Z - X^2(X+Z) and Y^2Z - X(X+Z)^2
+
+#I_2* fiber: XZ(X+Z)
+
+#Section W(a): Y
+
+#A double section is S = Y^2Z + X(X+Z)^2
+
+Fibers:
+    I2* Try Fix
+        E_1 E_2 E_3 A B C E_4
+    I2  Fix Fix
+        F_1 E_6
+    I2  Fix Dis
+        F_2 E_8
+Sections:
+    E_5 Try
+        E_4 F_1 F_2
+    E_7 Try
+        A E_6 F_2
+    E_9 Try
+        B F_1 E_8
+    W   Try
+        C E_6 E_8
+Sections(0):
+    S Try
+        E_3 E_7 E_8 E_8 F_1 F_1

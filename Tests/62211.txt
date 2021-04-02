@@ -1,0 +1,96 @@
+
+Output: jsonl/62211
+Summary_Output: summary/62211
+Summary_Style: LaTeX_Table
+
+Single_Chain: Y
+Double_Chain: Y
+Single_QHD: Y
+Double_QHD: Y
+Keep_First: global
+Search_For: 1 2 3 4 5 6 7 8 9
+
+Nef_Check: print
+Effective_Check: print
+Obstruction_Check: print
+
+Summary_Include_GCD: Y
+
+Threads: 4
+
+Tests: 10
+
+
+# R = 2Y - Z
+# C = X^2 + (Y-Z)^2 - Z^2
+# Q = 2Y^2 - 2X^2 + Z^2
+# L = Y
+
+# Pencil: aLQ + RC
+
+# a = -2: Nodal curve T.
+# a = 3/2(1 +- sqrt(3/2)): Nodal curves F_1, F_2 with nodes at X = 0.
+
+# W_1 = sqrt(3)Y - X
+# W_2 = sqrt(3)Y + X
+
+# D_1 = Y - sqrt(3)X + 1
+# D_1 = Y + sqrt(3)X + 1
+
+# P_0 = D_1.D_2 = [0,-1,1]
+
+# H = X
+# N_1 = X - sqrt(3)/2 Z
+# N_2 = X + sqrt(3)/2 Z
+# S = 2Y + Z
+
+# E_1 - E_2 : Blowup at L.C = [0,0,1]
+# E_3 - E_5 : Blowup at Q.C = [sqrt(3),1,2]
+# E_6 - E_8 : Blowup at Q.C = [-sqrt(3),1,2]
+# E_9 : Blowup at L.R = [1,0,0]
+
+
+Fibers:
+    I6 Fix Fix Fix Fix Dis Dis Dis Dis Dis Dis
+        R E_3 E_4 C E_7 E_6
+    I2 Fix Dis Dis Dis Fix Fix Fix Dis Dis Dis
+        Q L
+    I2 Try Fix Dis Dis Fix Dis Dis Fix Fix Dis
+        T E_1
+    I1 Try Try Fix Ign Try Fix Ign Fix Ign Fix
+        F_1
+    I1 Try Try Try Fix Try Try Fix Try Fix Fix
+        F_2
+Name:
+    G_1 Try Try Try Ign Try Try Ign Try Ign Try
+        F_1 F_1
+    G_2 Try
+        F_2 F_2
+Sections:
+    E_2 Try
+        C L E_1 F_1 F_2
+    E_5 Try
+        E_4 Q T F_1 F_2
+    E_8 Try
+        E_7 Q T F_1 F_2
+    E_9 Try
+        R L T F_1 F_2
+    W_1 Try
+        E_3 Q E_1 F_1 F_2
+    W_2 Try
+        E_6 Q E_1 F_1 F_2
+DoubleSections:
+    H Try
+        R C Q Q T E_1 G_1 G_2
+    N_1 Try
+        C E_6 L Q T T F_1 F_1 F_2 F_2 H N_1
+    N_2 Try
+        C E_3 L Q T T F_1 F_1 F_2 F_2 H
+Name:
+    INFTY Try
+        H N_1 N_2
+DoubleSections:
+    Z Try
+        C C Q Q T T F_1 F_1 F_2 F_2 INFTY W_1 W_2 E_9
+
+        
