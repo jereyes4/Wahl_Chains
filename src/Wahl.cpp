@@ -43,9 +43,10 @@ Wahl::Wahl(int argc, char** argv) {
     std::cout << std::fixed;
     std::cout.precision(1);
     std::cout << "\e[s";
-    while (current_test < total_tests + (long long)threads) {
+    long long mintest = 0;
+    while (mintest < total_tests) {
         std::cout << "\e[u\e[?25l";
-        long long mintest = total_tests;
+        mintest = total_tests;
         for (int i = 0; i < threads; ++i) {
             long long searcher_test = searchers[i].current_test;
             mintest = std::min(mintest, searcher_test);
@@ -64,10 +65,11 @@ Wahl::Wahl(int argc, char** argv) {
 
     std::cout << std::fixed;
     std::cout.precision(1);
-    while (current_test < total_tests + (long long)threads) {
-        long long mintest = total_tests;
+    long long mintest = 0;
+    while (mintest < total_tests) {
+        mintest = total_tests;
         for (int i = 0; i < threads; ++i) {
-            mintest = std::min(mintest,(long long)searchers[i].current_test);
+            mintest = std::min(mintest,searchers[i].current_test);
         }
         std::cout << '\r' << double(mintest)*100./double(total_tests) << "% " << mintest << "/" << total_tests;
         std::cout.flush();
