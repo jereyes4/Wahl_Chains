@@ -938,7 +938,7 @@ namespace Writer {
                     }
                     f << " & ";
                 }
-                if (ex.type == !Example::p_extremal_) f << "-- & ";
+                if (ex.type != Example::p_extremal_) f << "-- & ";
                 else if (ex.worm_hole) {
                     if (ex.worm_hole_conjecture_counterexample) {
                         f << "CE ${}^\\ddagger$ & ";
