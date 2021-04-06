@@ -14,6 +14,8 @@ Nef_Check: print
 Effective_Check: print
 Obstruction_Check: print
 
+LaTeX_Include_Subsection: Y
+
 Summary_Include_GCD: Y
 
 Threads: 4
@@ -83,9 +85,9 @@ DoubleSections:
     H Try
         R C Q Q T E_1 G_1 G_2
     N_1 Try
-        C E_6 L Q T T F_1 F_1 F_2 F_2 H N_1
+        C E_6 L Q T T F_1 F_1 F_2 F_2 H
     N_2 Try
-        C E_3 L Q T T F_1 F_1 F_2 F_2 H
+        C E_3 L Q T T F_1 F_1 F_2 F_2 H N_1
 Name:
     INFTY Try
         H N_1 N_2

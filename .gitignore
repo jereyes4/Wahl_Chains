@@ -7,8 +7,11 @@
 !LICENSE
 !TODO.md
 !README.md
-!README.raw.md
-!readmer.py
+
+!Utilities/
+!Utilities/*.cxx
+!Utilities/README.raw.md
+!Utilities/*.py
 
 # Source files,
 !src/
@@ -20,11 +23,12 @@
 
 # Test files,
 !Tests/
-!Tests/*
+!Tests/*.txt
 !jsonl/
-!jsonl/*
+!jsonl/*.jsonl
 !summary/
-!summary/*
+!summary/*.tex
+!summary/*.txt
 
 # pdf file
 !pdf/

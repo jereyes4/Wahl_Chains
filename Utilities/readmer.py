@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 f = open("README.raw.md","r")
-g = open("README.md","w")
+g = open("../README.md","w")
 for l in f:
     sep = l.split('$')
     for i in range(len(sep)//2):
