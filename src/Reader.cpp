@@ -211,7 +211,7 @@ Reader::Reader() {
     choose_curves.resize(1);
     ignored_curves.resize(1);
 #ifdef WAHL_MULTITHREAD
-    threads = 1;
+    threads = MAX_THREADS;
 #endif
     output_filename = DEFAULT_OUTPUT_NAME;
     summary_filename = DEFAULT_SUMMARY_NAME;

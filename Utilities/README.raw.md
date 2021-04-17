@@ -171,8 +171,8 @@ Following is the full list of settings and their possible options:
   
   When an example is obtained such that its invariants were already found, it gets immediately discarded. This means that if any check is set to `print` and the first example found did not pass the test, but the second example did, then only the less interesting example is included in the results. Thus an option other than `global` still has some merit.  
   Defaults to `global`.
-- `Threads`: The amount of threads to spawn with multi thread support. Has a hard limit of `4`, given by the macro `MAX_THREADS` in `config.hpp`.  
-  Defaults to `1`.
+- `Threads`: The amount of threads to spawn with multi thread support. Has a hard limit given by the macro `MAX_THREADS` in `config.hpp`, which is `4` unless modified. 
+  Defaults to `MAX_THREADS`.
 - `Sections_Input`: Determines the meaning of the parameter when adding curves. Takes two options:
   - `By_Self_Intersection`: The parameter for sections correspond to their self intersection in the original surface $Y$.
   - `By_Canonical_Intersection`: The parameter corresponds to the intersection of the section with the canonical class in the original surface $Y$.
