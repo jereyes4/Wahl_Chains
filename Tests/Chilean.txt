@@ -16,7 +16,7 @@ Obstruction_Check: print
 
 Summary_Include_GCD: Y
 
-Threads: 4
+Threads: 80
 
 Tests: 20
 

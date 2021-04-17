@@ -623,10 +623,14 @@ void Reader::parse_option(const vector<string>& tokens) {
             error("Option \'Threads\' must take exactly one argument.");
         }
         int value;
-        if (!safe_stoi(tokens[1],value) or value < 1 or value > MAX_THREADS) {
+        if (!safe_stoi(tokens[1],value) or value < 1) {
             error("Invalid number for option \'Threads\': " + tokens[1]);
         }
 #ifdef WAHL_MULTITHREAD
+        if (value > MAX_THREADS) {
+            warning("Build allows for " + to_string(MAX_THREADS) + ". Value capped.");
+            value = MAX_THREADS;
+        }
         threads = value;
 #else
         warning("Build does not allow threads. This option does nothing.");
