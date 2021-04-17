@@ -23,9 +23,17 @@ The program has support for multi-threading. To use it with `GNU C++`, run
 
     g++ -std=c++17 -Ofast -flto -pthread -D WAHL_MULTITHREAD src/*.cpp -o Search.exe
 
+To set the maximum amount of threads, do for example
+
+    g++ -std=c++17 -Ofast -flto -pthread -D WAHL_MULTITHREAD -D MAX_THREADS=8 src/*.cpp -o Search.exe
+
 Alternatively, in the file `config.hpp` uncomment the line
 
     #define WAHL_MULTITHREAD
+
+and optionally change the maximum number of threads by modifying
+
+    #define MAX_THREADS 4
 
 and run
 
@@ -163,7 +171,7 @@ Following is the full list of settings and their possible options:
   
   When an example is obtained such that its invariants were already found, it gets immediately discarded. This means that if any check is set to `print` and the first example found did not pass the test, but the second example did, then only the less interesting example is included in the results. Thus an option other than `global` still has some merit.  
   Defaults to `global`.
-- `Threads`: The amount of threads to spawn with multi thread support. Has a hard limit of `16`, given by the macro `MAX_THREADS` in `config.hpp`.  
+- `Threads`: The amount of threads to spawn with multi thread support. Has a hard limit of `4`, given by the macro `MAX_THREADS` in `config.hpp`.  
   Defaults to `1`.
 - `Sections_Input`: Determines the meaning of the parameter when adding curves. Takes two options:
   - `By_Self_Intersection`: The parameter for sections correspond to their self intersection in the original surface $Y$.
