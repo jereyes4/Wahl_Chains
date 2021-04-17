@@ -1,6 +1,6 @@
 
-Output: jsonl/Exp_9111
-Summary_Output: summary/Exp_9111
+Output: jsonl/9111
+Summary_Output: summary/9111
 Summary_Style: LaTeX_Table
 
 Single_Chain: Y
