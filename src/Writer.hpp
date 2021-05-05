@@ -303,6 +303,8 @@ namespace Writer {
         f << ',';
         json_export_vector(f,"graph",reader.adj_list);
         f << ',';
+        json_export_vector(f,"selfint",reader.self_int);
+        f << ',';
         json_export_number(f,"K2",reader.K.self_int);
         f << ',';
 
@@ -422,6 +424,8 @@ namespace Writer {
             json_export_number(f,"#",2);
             f << ',';
             json_export_number(f,"WH",example.worm_hole?2:1);
+            f << ',';
+            json_export_number(f,"WHid",example.worm_hole?example.worm_hole_id:0);
             f << ',';
             json_export_number(f,"K2",example.K2);
             f << ',';
