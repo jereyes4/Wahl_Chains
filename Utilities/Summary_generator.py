@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, json, linecache, tkinter, getopt
+import sys, json, getopt
 from math import gcd
 
 header =(
@@ -21,8 +21,8 @@ header =(
 )
 
 if __name__ == "__main__":
-    options = ["Subsection", "Nef", "Obstruction", "Effective", "Gcd", "Chern", "PK", "Length_Sort","Output ="]
-    options_short = "snbegcpklo:"
+    options = ["All","Subsection", "Nef", "Obstruction", "Effective", "Gcd", "Chern", "PK", "Length_Sort","Output ="]
+    options_short = "asnbegcpklo:"
     try:
         args, extra = getopt.gnu_getopt(sys.argv[1:],options_short,options)
     except:
@@ -48,6 +48,24 @@ if __name__ == "__main__":
         include_pk = False
         by_length = False
         for arg, val in args:
+            if arg in ["-a","--All"]:
+                include_subsection = True
+                if graph_info["nef_check"]:
+                    include_nef = True
+                else:
+                    print("No nef check in json")
+                if graph_info["obstruction_check"]:
+                    include_obs = True
+                else:
+                    print("No obstruction check in json")
+                if graph_info["effective_check"]:
+                    include_eff = True
+                else:
+                    print("No effective check in json")
+                include_gcd = True
+                include_chern = True
+                include_pk = True
+                by_length = True
             if arg in ["-s","--Subsection"]:
                 include_subsection = True
             if arg in ["-n","--Nef"]:
@@ -234,7 +252,7 @@ if __name__ == "__main__":
                 outfile.write("YES & " if config_info["Qef"] else "NO & ")
             if include_obs:
                 if config_info["obs"]:
-                    output.write("YES & ")
+                    outfile.write("YES & ")
                 else:
                     complete_fibers = 0
                     for fiber in Fibers:
@@ -286,6 +304,8 @@ if __name__ == "__main__":
                     if include_pk:
                         outfile.write("-- & ")
                     continue
+
+
                 used = set(used + exceptionals)
                 double_points_2 = 0
                 for curve in used:
@@ -297,23 +317,25 @@ if __name__ == "__main__":
                         mpoints[m] = 1
                     else:
                         mpoints[m] += 1
+
+
                 Ptilde = -double_points_2
                 Ktilde = original_K2 - double_points_2//2
-                c_1_tilde = 0
-                c_2_tilde = 12
+                c_1_tilde = -len(exceptionals) - 4*len(used) + double_points_2
+                c_2_tilde = 12 + len(exceptionals) - 2*len(used) + double_points_2//2
                 for curve in used:
                     Ptilde += selfint[curve] + 5
                     Ktilde += 2
-                    c_1_tilde += 1
+                    c_1_tilde -= selfint[curve]
                 Ktilde -= Ptilde
-                c_1_tilde -= Ptilde
-                c_2_tilde -= Ktilde + Ptilde
                 for m,tm in mpoints.items():
                     Ptilde += (2*m - 4)*tm
                     Ktilde += (2 - m)*tm
-                    c_1_tilde += tm
+
+
+
                 if include_chern:
-                    outfile.write("$({0},{1})$ & ".format(c_1_tilde,c_2_tilde))
+                    outfile.write("${0}$ & ".format(c_1_tilde/(c_2_tilde if c_2_tilde != 0 else 1)))
                 if include_pk:
                     outfile.write("$({0},{1})$ & ".format(Ptilde,Ktilde))
             if chain_amount == 2:
@@ -326,10 +348,14 @@ if __name__ == "__main__":
                         if config_info["WH_CE"]:
                             outfile.write("CE ${}^\\dagger$ & ")
                         else:
-                            outfile.write("YES & ")
+                            if "WHid" in config_info:
+                                outfile.write("{0} & ".format(config_info["WHid"]))
+                            else:
+                                outfile.write("YES & ")
             outfile.write(str(ex_id))
             if config_info["nef_warn"]:
                 outfile.write(" ${}^\\dagger$")
+            ex_id += 1
         if prev_chain_amount != 0:
             outfile.write("\n\\end{longtable}\n")
     infile.close()
