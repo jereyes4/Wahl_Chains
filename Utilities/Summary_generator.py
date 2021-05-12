@@ -21,8 +21,8 @@ header =(
 )
 
 if __name__ == "__main__":
-    options = ["All","Subsection", "Nef", "Obstruction", "Effective", "Gcd", "Chern", "PK", "Length_Sort","Output ="]
-    options_short = "asnbegcpklo:"
+    options = ["All","Subsection", "Nef", "Obstruction", "Effective", "Gcd", "Chern", "PK", "Length_Sort","Fraction","Output ="]
+    options_short = "asnbegcpklfo:"
     try:
         args, extra = getopt.gnu_getopt(sys.argv[1:],options_short,options)
     except:
@@ -46,6 +46,7 @@ if __name__ == "__main__":
         include_gcd = False
         include_chern = False
         include_pk = False
+        chern_fraction = False
         by_length = False
         for arg, val in args:
             if arg in ["-a","--All"]:
@@ -65,7 +66,6 @@ if __name__ == "__main__":
                 include_gcd = True
                 include_chern = True
                 include_pk = True
-                by_length = True
             if arg in ["-s","--Subsection"]:
                 include_subsection = True
             if arg in ["-n","--Nef"]:
@@ -91,6 +91,8 @@ if __name__ == "__main__":
                 include_pk = True
             if arg in ["-l","--Length_Sort"]:
                 by_length = True
+            if arg in ["-f","--Fraction"]:
+                chern_fraction = True
             if arg in ["-o","--Output"]:
                 outname = val
         try:
@@ -145,7 +147,10 @@ if __name__ == "__main__":
                     column_values += "Obs 0 & "
                     columns += 1
                 if include_chern:
-                    column_values += "$(\\overline c_1^2,\\overline c_2)$ & "
+                    if chern_fraction:
+                        column_values += "$\\overline c_1^2 / \\overline c_2$ & "
+                    else:
+                        column_values += "$(\\overline c_1^2,\\overline c_2)$ & "
                     columns += 1
                 if include_pk:
                     column_values += "$(P,K)$ & "
@@ -215,32 +220,32 @@ if __name__ == "__main__":
                     if by_length:
                         ex0 = (len(chain0),n0,a0)
                         ex1 = (len(chain1),n1,a1)
-                        if ex1 < ex0:
+                        if ex1 > ex0:
                             ex0,ex1 = ex1, ex0
                         outfile.write("$({n},{a})$ & {size} & ".format(
-                        n = ex0[1],
-                        a = ex0[2],
-                        size = ex0[0]
+                            n = ex0[1],
+                            a = ex0[2],
+                            size = ex0[0]
                         ))
                         outfile.write("$({n},{a})$ & {size} & ".format(
-                        n = ex1[1],
-                        a = ex1[2],
-                        size = ex1[0]
+                            n = ex1[1],
+                            a = ex1[2],
+                            size = ex1[0]
                         ))
                     else:
                         ex0 = (n0,a0,len(chain0))
                         ex1 = (n1,a1,len(chain1))
-                        if ex1 < ex0:
+                        if ex1 > ex0:
                             ex0,ex1 = ex1, ex0
                         outfile.write("$({n},{a})$ & {size} & ".format(
-                        n = ex0[1],
-                        a = ex0[2],
-                        size = ex0[0]
+                            n = ex0[0],
+                            a = ex0[1],
+                            size = ex0[2]
                         ))
                         outfile.write("$({n},{a})$ & {size} & ".format(
-                        n = ex1[1],
-                        a = ex1[2],
-                        size = ex1[0]
+                            n = ex1[0],
+                            a = ex1[1],
+                            size = ex1[2]
                         ))
             if chain_amount == 2 and include_gcd:
                 n0 = config_info["N0"]
@@ -267,7 +272,7 @@ if __name__ == "__main__":
             if include_chern or include_pk:
                 blowdowns = config_info["blds"][::-1]
                 for curve in range(len(graph)):
-                    if curve not in blowdowns and curve not in used:
+                    if curve not in exceptionals and curve not in used:
                         for other in graph[curve]:
                             graph[other] = [c for c in graph[other] if c != curve]
                         graph[curve] = []
@@ -335,7 +340,13 @@ if __name__ == "__main__":
 
 
                 if include_chern:
-                    outfile.write("${0}$ & ".format(c_1_tilde/(c_2_tilde if c_2_tilde != 0 else 1)))
+                    if chern_fraction:
+                        if c_2_tilde == 0:
+                            outfile.write("$\\infty$ & ")
+                        else:
+                            outfile.write("${0:.2f}$ & ".format(c_1_tilde/c_2_tilde))
+                    else:
+                        outfile.write("$({0},{1})$ & ".format(c_1_tilde,c_2_tilde))
                 if include_pk:
                     outfile.write("$({0},{1})$ & ".format(Ptilde,Ktilde))
             if chain_amount == 2:
