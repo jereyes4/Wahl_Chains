@@ -360,7 +360,7 @@ if __name__ == "__main__":
                             outfile.write("CE ${}^\\dagger$ & ")
                         else:
                             if "WHid" in config_info:
-                                outfile.write("{0} & ".format(config_info["WHid"]))
+                                outfile.write("{0} & ".format(config_info["WHid"] + 1))
                             else:
                                 outfile.write("YES & ")
             outfile.write(str(ex_id))
