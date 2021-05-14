@@ -406,6 +406,9 @@ void Reader::parse_option(const vector<string>& tokens) {
         else if (tokens[1] == "Plain_Text") {
             summary_style = plain_text_;
         }
+        else if (tokens[1] == "skip") {
+            summary_style = skip_;
+        }
         else {
             error("Invalid argument for \'Summary_Style\': " + tokens[1]);
         }

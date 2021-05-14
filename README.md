@@ -120,6 +120,7 @@ Following is the full list of settings and their possible options:
 - `Summary_Style`: Determines the style of the summary file. Takes two possible options
   - `LaTeX_Table`: Summary is exported as an easy to include table in Latex format.
   - `Plain_Text`: Summary is exported as a plain text file.
+  - `skip`: Does not export summary.
 
   Defaults to `Plain_Text`.
 - `Summary_Include_GCD`: For examples with two singularities, include in the summary the gcd of the common denominators for discrepancies. Useful when calculating fundamental groups. Takes `Y` as yes and `N` as no.  
