@@ -15,8 +15,7 @@ Effective_Check: print
 Obstruction_Check: print
 
 Summary_Include_GCD: Y
-
-Threads: 80
+LaTeX_Include_Subsection: Y
 
 Tests: 20
 

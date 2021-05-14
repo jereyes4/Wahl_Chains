@@ -1,6 +1,6 @@
 
-Output: jsonltest/4422
-Summary_Output: jsonltest/4422
+Output: jsonl/4422
+Summary_Output: summary/4422
 Summary_Style: LaTeX_Table
 
 Single_Chain: Y
@@ -15,8 +15,7 @@ Effective_Check: print
 Obstruction_Check: print
 
 Summary_Include_GCD: Y
-
-Threads: 80
+LaTeX_Include_Subsection: Y
 
 Tests: 4
 

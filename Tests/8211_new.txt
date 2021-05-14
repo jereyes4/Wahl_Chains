@@ -16,8 +16,6 @@ Obstruction_Check: print
 Summary_Include_GCD: Y
 LaTeX_Include_Subsection: Y
 
-Threads: 80
-
 Tests: 6
 
 Fibers:

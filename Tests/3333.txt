@@ -15,8 +15,8 @@ Effective_Check: print
 Obstruction_Check: print
 
 Summary_Include_GCD: Y
+LaTeX_Include_Subsection: Y
 
-Threads: 80
 
 # Dada una raiz de la unidad s^2 + s + 1 = 0,
 # L_X = X
