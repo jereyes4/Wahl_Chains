@@ -40,16 +40,16 @@ bool bullets = false;
 
 const char header[] =
 "%\\usepackage{longtable}\n"
-"\\begin{longtable}{|c|c|c|c|c||||c|c|c|c||||c|c|c|}\n"
+"\\begin{longtable}{|c|c|c|c|c||||c|c|c|c||||c|c|c||||c|}\n"
 "\\hline\n"
-"\\multicolumn{12}{|c|}{ " xstr(PP) " chains, $K^2 = " xstr(KK) "$, Singular fibers: " xstr(FF) " }\\\\\n"
+"\\multicolumn{13}{|c|}{ " xstr(PP) " chains, $K^2 = " xstr(KK) "$, Singular fibers: " xstr(FF) " }\\\\\n"
 "\\hline\n"
-"$e_{-2}$ & $e_{-1}$ & $e_{0}$ & $e_{1}$ & $e_{2}$ & $c_2$ & $c_3$ & $c_4$ & $c_5$ & $c_3^\\bullet$ & $c_4^\\bullet$ & $c_5^\\bullet$\\\\\n"
+"$e_{-2}$ & $e_{-1}$ & $e_{0}$ & $e_{1}$ & $e_{2}$ & $t_2$ & $t_3$ & $t_4$ & $t_5$ & $t_3^\\bullet$ & $t_4^\\bullet$ & $t_5^\\bullet$ & $\\overline c_1^2 / \\overline c_2$\\\\\n"
 "\\hline\n"
 "\\endfirsthead\n"
 "\n"
 "\\hline\n"
-"$e_{-2}$ & $e_{-1}$ & $e_{0}$ & $e_{1}$ & $e_{2}$ & $c_2$ & $c_3$ & $c_4$ & $c_5$ & $c_3^\\bullet$ & $c_4^\\bullet$ & $c_5^\\bullet$\\\\\n"
+"$e_{-2}$ & $e_{-1}$ & $e_{0}$ & $e_{1}$ & $e_{2}$ & $t_2$ & $t_3$ & $t_4$ & $t_5$ & $t_3^\\bullet$ & $t_4^\\bullet$ & $t_5^\\bullet$ & $\\overline c_1^2 / \\overline c_2$\\\\\n"
 "\\hline\n"
 "\\endhead\n"
 "\\hline\n"
@@ -58,16 +58,16 @@ const char header[] =
 
 const char header_no_bullet[] = 
 "%\\usepackage{longtable}\n"
-"\\begin{longtable}{|c|c|c|c|c||||c|c|c|c|}\n"
+"\\begin{longtable}{|c|c|c|c|c||||c|c|c|c||||c|}\n"
 "\\hline\n"
-"\\multicolumn{9}{|c|}{ " xstr(PP) " chains, $K^2 = " xstr(KK) "$, Singular fibers: " xstr(FF) " }\\\\\n"
+"\\multicolumn{10}{|c|}{ " xstr(PP) " chains, $K^2 = " xstr(KK) "$, Singular fibers: " xstr(FF) " }\\\\\n"
 "\\hline\n"
-"$e_{-2}$ & $e_{-1}$ & $e_{0}$ & $e_{1}$ & $e_{2}$ & $c_2$ & $c_3$ & $c_4$ & $c_5$\\\\\n"
+"$e_{-2}$ & $e_{-1}$ & $e_{0}$ & $e_{1}$ & $e_{2}$ & $t_2$ & $t_3$ & $t_4$ & $t_5$ & $\\overline c_1^2 / \\overline c_2$\\\\\n"
 "\\hline\n"
 "\\endfirsthead\n"
 "\n"
 "\\hline\n"
-"$e_{-2}$ & $e_{-1}$ & $e_{0}$ & $e_{1}$ & $e_{2}$ & $c_2$ & $c_3$ & $c_4$ & $c_5$\\\\\n"
+"$e_{-2}$ & $e_{-1}$ & $e_{0}$ & $e_{1}$ & $e_{2}$ & $t_2$ & $t_3$ & $t_4$ & $t_5$ & $\\overline c_1^2 / \\overline c_2$\\\\\n"
 "\\hline\n"
 "\\endhead\n"
 "\\hline\n"
@@ -76,6 +76,8 @@ const char header_no_bullet[] =
 
 int main() {
     std::ofstream f("THINGS.tex");
+    f.precision(2);
+    f << std::fixed;
     if (bullets) f << header;
     else f << header_no_bullet;
     bool first = true;
@@ -84,17 +86,17 @@ int main() {
     for (int p0 = min_p0; p0 <= max_p0; ++p0)
     for (int p1 = min_p1; p1 <= max_p1; ++p1)
     for (int p2 = min_p2; p2 <= max_p2; ++p2)
-    for (int c3 = 0; c3 <= max_triple; ++c3)
-    for (int c3p = 0; c3p <= c3; ++c3p)
-    for (int c4 = 0; c4 <= max_quadruple; ++c4)
-    for (int c4p = 0; c4p <= c4; ++c4p)
-    for (int c5 = 0; c5 <= max_quintuple; ++c5)
-    for (int c5p = 0; c5p <= c5; ++c5p){
-        int c2 = KK - (2*c3 + c3p + 3*c4 + 2*c4p + 4*c5 + 3*c5p) + (n2 + 2*n1 + 3*p0 + 4*p1 + 5*p2);
-        int c2_2 = - PP - (3*c3 + 2*c3p + 4*c4 + 4*c4p + 5*c5 + 6*c5p) + (3*n2 + 4*n1 + 5*p0 + 6*p1 + 7*p2);
-        if (2*c2 != c2_2) continue;
-        if (c2 < 2*n1 + n2 - 2) continue;
-        if (n2 == max_n2 and c2 + 3*c3 + 6*c4 + 10*c5 < max_n2 + FF*(n1 + 2*p0 + 3*p1 + 4*p2)) continue;
+    for (int t3 = 0; t3 <= max_triple; ++t3)
+    for (int t3p = 0; t3p <= t3; ++t3p)
+    for (int t4 = 0; t4 <= max_quadruple; ++t4)
+    for (int t4p = 0; t4p <= t4; ++t4p)
+    for (int t5 = 0; t5 <= max_quintuple; ++t5)
+    for (int t5p = 0; t5p <= t5; ++t5p){
+        int t2 = KK - (2*t3 + t3p + 3*t4 + 2*t4p + 4*t5 + 3*t5p) + (n2 + 2*n1 + 3*p0 + 4*p1 + 5*p2);
+        int t2_2 = - PP - (3*t3 + 2*t3p + 4*t4 + 4*t4p + 5*t5 + 6*t5p) + (3*n2 + 4*n1 + 5*p0 + 6*p1 + 7*p2);
+        if (2*t2 != t2_2) continue;
+        if (t2 < 2*n1 + n2 - 2) continue;
+        if (n2 == max_n2 and t2 + 3*t3 + 6*t4 + 10*t5 < max_n2 + FF*(n1 + 2*p0 + 3*p1 + 4*p2)) continue;
         if (not (n1 or p0 or p1 or p2)) continue;
         if (!first) f << "\\\\\n";
         first = false;
@@ -103,15 +105,22 @@ int main() {
         f << p0 << " & ";
         f << p1 << " & ";
         f << p2 << " & ";
-        f << c2 << " & ";
-        f << c3 << " & ";
-        f << c4 << " & ";
-        f << c5;
+        f << t2 << " & ";
+        f << t3 << " & ";
+        f << t4 << " & ";
+        f << t5 << " & ";
         if (bullets) {
-            f << " & ";
-            f << c3p << " & ";
-            f << c4p << " & ";
-            f << c5p;
+            f << t3p << " & ";
+            f << t4p << " & ";
+            f << t5p << " & ";
+        }
+        int c1 = -(n1 + 2*p0 + 3*p1 + 4*p2) - 2*(n2 + n1 + p0 + p1 + p2) + (2*t2 + 5*t3 + 8*t4 + 11*t5);
+        int c2 = 12 + (t2 + 2*t3 + 3*t4 + 4*t5) - 2*(n2 + n1 + p0 + p1 + p2);
+        if (c2 == 0) {
+            f << "\\infty";
+        }
+        else {
+            f << double(c1)/double(c2);
         }
     }
     f << "\n\\end{longtable}\n";
