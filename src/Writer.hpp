@@ -609,6 +609,24 @@ namespace Writer {
         }
     }
 
+    static void export_jsonl(Reader& reader) {
+        std::string filename = reader.output_filename + ".jsonl";
+        std::ofstream f(filename);
+        if (f.fail()) {
+            std::cout << "Error while opening file \"" << filename << "\"." << std::endl;
+            filename = DEFAULT_OUTPUT_NAME ".jsonl";
+            std::cout << "Attempting to open default file \"" << filename << "\"." << std::endl;
+            f.clear();
+            f.open(filename);
+            if (f.fail()) {
+                std::cout << "Also failed. Aborting." << std::endl;
+                exit(0);
+            }
+        }
+        export_graph_data(f,reader);
+        f.close();
+    }
+
     static void export_jsonl(Reader& reader, std::vector<Example*>& ptr_examples) {
         std::string filename = reader.output_filename + ".jsonl";
         std::ofstream f(filename);

@@ -86,7 +86,9 @@ public:
             id(id), multiplicity(multiplicity), left_parent(left_parent), right_parent(right_parent) {}
     };
     std::unordered_set<int> used_components;
+    std::unordered_set<int> used_components_including_forgotten;
     std::vector<Component> components;
+    std::vector<Component> components_including_forgotten;
 };
 
 class Reader
@@ -98,7 +100,9 @@ public:
         comment_,
         fibers_,
         sections_,
-        merge_
+        merge_,
+        make_fibers_,
+        forget_exceptionals_
     };
     enum Setting : char {
         no_,
@@ -123,6 +127,7 @@ public:
     Setting keep_first;
     Setting section_input_mode;
     bool only_do_pretest;
+    bool parse_only;
     bool search_single_chain;
     bool search_double_chain;
     bool search_single_QHD;
@@ -149,6 +154,8 @@ public:
     std::vector<std::string> curve_name;
     std::vector<std::vector<int>> fibers;
     std::vector<std::string> fiber_type;
+    std::unordered_set<int> curves_in_fibers;
+    std::unordered_set<int> forgotten_exceptionals;
     std::set<int> sections;
     std::vector<std::multiset<int>> adj_list;
     std::vector<int> self_int;
@@ -156,6 +163,7 @@ public:
     std::vector<std::vector<int>> try_curves;
     std::vector<std::vector<std::vector<int>>> choose_curves;
     std::vector<std::vector<int>> ignored_curves;
+    // used only for exceptionals, since it is unneeded for other curves as of yet.
 
     std::ostream* error_stream;
 
@@ -172,6 +180,8 @@ public:
     void parse_fiber(const std::vector<std::string>& def_tokens, const std::vector<std::string>& content_tokens);
     void parse_section(const std::vector<std::string>& def_tokens, const std::vector<std::string>& content_tokens);
     void parse_merge(const std::vector<std::string>& def_tokens, const std::vector<std::string>& content_tokens);
+    void parse_make_fiber(const std::vector<std::string>& def_tokens, const std::vector<std::string>& content_tokens);
+    void parse_forget_exceptional(const std::vector<std::string>& tokens);
     long long get_test_numbers(std::vector<long long>& test_numbers);
 };
 

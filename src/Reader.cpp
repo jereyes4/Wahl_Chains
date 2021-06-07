@@ -1,4 +1,5 @@
 #include"Reader.hpp"
+#include<algorithm> // std::find
 using std::string;
 using std::vector;
 using std::map;
@@ -194,6 +195,7 @@ Reader::Reader() {
     keep_first = keep_global_;
     section_input_mode = by_self_intersection_;
     only_do_pretest = false;
+    parse_only = false;
     search_single_chain = true;
     search_double_chain = false;
     search_single_QHD = false;
@@ -247,7 +249,7 @@ void Reader::parse(istream& input) {
             }
             continue;
         }
-        if (tokens.size() == 1) {
+        if (tokens.size() == 1 and tokens[0].back() == ':') {
             if (tokens[0] == "Fibers:") {
                 state = fibers_;
                 continue;
@@ -271,6 +273,14 @@ void Reader::parse(istream& input) {
                 state = merge_;
                 continue;
             }
+            if (tokens[0] == "MakeFibers:") {
+                state = make_fibers_;
+                continue;
+            }
+            if (tokens[0] == "ForgetExceptionals:") {
+                state = forget_exceptionals_;
+                continue;
+            }
             if (tokens[0].substr(0,9) == "Sections(" and
                 tokens[0].substr(tokens[0].size() - 2) == "):") {
                 int value;
@@ -284,6 +294,7 @@ void Reader::parse(istream& input) {
                     error("Invalid self intersection for Sections: " + temp);
                 }
             }
+            warning("Token \'" + tokens[0] + "\' is not a command. Treated as a name.");
         }
         switch (state) {
         case start_:
@@ -316,18 +327,41 @@ void Reader::parse(istream& input) {
             next_tokens = split(next_line);
             parse_merge(tokens,next_tokens);
             break;
+        case make_fibers_:
+            if (input.eof()) {
+                error("Unexpected EOF after MakeFiber definition.");
+            }
+            getline(input,next_line);
+            line_no++;
+            next_tokens = split(next_line);
+            parse_make_fiber(tokens,next_tokens);
+            break;
+        case forget_exceptionals_:
+            parse_forget_exceptional(tokens);
+            break;
         default:;
         }
     }
     
-    if (tests_no > 1 and tests_start_index + tests_no > max_test_number) {
-        warning("Test range exedes number of tests given by curve options. Redundant tests are ignored.");
-        tests_no = std::max(1,max_test_number - tests_start_index);
-    }
     for (int i = 0; i < curve_no; ++i) {
         if (contains(adj_list[i],i)) {
             error("Curve \'" + curve_name[i] + "\' still has singularities.");
         }
+    }
+    
+    for (auto& comp : K.components_including_forgotten) {
+        if (!contains(forgotten_exceptionals,comp.id)) {
+            K.components.emplace_back(comp);
+            K.used_components.insert(comp.id);
+        }
+    }
+
+    if (tests_no > 1 and tests_start_index + tests_no > max_test_number) {
+        warning("Test range exedes number of tests given by curve options. Redundant tests are ignored.");
+        tests_no = std::max(1,max_test_number - tests_start_index);
+    }
+    if (parse_only) {
+        warning("Parse only debug mode: no testing is done.");
     }
 }
 
@@ -338,12 +372,19 @@ void Reader::parse_option(const vector<string>& tokens) {
         }
         if (tokens.size() == 2) {
             int value;
-            if (!safe_stoi(tokens[1],value) or value < 1) {
+            if (!safe_stoi(tokens[1],value) or value < 0) {
                 error("Invalid number for option \'Tests\': " + tokens[1]);
             }
             if (value > MAX_TESTS) {
                 warning("Number of tests cannot exceed " + to_string(MAX_TESTS) + ". Further test ignored.");
                 value = MAX_TESTS;
+            }
+            if (value == 0) {
+                parse_only = true;
+                value = 1;
+            }
+            else {
+                parse_only = false;
             }
             tests_no = value;
             fixed_curves.resize(tests_no);
@@ -353,6 +394,7 @@ void Reader::parse_option(const vector<string>& tokens) {
             return;
         }
         else {
+            parse_only = false;
             int start, finish;
             if (!safe_stoi(tokens[1],start) or start < 1) {
                 error("Invalid number for option \'Tests\': " + tokens[1]);
@@ -727,12 +769,16 @@ void Reader::parse_fiber(const vector<string>& def_tokens, const vector<string>&
         }
         else if (option == "Dis" or option == "D") {
             if (n == 1){
-                ignored_curves[t].emplace_back(fibers.back()[0]);
+                // ignored_curves[t].emplace_back(fibers.back()[0]);
             }
-            choose_curves[t].emplace_back(fibers.back());
+            else {
+                choose_curves[t].emplace_back(fibers.back());
+            }
         }
         else if (option == "Ign" or option == "I") {
-            ignored_curves[t].emplace_back(fibers.back()[0]);
+            // for (int curve : fibers.back()) {
+            //     ignored_curves[t].emplace_back(curve);
+            // }
         }
         else {
             error("Invalid test option for Fiber " + def_tokens[0] + ".",line_no-1);
@@ -781,10 +827,10 @@ void Reader::parse_section(const vector<string>& def_tokens, const vector<string
             try_curves[t].emplace_back(this_id);
         }
         else if (option == "Ign" or option == "I") {
-            ignored_curves[t].emplace_back(this_id);
+            // ignored_curves[t].emplace_back(this_id);
         }
         else {
-            error("Invalid test option for Setion \'" + def_tokens[0] + "\'.",line_no-1);
+            error("Invalid test option for Section \'" + def_tokens[0] + "\'.",line_no-1);
         }
     }
 }
@@ -859,7 +905,7 @@ void Reader::parse_merge(const vector<string>& def_tokens, const vector<string>&
 }
 int Canonical_Divisor::exceptional_intersection(map<int,int>& intersections) {
     int result = 0;
-    for (auto& comp : components) {
+    for (auto& comp : components_including_forgotten) {
         result += comp.multiplicity*intersections[comp.id];
     }
     return result;
@@ -868,7 +914,7 @@ int Canonical_Divisor::exceptional_intersection(map<int,int>& intersections) {
 int Canonical_Divisor::blowup_curve_self_int_delta(map<int,int>& intersections) {
     int ex_inters = exceptional_intersection(intersections);
     int delta_arithmetic_genus = 0;
-    for (auto iter = components.rbegin(); iter != components.rend(); ++iter) {
+    for (auto iter = components_including_forgotten.rbegin(); iter != components_including_forgotten.rend(); ++iter) {
         auto& comp = *iter;
         int inters = intersections[comp.id];
         delta_arithmetic_genus += inters*(inters-1)/2;
@@ -887,7 +933,7 @@ void Canonical_Divisor::blowup(int id, const map<int,int>& intersections) {
     int mult = 1;
     int left_p = -1;
     int right_p = -1;
-    for (auto& comp : components) {
+    for (auto& comp : components_including_forgotten) {
         if (contains(intersections,comp.id) and intersections.at(comp.id) > 0) {
             if (left_p == -1) {
                 left_p = comp.id;
@@ -898,8 +944,92 @@ void Canonical_Divisor::blowup(int id, const map<int,int>& intersections) {
             mult += comp.multiplicity;
         }
     }
-    used_components.insert(id);
-    components.emplace_back(id,mult,left_p,right_p);
+    used_components_including_forgotten.insert(id);
+    components_including_forgotten.emplace_back(id,mult,left_p,right_p);
+}
+
+void Reader::parse_make_fiber(const vector<string>& def_tokens, const vector<string>& content_tokens) {
+    fiber_type.emplace_back(def_tokens[0]);
+    fibers.emplace_back();
+    int n = content_tokens.size();
+    if (n == 0) {
+        error("Fiber declaration empty.");
+    }
+    for (const string& curve : content_tokens) {
+        if (!contains(curve_id,curve)) {
+            error("Curve \'" + curve + "\' is undefined.");
+        }
+        int id = curve_id[curve];
+        if (contains(curves_in_fibers,id)) {
+            error("Curve \'" + curve + "\' is already part of a fiber.");
+        }
+        fibers.back().emplace_back(id);
+        curves_in_fibers.insert(id);
+        if (contains(K.used_components_including_forgotten,id)) {
+            forgotten_exceptionals.insert(id);
+        }
+        for (int t = 0; t < tests_no; ++t) {
+            auto it = std::find(fixed_curves[t].begin(),fixed_curves[t].end(),id);
+            if (it != fixed_curves[t].end()) {
+                std::iter_swap(it,fixed_curves[t].end()-1);
+                fixed_curves[t].erase(fixed_curves[t].end()-1);
+            }
+            it = std::find(try_curves[t].begin(),try_curves[t].end(),id);
+            if (it != try_curves[t].end()) {
+                std::iter_swap(it,try_curves[t].end()-1);
+                try_curves[t].erase(try_curves[t].end()-1);
+            }
+        }
+    }
+    max_test_number = std::max(max_test_number,(int)def_tokens.size() - 1);
+    string option = def_tokens.size() == 1 ? "T" : def_tokens.back();
+    for (int t = 0; t < tests_no; ++t) {
+        if (def_tokens.size() > t + 1 + tests_start_index) {
+            option = def_tokens[t + 1 + tests_start_index];
+        }
+        if (option == "Fix" or option == "F") {
+            for (int curve : fibers.back()) {
+                fixed_curves[t].emplace_back(curve);
+            }
+        }
+        else if (option == "Try" or option == "T") {
+            for (int curve : fibers.back()) {
+                try_curves[t].emplace_back(curve);
+            }
+        }
+        else if (option == "Dis" or option == "D") {
+            if (n == 1){
+                // ignored_curves[t].emplace_back(fibers.back()[0]);
+            }
+            else {
+                choose_curves[t].emplace_back(fibers.back());
+            }
+        }
+        else if (option == "Ign" or option == "I") {
+            // for (int curve : fibers.back()) {
+            //     ignored_curves[t].emplace_back(curve);
+            // }
+        }
+        else {
+            error("Invalid test option for MakeFiber " + def_tokens[0] + ".",line_no-1);
+        }
+    }
+}
+
+void Reader::parse_forget_exceptional(const vector<string>& tokens) {
+    for (const string& curve : tokens) {
+        if (!contains(curve_id,curve)) {
+            error("Curve \'" + curve + "\' is undefined.");
+        }
+        int id = curve_id[curve];
+        if (!contains(K.used_components_including_forgotten,id)) {
+            error("Curve \'" + curve + "\' is not an exceptional.");
+        }
+        if (contains(forgotten_exceptionals,id)) {
+            error("Curve \'" + curve + "\' is already forgotten.");
+        }
+        forgotten_exceptionals.insert(id);
+    }
 }
 
 long long Reader::get_test_numbers(vector<long long>& number_of_tests) {

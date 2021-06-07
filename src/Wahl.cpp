@@ -20,6 +20,11 @@ Wahl::Wahl(int argc, char** argv) {
     reader.parse(f);
     f.close();
 
+    if (reader.parse_only) {
+        Writer::export_jsonl(reader);
+        return;
+    }
+
     // debugx(reader.tests_no);
 
     total_tests = reader.get_test_numbers(number_tests);
