@@ -1026,7 +1026,7 @@ void Reader::parse_forget_exceptional(const vector<string>& tokens) {
             error("Curve \'" + curve + "\' is not an exceptional.");
         }
         if (contains(forgotten_exceptionals,id)) {
-            error("Curve \'" + curve + "\' is already forgotten.");
+            warning("Curve \'" + curve + "\' is already forgotten.");
         }
         forgotten_exceptionals.insert(id);
     }
