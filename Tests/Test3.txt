@@ -20,6 +20,8 @@ LaTeX_Include_Subsection: Y
 Tests: 6
 K2: 9
 
+SubTests: 0 - 8000
+
 Name:
     E_1 Try
 
@@ -49,19 +51,19 @@ Sections(1):
     Y Try
         E_3 E_2
     Z Try
-        Y E_7 E_5
+        Y E_7 E_6
     A Try
         E_1 E_8
     C Try
-        A E_5 E_3
+        A E_5 E_4
     B Try
         E_5 E_1 E_9
 
 Sections(9):
     F_1 Try
-        G_1 G_1 E_2 E_4 E_6 E_8
+        G_1 G_1 E_2 E_4 E_6 E_8 E_9
     F_2 Try
-        G_2 G_2 E_2 E_4 E_6 E_8
+        G_2 G_2 E_2 E_4 E_6 E_8 E_9
 
 Sections(1):
     S Try
