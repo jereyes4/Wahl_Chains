@@ -20,7 +20,7 @@ LaTeX_Include_Subsection: Y
 Tests: 6
 K2: 9
 
-SubTests: 0 - 8000
+// SubTests: 0 - 8000
 
 Name:
     E_1 Try
