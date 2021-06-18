@@ -1,0 +1,66 @@
+
+Output: jsonl/Test1
+Summary_Output: summary/Test1
+Summary_Style: LaTeX_Table
+
+Single_Chain: Y
+Double_Chain: Y
+Single_QHD: Y
+Double_QHD: Y
+Keep_First: global
+Search_For: 1 2 3 4 5 6 7 8 9
+
+Nef_Check: print
+Effective_Check: print
+Obstruction_Check: print
+
+Summary_Include_GCD: Y
+LaTeX_Include_Subsection: Y
+
+Tests: 6
+
+Fibers:
+    I5 Fix Fix Fix Dis Dis Dis
+        X E_3 Y Z E_7
+    I5 Fix Dis Dis Fix Fix Dis
+        A C E_5 B E_1
+    I1 Try Fix Ign Fix Ign Fix
+        F_1
+    I1 Try Try Fix Try Fix Fix
+        F_2
+Name:
+    G_1 Try
+        F_1 F_1
+    G_2 Try
+        F_2 F_2
+Sections:
+    E_2 Try
+        E_1 Y F_1 F_2
+    E_4 Try
+        E_3 C F_1 F_2
+    E_6 Try
+        E_5 Z F_1 F_2
+    E_8 Try
+        E_7 A F_1 F_2
+    E_9 Try
+        X B F_1 F_2
+DoubleSections:
+    S Try
+        Z E_3 A B G_1 F_2 F_2
+Sections(1):
+    R Try
+        Y Z X A C B F_1 G_1 F_2 G_2
+    Q Try
+        C B E_1 E_3 Z E_7 G_1 F_1 G_2 F_2
+Merge:
+    P_1 Try
+        Y Z R
+    P_2 Try
+        A C R
+    P_3 Try
+        B E_1 Q
+    P_4 Try
+        Z E_7 Q
+Sections(0):
+    T Try
+        P_1 A C F_1 F_1 F_2 F_2 E_9 Q Q

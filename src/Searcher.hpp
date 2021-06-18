@@ -112,7 +112,7 @@ struct alignas(64) Example {
 
 class alignas(64) Searcher {
 public:
-    Searcher() : test_index(0), test_start(0), current_test(0){}
+    Searcher() : test_index(0), test_start(0), current_test(-1){}
 
     std::stringstream* err;
 
@@ -124,6 +124,10 @@ public:
         std::atomic<long long> *wrapper_current_test;
     #else
         long long *wrapper_current_test;
+    #endif
+
+    #ifdef PRINT_PASSED_PRETESTS
+        long long *wrapper_passed_pretests;
     #endif
 
     bool current_no_obstruction;
@@ -316,6 +320,10 @@ public:
     std::queue<Example> results;
     Wahl *parent;
     std::stringstream err;
+
+#ifdef PRINT_PASSED_PRETESTS
+    long long passed_pretests;
+#endif
 
     void search();
 

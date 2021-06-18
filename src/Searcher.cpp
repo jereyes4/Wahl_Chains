@@ -13,6 +13,10 @@ void Searcher_Wrapper::search() {
     worker.results = &results;
     worker.err = &err;
     worker.wrapper_current_test = &current_test;
+    #ifdef PRINT_PASSED_PRETESTS
+    worker.wrapper_passed_pretests = &passed_pretests;
+    passed_pretests = 0;
+    #endif
     worker.search();
 }
 
@@ -263,16 +267,17 @@ void Searcher::search() {
         }
 #endif
         *wrapper_current_test = current_test = parent->get_test(current_test);
-        while (test_index < parent->number_tests.size() and
-            parent->number_tests[test_index] + test_start <= current_test) {
+
+        long long real_test = current_test + reader_copy.subtest_start;
+        if (current_test >= parent->total_tests) {
+            return;
+        }
+        while (parent->number_tests[test_index] + test_start <= real_test) {
             test_start += parent->number_tests[test_index];
             test_index++;
         }
-        if (test_index == parent->number_tests.size()) {
-            return;
-        }
         //from this mask read in order first try_curves and then choose_curves
-        long long mask = current_test - test_start;
+        long long mask = real_test - test_start;
 
         K2 = reader_copy.K.self_int;
 
@@ -352,6 +357,12 @@ void Searcher::search() {
         current_K2 = K;
         
         if (!contains(reader_copy.search_for,K)) continue;
+
+        // Pretest passed.
+        #ifdef PRINT_PASSED_PRETESTS
+        (*wrapper_passed_pretests)++;
+        #endif
+
         G.reset();
         curve_dict.clear();
         curve_translate.resize(0);

@@ -19,27 +19,27 @@ public:
         return current_test++;
 #else
         // The last bunch if tests should be done one by one, not in bulk.
-        if (total_tests < BULK_SIZE*MAX_THREADS) {
+        if (total_tests < (long long)(BULK_SIZE*MAX_THREADS)) {
             // If there are too few tests, ignore bulks.
             return current_test.fetch_add(1,std::memory_order_relaxed);
         }
 
         // index where the last batch starts
-        const long long last_batch = total_tests - (BULK_SIZE*MAX_THREADS + total_tests%BULK_SIZE);
+        const long long last_batch = total_tests - ((long long)(BULK_SIZE*MAX_THREADS) + total_tests%(long long)BULK_SIZE);
 
         if (++previous >= last_batch) {
             long long next = current_test.fetch_add(BULK_SIZE,std::memory_order_relaxed);
-            next = last_batch + (next - last_batch)/BULK_SIZE;
+            next = last_batch + (next - last_batch)/(long long)BULK_SIZE;
             return next;
         }
-        if (previous%BULK_SIZE) {
+        if (previous%(long long)BULK_SIZE) {
             // Has not finished bulk
             return previous;
         }
         else {
             long long next = current_test.fetch_add(BULK_SIZE,std::memory_order_relaxed);
             if (next >= last_batch) {
-                next = last_batch + (next - last_batch)/BULK_SIZE;
+                next = last_batch + (next - last_batch)/(long long)BULK_SIZE;
             }
             return next;
         }

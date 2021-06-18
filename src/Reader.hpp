@@ -68,7 +68,8 @@ try_curves, ignored_curves: same but with try curves and ignored curves.
 choose_curves: for every test t, choose_curves[t] contains the lists of groups of curves we want to try from, but not including all of them at once.
 */
 
-// Actually keeps track of the exceptional divisor.
+// Keeps track of the exceptional divisor for calculating self intersections.
+// Becomes invalid if there were forgotten exceptionals...
 class Canonical_Divisor {
 public:
     int self_int;
@@ -143,6 +144,10 @@ public:
     int tests_no;
     int tests_start_index;
     int max_test_number;
+
+    long long subtest_start;
+    long long subtest_end;
+
     int line_no;
     int curve_no;
     int current_section_argument;

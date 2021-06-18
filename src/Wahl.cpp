@@ -1,4 +1,4 @@
-#include"Wahl.hpp"
+#include"Wahl.hpp" // string, to_string
 #include"Searcher.hpp" // Searcher_Wrapper, queue, priority_queue, single_invariant, double_invariant, p_extremal_invariant and their hashes
 #include"Algorithms.hpp"
 #include<fstream> // ifstream
@@ -29,6 +29,19 @@ Wahl::Wahl(int argc, char** argv) {
 
     total_tests = reader.get_test_numbers(number_tests);
     current_test = 0;
+
+    if (reader.subtest_end != -1) {
+        auto temp = total_tests;
+        total_tests = std::min(total_tests,reader.subtest_end);
+        std:: cout << "From a total of " + std::to_string(temp) + " attempting to test from " + std::to_string(reader.subtest_start) + " to " + std::to_string(total_tests) + "." << std::endl;
+        if (total_tests < reader.subtest_start) {
+            reader.error("Subtest range out of bounds.");
+        }
+        total_tests -= reader.subtest_start;
+    }
+    else {
+        reader.subtest_start = 0;
+    }
     std::cout << "Total tests: " << total_tests << std::endl;
 
 
@@ -251,7 +264,15 @@ void Wahl::Write(std::vector<Searcher_Wrapper>& searchers) {
             }
         }
     }
+    #ifdef PRINT_PASSED_PRETESTS
+    long long passed_pretests = 0;
+    for (auto& s : searchers) {
+        passed_pretests += s.passed_pretests;
+    }
+    std::cout << "Done! " << passed_pretests << " pretests passed and found " << example_vector.size() << " examples." << std::endl;
+    #else
     std::cout << "Done! Found " << example_vector.size() << " examples." << std::endl;
+    #endif
     Write(example_vector);
 }
 
@@ -265,7 +286,11 @@ void Wahl::Write(Searcher_Wrapper& searcher) {
         example_vector.push_back(std::move(searcher.results.front()));
         searcher.results.pop();
     }
+    #ifdef PRINT_PASSED_PRETESTS
+    std::cout << "Done! " << searcher.passed_pretests << " pretests passed and found " << example_vector.size() << " examples." << std::endl;
+    #else
     std::cout << "Done! Found " << example_vector.size() << " examples." << std::endl;
+    #endif
     Write(example_vector);
 }
 

@@ -10,27 +10,41 @@
 // #define NDEBUG
 
 // Uncomment for multi thread executable, or use flag -D WAHL_MULTITHREAD
+
 // #define WAHL_MULTITHREAD
+
 
 // Status is printed in Wahl::Wahl() if compiled with multithread support.
 // Status is printed in Searcher::search() if compiled without multithread.
 // It uses \r.
+
 #define PRINT_STATUS
 
 // time to wait between status updates, in milliseconds
+
 #define STATUS_WAIT 1000
 
+
 // If multithread, we can print a nicer status if we allow ANSI escape characters
+
 // #define WAHL_MULTITHREAD_STATUS_ANSI
+
 
 // Add some sort of overflow check in calculating continued fractions.
 // TODO: If it happens, use Boost multiprecision instead of ll.
+
 // #define OVERFLOW_CHECK
+
 
 // Avoids searching multiple times some test cases at the cost of some performance.
 // (But then, less search = better performance? IDK which is better.)
 // I guess really only useful when Keep_first is set to No.
+
 // #define NO_REPEATED_SEARCH
+
+// At the end, print the amount of pretests that passed P and K.
+
+#define PRINT_PASSED_PRETESTS
 
 //////////////////////////////////////////////////////////
 // Some hard limits. Keep MAX_THREADS and BULK_SIZE a power of two.

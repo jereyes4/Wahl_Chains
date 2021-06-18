@@ -1,5 +1,5 @@
 #include"Reader.hpp"
-#include<algorithm> // std::find
+#include<algorithm> // std::find, std::sort
 using std::string;
 using std::vector;
 using std::map;
@@ -186,6 +186,20 @@ bool safe_stoi(const string& s, int& result) {
     return 1;
 }
 
+bool safe_stoll(const string& s, long long& result) {
+    try {
+        size_t z;
+        result = stoll(s,&z);
+        if (z != s.size()) {
+            return 0;
+        }
+    }
+    catch (std::exception& e) {
+        return 0;
+    }
+    return 1;
+}
+
 Reader::Reader() {
     summary_style = plain_text_;
     summary_sort = sort_by_n_;
@@ -207,6 +221,8 @@ Reader::Reader() {
     tests_no = 1;
     tests_start_index = 0;
     max_test_number = 1;
+    subtest_start = -1;
+    subtest_end = -1;
     K.self_int = 0;
     fixed_curves.resize(1);
     try_curves.resize(1);
@@ -349,10 +365,28 @@ void Reader::parse(istream& input) {
         }
     }
     
+    // For consistency, sort all fixed / ignored / try vectors
+    for (auto& v : fixed_curves) {
+        std::sort(v.begin(),v.end());
+    }
+    for (auto& v : try_curves) {
+        std::sort(v.begin(),v.end());
+    }
+    for (auto& v : ignored_curves) {
+        std::sort(v.begin(),v.end());
+    }
+
     for (auto& comp : K.components_including_forgotten) {
         if (!contains(forgotten_exceptionals,comp.id)) {
             K.components.emplace_back(comp);
             K.used_components.insert(comp.id);
+        }
+        if (contains(forgotten_exceptionals,comp.right_parent)) {
+            comp.right_parent = -1;
+        }
+        if (contains(forgotten_exceptionals,comp.left_parent)) {
+            comp.left_parent = comp.right_parent;
+            comp.right_parent = -1;
         }
     }
 
@@ -360,6 +394,7 @@ void Reader::parse(istream& input) {
         warning("Test range exedes number of tests given by curve options. Redundant tests are ignored.");
         tests_no = std::max(1,max_test_number - tests_start_index);
     }
+
     if (parse_only) {
         warning("Parse only debug mode: no testing is done.");
     }
@@ -415,6 +450,22 @@ void Reader::parse_option(const vector<string>& tokens) {
             ignored_curves.resize(tests_no);
             return;
         }
+    }
+    else if (tokens[0] == "SubTests:") {
+        if (!(tokens.size() == 4 and tokens[2] == "-")) {
+            error("Argument for option \'SubTests\' must be \'<number> - <number>\'.");
+        }
+        parse_only = false;
+        long long start, finish;
+        if (!safe_stoll(tokens[1],start) or start < 0ll) {
+            error("Invalid number for option \'Tests\': " + tokens[1]);
+        }
+        if (!safe_stoll(tokens[3],finish) or finish < start) {
+            error("Invalid number for option \'Tests\': " + tokens[3]);
+        }
+        subtest_start = start;
+        subtest_end = finish;
+        return;
     }
     else if (tokens[0] == "Output:") {
         if (tokens.size() != 2) {
@@ -731,6 +782,7 @@ void Reader::parse_fiber(const vector<string>& def_tokens, const vector<string>&
         }
         curve_id[curve] = curve_no;
         fibers.back().emplace_back(curve_no);
+        curves_in_fibers.insert(curve_no);
         curve_name.emplace_back(curve);
         adj_list.emplace_back();
         if (n == 1) {
@@ -979,6 +1031,11 @@ void Reader::parse_make_fiber(const vector<string>& def_tokens, const vector<str
                 std::iter_swap(it,try_curves[t].end()-1);
                 try_curves[t].erase(try_curves[t].end()-1);
             }
+            it = std::find(ignored_curves[t].begin(),ignored_curves[t].end(),id);
+            if (it != ignored_curves[t].end()) {
+                std::iter_swap(it,ignored_curves[t].end()-1);
+                ignored_curves[t].erase(ignored_curves[t].end()-1);
+            }
         }
     }
     max_test_number = std::max(max_test_number,(int)def_tokens.size() - 1);
@@ -1027,6 +1084,13 @@ void Reader::parse_forget_exceptional(const vector<string>& tokens) {
         }
         if (contains(forgotten_exceptionals,id)) {
             warning("Curve \'" + curve + "\' is already forgotten.");
+        }
+        for (int t = 0; t < tests_no; ++t) {
+            auto it = std::find(ignored_curves[t].begin(), ignored_curves[t].end(), id);
+            if (it != ignored_curves[t].end()) {
+                std::iter_swap(it,ignored_curves[t].end()-1);
+                ignored_curves[t].erase(ignored_curves[t].end()-1);
+            }
         }
         forgotten_exceptionals.insert(id);
     }

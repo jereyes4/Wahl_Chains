@@ -110,7 +110,8 @@ Following is the full list of settings and their possible options:
 - `Tests`: Takes a range of positive numbers, for example "`2 - 5`". It determines a range of tests to be performed on the configuration. The difference between these tests is determined by the options given later for each curve.  
   Can also take a single number `n`, which is effectively equivalent to the range "`1 - n`".  
   Values are clamped below the hard limit of `100`, given by the macro `MAX_TESTS` in `config.hpp`.
-  Defaults to `1`.
+  Defaults to `1`.  
+  By putting `Tests: 0` no test is done. The program only dumps the information of the complete configuration to the `.jsonl` file.
 - `Output`: Takes the name of the file where a database of examples will be exported. It will be of extension `.jsonl`. For example if one writes
 
       Output: filename
@@ -180,10 +181,12 @@ Following is the full list of settings and their possible options:
   
   This option is useful when dealing with highly singular multiple sections. For example if a curve $C$ is sextuple section, then $C.K_Y = -6$, but if it is too singular, perhaps it is not immediate knowing $C^2$.
 
-## Adding Curves
+## Adding and Modifying Curves
 
-There are three ways of adding curves. Either as complete fibers, as sections (which in practice can work with any kind of curves, not only sections) and as exceptional curves (or named points). A block of fibers is declared with `Fibers:`. A block of sections is declared with `Sections(n):`, where `n` is a parameter whose meaning is given by the option `Sections_Input`. A block of exceptional curves is declared with `Name:` or `Merge:`. A block ends when another block is declared, or when reaching the end of file. After declaring the first block, it will be impossible to declare further options.  
-Indentation makes no difference, it is just useful to make it more readable.
+There are three ways of adding curves. Either as complete fibers, as sections (which in practice can work with any kind of curves, not only sections) and as exceptional curves (or named points). A block of fibers is declared with `Fibers:`. A block of sections is declared with `Sections(n):`, where `n` is a parameter whose meaning is given by the option `Sections_Input`. A block of exceptional curves is declared with `Name:` or `Merge:`.  
+Additionally, there are two blocks for modifying some information about fibers and curves: `MakeFibers:` and `ForgetExceptionals:`.  
+A block ends when another block is declared, or when reaching the end of file. After declaring the first block, it will be impossible to declare further options.  
+Indentation makes no difference, it is just useful to make it more readable.  
 Each curve must be declared with a name, and each name must be unique.
 
 - `Fiber` block: Within a `Fiber` block, fibers are declared. Each fiber declaration consists of two lines. Empty lines or comments are ignored, but the two lines of a fiber declaration **must** be contiguous, that is, no empty lines or comments may appear in between.
@@ -335,6 +338,31 @@ Each curve must be declared with a name, and each name must be unique.
   Disclaimer: This simulation is still just a trick that fools the computer into working with these fibers. In reality it keeps believing the fibers are of types `I3`, `I2` or `I1`. A consequence of this is that it will probably give false positives for the effective check in the case of `IV`.
 
   **Even after blowing up, the parameter** `n` **of** `Sections(n)` **is a value calculated in the original surface** $Y$, **not in the surface after blowups done in** `Name`.
+
+- `MakeFibers` block: Within a `MakeFiber` block, one can declare that a set of previously defined curves form a fiber. Each Make fiber declaration consists of two lines. Empty lines or comments are ignored, but the two lines of a name declaration **must** be contiguous, that is, no empty lines or comments may appear in between. The contents of these lines have analogous meanings as the contents of a `Fiber` block declaration.   
+  For example, doing
+
+      Sections(-2):
+          A Try
+
+          B Try
+              A A
+      MakeFibers:
+          I2 Try
+              A B
+  is effectively the same as
+
+      Fibers:
+          I2 Try
+              A B
+  The type of fiber, in this case `I2`, can be any non empty string, even types not supported by the program.  
+  The curves that appear in the declaration of the fiber can be any section or exceptional which was previously defined, except a curve that is already part of a fiber.  
+  `MakeFiber` does not modify the self intersection of the curves and neither the intersections between curves. It also does not check wether the the given intersections or self intersections are consistent with the type of fiber, thus making this operation quite flexible.
+  The `Try/Ignore/Fix` attribute of each curve is overwritten with the attribute given by the new fiber declaration.
+  If an exceptional curve is part of a `MakeFiber` declaration, then its status as exceptional is forgotten in the sense of `ForgetExceptional`.
+
+- `ForgetExceptionals` block: Within a `ForgetExceptional` block, curves previously defined in a `merge/name` block are stripped of their status as exceptional curves and become equivalent as other curves or sections. This means that they are not taken into account in the Nef and Obstruction check. They are not contracted if within a sub-test they are an isolated (-1)-curve.  
+  Each `ForgetExceptional` declaration consists of a single line. Each line consists of a list of space separated names, which correspond to exceptionals that are to be forgotten.
 
 
 **Testing cannot start if there are curves with double points. Every singularity must be solved.**
