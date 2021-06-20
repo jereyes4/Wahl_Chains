@@ -168,7 +168,6 @@ public:
     std::vector<std::vector<int>> try_curves;
     std::vector<std::vector<std::vector<int>>> choose_curves;
     std::vector<std::vector<int>> ignored_curves;
-    // used only for exceptionals, since it is unneeded for other curves as of yet.
 
     std::ostream* error_stream;
 

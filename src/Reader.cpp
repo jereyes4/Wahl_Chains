@@ -376,17 +376,17 @@ void Reader::parse(istream& input) {
         std::sort(v.begin(),v.end());
     }
 
-    for (auto& comp : K.components_including_forgotten) {
-        if (!contains(forgotten_exceptionals,comp.id)) {
-            K.components.emplace_back(comp);
-            K.used_components.insert(comp.id);
-        }
+    for (auto comp : K.components_including_forgotten) {
         if (contains(forgotten_exceptionals,comp.right_parent)) {
             comp.right_parent = -1;
         }
         if (contains(forgotten_exceptionals,comp.left_parent)) {
             comp.left_parent = comp.right_parent;
             comp.right_parent = -1;
+        }
+        if (!contains(forgotten_exceptionals,comp.id)) {
+            K.components.emplace_back(comp);
+            K.used_components.insert(comp.id);
         }
     }
 
@@ -821,16 +821,16 @@ void Reader::parse_fiber(const vector<string>& def_tokens, const vector<string>&
         }
         else if (option == "Dis" or option == "D") {
             if (n == 1){
-                // ignored_curves[t].emplace_back(fibers.back()[0]);
+                ignored_curves[t].emplace_back(fibers.back()[0]);
             }
             else {
                 choose_curves[t].emplace_back(fibers.back());
             }
         }
         else if (option == "Ign" or option == "I") {
-            // for (int curve : fibers.back()) {
-            //     ignored_curves[t].emplace_back(curve);
-            // }
+            for (int curve : fibers.back()) {
+                ignored_curves[t].emplace_back(curve);
+            }
         }
         else {
             error("Invalid test option for Fiber " + def_tokens[0] + ".",line_no-1);
@@ -879,7 +879,7 @@ void Reader::parse_section(const vector<string>& def_tokens, const vector<string
             try_curves[t].emplace_back(this_id);
         }
         else if (option == "Ign" or option == "I") {
-            // ignored_curves[t].emplace_back(this_id);
+            ignored_curves[t].emplace_back(this_id);
         }
         else {
             error("Invalid test option for Section \'" + def_tokens[0] + "\'.",line_no-1);
@@ -1020,6 +1020,7 @@ void Reader::parse_make_fiber(const vector<string>& def_tokens, const vector<str
         if (contains(K.used_components_including_forgotten,id)) {
             forgotten_exceptionals.insert(id);
         }
+        sections.erase(id);
         for (int t = 0; t < tests_no; ++t) {
             auto it = std::find(fixed_curves[t].begin(),fixed_curves[t].end(),id);
             if (it != fixed_curves[t].end()) {
@@ -1056,16 +1057,16 @@ void Reader::parse_make_fiber(const vector<string>& def_tokens, const vector<str
         }
         else if (option == "Dis" or option == "D") {
             if (n == 1){
-                // ignored_curves[t].emplace_back(fibers.back()[0]);
+                ignored_curves[t].emplace_back(fibers.back()[0]);
             }
             else {
                 choose_curves[t].emplace_back(fibers.back());
             }
         }
         else if (option == "Ign" or option == "I") {
-            // for (int curve : fibers.back()) {
-            //     ignored_curves[t].emplace_back(curve);
-            // }
+            for (int curve : fibers.back()) {
+                ignored_curves[t].emplace_back(curve);
+            }
         }
         else {
             error("Invalid test option for MakeFiber " + def_tokens[0] + ".",line_no-1);
@@ -1085,13 +1086,7 @@ void Reader::parse_forget_exceptional(const vector<string>& tokens) {
         if (contains(forgotten_exceptionals,id)) {
             warning("Curve \'" + curve + "\' is already forgotten.");
         }
-        for (int t = 0; t < tests_no; ++t) {
-            auto it = std::find(ignored_curves[t].begin(), ignored_curves[t].end(), id);
-            if (it != ignored_curves[t].end()) {
-                std::iter_swap(it,ignored_curves[t].end()-1);
-                ignored_curves[t].erase(ignored_curves[t].end()-1);
-            }
-        }
+        sections.insert(id);
         forgotten_exceptionals.insert(id);
     }
 }

@@ -59,7 +59,9 @@ namespace Writer {
         if (a.type == Example::single_) {
             if (b.type != Example::single_) return true;
             if (a.n[0] != b.n[0]) return a.n[0] < b.n[0];
-            if (a.a[0] != b.a[0]) return a.a[0] < b.a[0];
+            long long min_a_a = std::min(a.a[0], a.n[0] - a.a[0]);
+            long long min_b_a = std::min(b.a[0], b.n[0] - b.a[0]);
+            if (min_a_a != min_b_a) return min_a_a < min_b_a;
             return a.test < b.test;
         }
         else if (b.type == Example::single_) return false;
@@ -149,7 +151,9 @@ namespace Writer {
             if (b.type != Example::single_) return true;
             if (a.chain[0].size() != b.chain[0].size()) return a.chain[0].size() < b.chain[0].size();
             if (a.n[0] != b.n[0]) return a.n[0] < b.n[0];
-            if (a.a[0] != b.a[0]) return a.a[0] < b.a[0];
+            long long min_a_a = std::min(a.a[0], a.n[0] - a.a[0]);
+            long long min_b_a = std::min(b.a[0], b.n[0] - b.a[0]);
+            if (min_a_a != min_b_a) return min_a_a < min_b_a;
             return a.test < b.test;
         }
         else if (b.type == Example::single_) return false;
@@ -883,7 +887,7 @@ namespace Writer {
             }
             if (chain_amount == 1) {
                 if (ex.type == Example::single_) {
-                    f << "$(" << ex.n[0] << ", " << ex.a[0] << ")$ & " << ex.chain[0].size() << " & ";
+                    f << "$(" << ex.n[0] << ", " << std::min(ex.a[0], ex.n[0] - ex.a[0]) << ")$ & " << ex.chain[0].size() << " & ";
                 }
                 else {
                     char c_type = ex.type - Example::QHD_single_a_ + 'a';
