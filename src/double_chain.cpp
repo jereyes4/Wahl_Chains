@@ -714,6 +714,7 @@ void Searcher::explore_double_candidate(vector<int> (&chain)[2]) {
                         Delta = -Delta;
                         location.swap(Swap_location);
                         std::swap(A,B);
+                        std::swap(end0,end1);
                     }
                 }
                 prev_prev_0 = prev_0;
