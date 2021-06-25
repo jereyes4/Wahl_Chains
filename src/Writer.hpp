@@ -45,11 +45,15 @@ namespace Writer {
         If all coincide and both are double or p-extremal:
             Suppose that (n[0],a[0]) >= (n[1],a[1])
             4. (n[0],n[1],a[0],a[1])
+            5. non p-extremal < p-extremal
         If all coincide and double QHD or QHD-extremal:
             4. Type of QHD
             5. Invariants of QHD
             6. (n[1],a[1])
+            7. non p-extremal < p-extremal
     Meant to be used with stable_sort and where the examples are already sorted by test
+
+    TODO: when p-extremal for QHD this will be inconsistent.
     */
     static bool less_by_n(const Example& a, const Example& b) {
         int amount_a = a.type <= Example::QHD_single_j_ ? 1 : 2;
@@ -77,6 +81,7 @@ namespace Writer {
             auto inv_a = uniformize_double_by_n(a.n,a.a);
             auto inv_b = uniformize_double_by_n(b.n,b.a);
             if (inv_a != inv_b) return inv_a < inv_b;
+            if (a.type != b.type) return a.type < b.type;
             return a.test < b.test;
         }
         else if (b.type <= Example::p_extremal_) return false;
@@ -134,13 +139,17 @@ namespace Writer {
             5. length(chain[1])
             Suppose that if length(chain[0]) == length(chain[1]) then (n[0],a[0]) >= (n[1],a[1])
             6. (n[0],n[1],a[0],a[1])
+            7. non p-extremal < p-extremal
         If all coincide and both are double QHD or QHD-extremal:
             4. Size of fork
             5. length(chain[1])
             6. Type of QHD
             7. Invariants of QHD
             8. (n[1],a[1])
+            9. non p-extremal < p-extremal
     Meant to be used with stable_sort and where the examples are already sorted by test
+
+    TODO: when p-extremal for QHD this will be inconsistent.
     */
     static bool less_by_length(const Example& a, const Example& b) {
         int amount_a = a.type <= Example::QHD_single_j_ ? 1 : 2;
@@ -171,6 +180,7 @@ namespace Writer {
             auto inv_a = uniformize_double_by_length(a.n,a.a,a.chain[0].size(),a.chain[1].size());
             auto inv_b = uniformize_double_by_length(b.n,b.a,b.chain[0].size(),b.chain[1].size());
             if (inv_a != inv_b) return inv_a < inv_b;
+            if (a.type != b.type) return a.type < b.type;
             return a.test < b.test;
         }
         else if (b.type <= Example::p_extremal_) return false;
