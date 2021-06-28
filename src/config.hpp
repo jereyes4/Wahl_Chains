@@ -46,8 +46,12 @@
 
 #define PRINT_PASSED_PRETESTS
 
+// Define to catch SIGINT and export whatever examples where found until that point
+
+#define CATCH_SIGINT
+
 //////////////////////////////////////////////////////////
-// Some hard limits. Keep MAX_THREADS and BULK_SIZE a power of two.
+// Some hard limits. Keep BULK_SIZE a power of two.
 
 #define MAX_TESTS 100
 
@@ -55,7 +59,7 @@
 #define MAX_THREADS 4
 #endif
 
-// On multithread mode, avoid cache incoherence by giving threads bulks of tests.
+// On multithread mode, avoid cache sharing by giving threads bulks of tests.
 // The last MAX_THREADS*BULK_SIZE tests are checked one by one to avoid idle threads.
 #define BULK_SIZE 512
 
@@ -87,7 +91,12 @@ inline std::ostream& operator<<(std::ostream& os, const std::pair<T,S>& p) {
 #define DEBUG_STREAM std::cerr
 
 // debugv for containers.
-#define debugv(x) do {DEBUG_STREAM << #x << ":\n   "; for(auto v : x) DEBUG_STREAM << " " << v; DEBUG_STREAM << std::endl;} while (0)
+#define debugv(x)                               \
+do {                                            \
+    DEBUG_STREAM << #x << ":\n   ";             \
+    for(auto v : x) DEBUG_STREAM << " " << v;   \
+    DEBUG_STREAM << std::endl;                  \
+} while (0)
 
 // debugx for values
 #define debugx(x) DEBUG_STREAM << #x << ": " << x << std::endl

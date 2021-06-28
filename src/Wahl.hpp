@@ -2,8 +2,12 @@
 #define WAHL_HPP
 #include"Reader.hpp" // Reader, vector
 
-#ifdef WAHL_MULTITHREAD
+#if defined(WAHL_MULTITHREAD) || defined(CATCH_SIGINT)
 #include<atomic> // atomic
+#endif
+
+#ifdef CATCH_SIGINT
+extern std::atomic<bool> sigint_catched;
 #endif
 
 class Searcher;

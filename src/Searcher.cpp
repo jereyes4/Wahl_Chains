@@ -1,8 +1,8 @@
 #include"Searcher.hpp"
-#include"Wahl.hpp"
+#include"Wahl.hpp" // sigint_catched
 #include<climits> // INT_MAX
 
-#ifndef WAHL_MULTITHREAD
+#if !defined(WAHL_MULTITHREAD) && defined(PRINT_STATUS)
 #include<chrono> // steady_clock, milliseconds
 #endif
 
@@ -256,6 +256,17 @@ bool Searcher::contract_exceptional() {
 void Searcher::search() {
     init();
     while (true) {
+
+#ifdef CATCH_SIGINT
+        if (sigint_catched) {
+
+#ifndef WAHL_MULTITHREAD
+            std::cout << "\n" "Abrupt close.";
+#endif
+            return;
+        }
+#endif
+
 #if !defined(WAHL_MULTITHREAD) && defined(PRINT_STATUS)
         //print here status.
         static auto last_time = std::chrono::steady_clock::now();

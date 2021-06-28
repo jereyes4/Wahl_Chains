@@ -9,6 +9,10 @@
 #include<thread> // thread, sleep_for
 #endif
 
+#ifdef CATCH_SIGINT
+#include<csignal>
+std::atomic<bool> sigint_catched;
+#endif // CATCH_SIGINT
 
 Wahl::Wahl(int argc, char** argv) {
     std::ifstream f;
@@ -44,6 +48,15 @@ Wahl::Wahl(int argc, char** argv) {
     }
     std::cout << "Total tests: " << total_tests << std::endl;
 
+    #ifdef CATCH_SIGINT
+    sigint_catched = false;
+    std::signal(SIGINT,
+        [] (int sig) {
+            std::signal(SIGINT,SIG_DFL);
+            sigint_catched = true;
+        }
+    );
+    #endif // CATCH_SIGINT
 
 #ifdef WAHL_MULTITHREAD
     int threads = reader.threads;
@@ -63,6 +76,18 @@ Wahl::Wahl(int argc, char** argv) {
     std::cout << "\e[s";
     long long mintest = 0;
     while (mintest < total_tests) {
+        
+#ifdef CATCH_SIGINT
+        if (sigint_catched) {
+            std::cout << "\n" "Abrupt close. Waiting for threads to finish..." << std::endl;
+            for (int i = 0; i < threads; ++i) {
+                spawns[i].join();
+            }
+            Write(searchers);
+            return;
+        }
+#endif // CATCH_SIGINT
+
         std::cout << "\e[u\e[?25l";
         mintest = total_tests;
         for (int i = 0; i < threads; ++i) {
@@ -85,6 +110,17 @@ Wahl::Wahl(int argc, char** argv) {
     std::cout.precision(1);
     long long mintest = 0;
     while (mintest < total_tests) {
+
+#ifdef CATCH_SIGINT
+        if (sigint_catched) {
+            std::cout << "\n" "Abrupt close. Waiting for threads to finish..." << std::endl;
+            for (int i = 0; i < threads; ++i) {
+                spawns[i].join();
+            }
+            Write(searchers);
+            return;
+        }
+#endif // CATCH_SIGINT
         mintest = total_tests;
         for (int i = 0; i < threads; ++i) {
             mintest = std::min(mintest,(long long) searchers[i].current_test);
@@ -103,6 +139,11 @@ Wahl::Wahl(int argc, char** argv) {
 #else // ndef PRINT_STATUS
     for(int i = 0; i < threads; ++i) {
         spawns[i].join();
+#ifdef CATCH_SIGINT
+        if (sigint_catched) {
+            std::cout << "\n" "Abrupt close." << std::endl;
+        }
+#endif
     }
 #endif // PRINT_STATUS
 
