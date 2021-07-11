@@ -94,7 +94,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::pair<T,S>& p) {
 #define debugv(x)                               \
 do {                                            \
     DEBUG_STREAM << #x << ":\n   ";             \
-    for(auto v : x) DEBUG_STREAM << " " << v;   \
+    for(auto& v : x) DEBUG_STREAM << " " << v;  \
     DEBUG_STREAM << std::endl;                  \
 } while (0)
 

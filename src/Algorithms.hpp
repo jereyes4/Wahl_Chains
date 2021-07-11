@@ -513,6 +513,36 @@ namespace algs {
             }
         }
     };
+
+    static const long long nCr(int n, int r) {
+        long long c = 1;
+        int k = std::min(n,n-r);
+        for (int i = 1; i <= k; ++i) {
+            c = c*(n-k+i)/i;
+        }
+        return c;
+    }
+
+    /*
+    Adaptation of python itertools nth_combination.
+    Assumes index between 0 and nCr(n,r)-1.
+    Appends results to the vector result
+    */
+    static void ith_combination(int n, int r, long long index, std::vector<int>& result) {
+        long long c = nCr(n,r);
+        int N = n;
+        while (r) {
+            c = c*r/n;
+            --n;
+            --r;
+            while (index >= c) {
+                index -= c;
+                c = c*(n-r)/n;
+                --n;
+            }
+            result.emplace_back(N-1-n);
+        }
+    }
 }
 
 #endif

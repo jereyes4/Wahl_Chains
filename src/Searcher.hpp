@@ -185,6 +185,10 @@ public:
     std::vector<long long> temp_marked_exceptional;
 
     std::map<int,std::multiset<int>> original_adj_map;
+
+    void get_curves_from_mask(long long mask);
+
+    bool get_curves_from_mask_exact_curves(long long mask);
     //////////////////////////////////////////////////////
 
     void init();

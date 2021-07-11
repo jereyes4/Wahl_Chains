@@ -1,5 +1,6 @@
 #include"Reader.hpp"
 #include<algorithm> // std::find, std::sort
+#include"Algorithms.hpp" // algs::nCr
 using std::string;
 using std::vector;
 using std::map;
@@ -223,6 +224,7 @@ Reader::Reader() {
     max_test_number = 1;
     subtest_start = -1;
     subtest_end = -1;
+    curves_used_exactly = -1;
     K.self_int = 0;
     fixed_curves.resize(1);
     try_curves.resize(1);
@@ -746,6 +748,7 @@ void Reader::parse_option(const vector<string>& tokens) {
         else {
             error("Invalid argument for \'Sections_Input\': " + tokens[1]);
         }
+        return;
     }
     else if (tokens[0] == "Only_Pretest:") {
         if (tokens.size() != 2) {
@@ -761,6 +764,17 @@ void Reader::parse_option(const vector<string>& tokens) {
             error("Invalid argument for \'Only_Pretest\': " + tokens[1]);
         }
         warning("Only pretesting not yet implemented. This option does nothing");
+        return;
+    }
+    else if (tokens[0] == "Use_Exactly:") {
+        if (tokens.size() != 2) {
+            error("Option \'Use_Exactly\' must take exactly one argument.");
+        }
+        int value;
+        if (!safe_stoi(tokens[1],value) or value < -1) {
+            error("Invalid number for option \'Use_Exactly\': " + tokens[1]);
+        }
+        curves_used_exactly = value;
         return;
     }
     else {
@@ -1092,6 +1106,9 @@ void Reader::parse_forget_exceptional(const vector<string>& tokens) {
 }
 
 long long Reader::get_test_numbers(vector<long long>& number_of_tests) {
+    if (curves_used_exactly != -1) {
+        return get_test_numbers_exact_curves(number_of_tests);
+    }
     long long total_tests = 0;
     number_of_tests.resize(tests_no);
     for (int t = 0; t < tests_no; ++t) {
@@ -1111,6 +1128,33 @@ long long Reader::get_test_numbers(vector<long long>& number_of_tests) {
             error("Too many test cases.");
         }
         number_of_tests[t] = current_test_number;
+    }
+    return total_tests;
+}
+
+long long Reader::get_test_numbers_exact_curves(vector<long long>& number_of_tests) {
+    long long total_tests = 0;
+    number_of_tests.resize(tests_no);
+    for (int t = 0; t < tests_no; ++t) {
+        int curves_to_test = try_curves[t].size();
+        for (auto& choose_set : choose_curves[t]) {
+            curves_to_test += choose_set.size();
+        }
+        if (curves_to_test >= 61) {
+            error("Too many test cases.");
+        }
+        int fixed = fixed_curves[t].size();
+        if (fixed <= curves_used_exactly and curves_to_test + fixed >= curves_used_exactly) {
+            long long current_test_number = algs::nCr(curves_to_test, curves_used_exactly - fixed);
+            total_tests += current_test_number;
+            if (total_tests >= (1ll<<62)) {
+                error("Too many test cases.");
+            }
+            number_of_tests[t] = current_test_number;
+        }
+        else {
+            number_of_tests[t] = 0;
+        }
     }
     return total_tests;
 }

@@ -145,6 +145,8 @@ public:
     int tests_start_index;
     int max_test_number;
 
+    int curves_used_exactly;
+
     long long subtest_start;
     long long subtest_end;
 
@@ -187,6 +189,7 @@ public:
     void parse_make_fiber(const std::vector<std::string>& def_tokens, const std::vector<std::string>& content_tokens);
     void parse_forget_exceptional(const std::vector<std::string>& tokens);
     long long get_test_numbers(std::vector<long long>& test_numbers);
+    long long get_test_numbers_exact_curves(std::vector<long long>& test_numbers);
 };
 
 #endif

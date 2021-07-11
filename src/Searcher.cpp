@@ -1,5 +1,6 @@
 #include"Searcher.hpp"
 #include"Wahl.hpp" // sigint_catched
+#include"Algorithms.hpp" // algs::ith_combination
 #include<climits> // INT_MAX
 
 #if !defined(WAHL_MULTITHREAD) && defined(PRINT_STATUS)
@@ -292,49 +293,12 @@ void Searcher::search() {
 
         K2 = reader_copy.K.self_int;
 
-        // If a try curve is not included in the graph and contracted, we can ignore this case as it's the same as if the curve was included to begin with.
-        temp_ignored_exceptional.clear();
-        temp_included_curves.clear();
-        temp_self_int = reader_copy.self_int;
-        temp_included_curves = original_adj_map;
-
-        for (int curve : reader_copy.ignored_curves[test_index]) {
-            if (contains(reader_copy.K.used_components,curve)) {
-                temp_ignored_exceptional.insert(curve);
-            }
-            else {
-                remove_curve(curve);
-            }
+        if (reader_copy.curves_used_exactly == -1) {
+            get_curves_from_mask(mask);
         }
-
-        for (int curve : reader_copy.try_curves[test_index]) {
-            if (!(mask & 1)) {
-                if (contains(reader_copy.K.used_components,curve)) {
-                    temp_try_ignored_exceptional[curve] = current_test;
-                    temp_ignored_exceptional.insert(curve);
-                }
-                else {
-                    remove_curve(curve);
-                }
-            }
-            mask >>= 1;
-        }
-
-        for (auto& choose_set : reader_copy.choose_curves[test_index]) {
-            long long choose_total = (1ll<<choose_set.size()) - 1ll;
-            long long choose_mask = mask%choose_total;
-            for (int curve : choose_set) {
-                if (!(choose_mask & 1)) {
-                    if (contains(reader_copy.K.used_components,curve)) {
-                        temp_ignored_exceptional.insert(curve);
-                    }
-                    else {
-                        remove_curve(curve);
-                    }
-                }
-                choose_mask >>= 1;
-            }
-            mask /= choose_total;
+        else {
+            bool ignore_test = get_curves_from_mask_exact_curves(mask);
+            if (ignore_test) continue;
         }
 
         bool ignore_test = contract_exceptional();
@@ -419,7 +383,123 @@ void Searcher::search() {
             else search_for_double_chain();
         }
     }
+}
+
+void Searcher::get_curves_from_mask(long long mask) {
+    // If a try curve is not included in the graph and contracted, we can ignore this case as it's the same as if the curve was included to begin with.
+    temp_ignored_exceptional.clear();
+    temp_included_curves.clear();
+
+    // These two lines might be extremely expensive. TODO: think an alternative.
+    temp_self_int = reader_copy.self_int;
+    temp_included_curves = original_adj_map;
+
+    for (int curve : reader_copy.ignored_curves[test_index]) {
+        if (contains(reader_copy.K.used_components,curve)) {
+            temp_ignored_exceptional.insert(curve);
+        }
+        else {
+            remove_curve(curve);
+        }
+    }
+
+    for (int curve : reader_copy.try_curves[test_index]) {
+        if (!(mask & 1)) {
+            if (contains(reader_copy.K.used_components,curve)) {
+                temp_try_ignored_exceptional[curve] = current_test;
+                temp_ignored_exceptional.insert(curve);
+            }
+            else {
+                remove_curve(curve);
+            }
+        }
+        mask >>= 1;
+    }
+
+    for (auto& choose_set : reader_copy.choose_curves[test_index]) {
+        long long choose_total = (1ll<<choose_set.size()) - 1ll;
+        long long choose_mask = mask%choose_total;
+        for (int curve : choose_set) {
+            if (!(choose_mask & 1)) {
+                if (contains(reader_copy.K.used_components,curve)) {
+                    temp_ignored_exceptional.insert(curve);
+                }
+                else {
+                    remove_curve(curve);
+                }
+            }
+            choose_mask >>= 1;
+        }
+        mask /= choose_total;
+    }
+}
+
+bool Searcher::get_curves_from_mask_exact_curves(long long mask) {
+    // If a try curve is not included in the graph and contracted, we can ignore this case as it's the same as if the curve was included to begin with.
+    temp_ignored_exceptional.clear();
+    temp_included_curves.clear();
+
+    // These two lines might be extremely expensive. TODO: think an alternative.
+    temp_self_int = reader_copy.self_int;
+    temp_included_curves = original_adj_map;
+
+    for (int curve : reader_copy.ignored_curves[test_index]) {
+        if (contains(reader_copy.K.used_components,curve)) {
+            temp_ignored_exceptional.insert(curve);
+        }
+        else {
+            remove_curve(curve);
+        }
+    }
+
+    static thread_local std::vector<int> chosen_curves;
+    chosen_curves.resize(0);
+    int to_choose_from = reader_copy.try_curves[test_index].size();
+    for (auto& choose_set : reader_copy.choose_curves[test_index]) {
+        to_choose_from += choose_set.size();
+    }
     
+    int to_choose = reader_copy.curves_used_exactly - reader_copy.fixed_curves[test_index].size();
+    algs::ith_combination(to_choose_from, to_choose, mask, chosen_curves);
+
+    int curve_index = 0;
+    int choice_index = 0;
+    for (int curve : reader_copy.try_curves[test_index]) {
+        if (choice_index >= to_choose or chosen_curves[choice_index] != curve_index) {
+            if (contains(reader_copy.K.used_components,curve)) {
+                temp_try_ignored_exceptional[curve] = current_test;
+                temp_ignored_exceptional.insert(curve);
+            }
+            else {
+                remove_curve(curve);
+            }
+        }
+        else {
+            choice_index++;
+        }
+        curve_index++;
+    }
+
+    for (auto& choose_set : reader_copy.choose_curves[test_index]) {
+        int included = 0;
+        for (int curve : choose_set) {
+            if (choice_index >= to_choose or chosen_curves[choice_index] != curve_index) {
+                if (contains(reader_copy.K.used_components,curve)) {
+                    temp_ignored_exceptional.insert(curve);
+                }
+                else {
+                    remove_curve(curve);
+                }
+            }
+            else {
+                choice_index++;
+                included++;
+            }
+            curve_index++;
+        }
+        if (included == choose_set.size()) return true;
+    }
+    return false;
 }
 
 std::pair<bool,int> Searcher::check_obstruction() {
