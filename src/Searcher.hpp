@@ -181,7 +181,7 @@ public:
     std::unordered_set<int> temp_ignored_exceptional;
     
     // using vector as set for O(0) clear. True is current_test, False is anything else.
-    std::vector<long long> temp_try_ignored_exceptional;
+    std::vector<long long> temp_try_included_exceptional;
     std::vector<long long> temp_marked_exceptional;
 
     std::map<int,std::multiset<int>> original_adj_map;

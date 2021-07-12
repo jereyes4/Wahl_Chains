@@ -27,14 +27,15 @@ void Searcher::init() {
     for (int i = 0; i < s; ++i) {
         original_adj_map[i] = reader_copy.adj_list[i];
     }
-    temp_try_ignored_exceptional.assign(s,-1);
+    temp_try_included_exceptional.assign(s,-1);
     temp_marked_exceptional.assign(s,-1);
     current_complete_fibers = 0;
     current_no_obstruction = false;
 }
 
 
-// returns true if we should ignore the test
+// returns true if we should ignore the test. This happens when a try curve is included and contracted, as this is
+// the same as not including it and contracting. The choice of ignoring when including is to make exact curves consistent.
 bool Searcher::contract_exceptional() {
     /*
     Try to contract (-1) curves in the exceptional divisor.
@@ -63,7 +64,7 @@ bool Searcher::contract_exceptional() {
         if (comp.left_parent == -1) {
             switch (iter_excep->second.size()) {
             case 0: {
-                if (temp_try_ignored_exceptional[comp.id] == current_test) {
+                if (temp_try_included_exceptional[comp.id] == current_test) {
                     return true;
                 }
                 temp_included_curves.erase(iter_excep);
@@ -72,7 +73,7 @@ bool Searcher::contract_exceptional() {
                 continue;
             }
             case 1: {
-                if (temp_try_ignored_exceptional[comp.id] == current_test) {
+                if (temp_try_included_exceptional[comp.id] == current_test) {
                     return true;
                 }
                 const int curve = *iter_excep->second.begin();
@@ -87,7 +88,7 @@ bool Searcher::contract_exceptional() {
                 const int curve_a = *iter_excep->second.begin();
                 const int curve_b = *iter_excep->second.rbegin();
                 if (curve_a == curve_b) continue;
-                if (temp_try_ignored_exceptional[comp.id] == current_test) {
+                if (temp_try_included_exceptional[comp.id] == current_test) {
                     return true;
                 }
                 temp_included_curves[curve_a].erase(comp.id);
@@ -107,7 +108,7 @@ bool Searcher::contract_exceptional() {
         else if(comp.right_parent == -1) {
             switch (iter_excep->second.size()) {
             case 1: {
-                if (temp_try_ignored_exceptional[comp.id] == current_test) {
+                if (temp_try_included_exceptional[comp.id] == current_test) {
                     return true;
                 }
                 temp_included_curves[comp.left_parent].erase(comp.id);
@@ -118,7 +119,7 @@ bool Searcher::contract_exceptional() {
                 continue;
             }
             case 2: {
-                if (temp_try_ignored_exceptional[comp.id] == current_test) {
+                if (temp_try_included_exceptional[comp.id] == current_test) {
                     return true;
                 }
                 int curve = *iter_excep->second.begin();
@@ -147,7 +148,7 @@ bool Searcher::contract_exceptional() {
                 if(curve_b == comp.left_parent) curve_b = *iter;
                 if(curve_a == curve_b) continue;
 
-                if(temp_try_ignored_exceptional[comp.id] == current_test) {
+                if(temp_try_included_exceptional[comp.id] == current_test) {
                     return true;
                 }
                 
@@ -172,7 +173,7 @@ bool Searcher::contract_exceptional() {
         else{
             switch (iter_excep->second.size()) {
             case 2: {
-                if (temp_try_ignored_exceptional[comp.id] == current_test) {
+                if (temp_try_included_exceptional[comp.id] == current_test) {
                     return true;
                 }
                 temp_included_curves[comp.left_parent].erase(comp.id);
@@ -190,7 +191,7 @@ bool Searcher::contract_exceptional() {
                 if (!contains(temp_ignored_exceptional,comp.left_parent) and !contains(temp_ignored_exceptional,comp.right_parent)) {
                     continue;
                 }
-                if(temp_try_ignored_exceptional[comp.id] == current_test) {
+                if(temp_try_included_exceptional[comp.id] == current_test) {
                     return true;
                 }
                 auto iter = iter_excep->second.begin();
@@ -227,7 +228,7 @@ bool Searcher::contract_exceptional() {
                 int curve_b = *iter++;
                 while (curve_b == comp.left_parent or curve_b == comp.right_parent) curve_b = *iter++;
                 if(curve_a == curve_b) continue;
-                if(temp_try_ignored_exceptional[comp.id] == current_test) {
+                if(temp_try_included_exceptional[comp.id] == current_test) {
                     return true;
                 }
                 temp_included_curves[curve_a].erase(comp.id);
@@ -406,12 +407,14 @@ void Searcher::get_curves_from_mask(long long mask) {
     for (int curve : reader_copy.try_curves[test_index]) {
         if (!(mask & 1)) {
             if (contains(reader_copy.K.used_components,curve)) {
-                temp_try_ignored_exceptional[curve] = current_test;
                 temp_ignored_exceptional.insert(curve);
             }
             else {
                 remove_curve(curve);
             }
+        }
+        else {
+            temp_try_included_exceptional[curve] = current_test;
         }
         mask >>= 1;
     }
@@ -467,7 +470,6 @@ bool Searcher::get_curves_from_mask_exact_curves(long long mask) {
     for (int curve : reader_copy.try_curves[test_index]) {
         if (choice_index >= to_choose or chosen_curves[choice_index] != curve_index) {
             if (contains(reader_copy.K.used_components,curve)) {
-                temp_try_ignored_exceptional[curve] = current_test;
                 temp_ignored_exceptional.insert(curve);
             }
             else {
@@ -475,6 +477,7 @@ bool Searcher::get_curves_from_mask_exact_curves(long long mask) {
             }
         }
         else {
+            temp_try_included_exceptional[curve] = current_test;
             choice_index++;
         }
         curve_index++;
