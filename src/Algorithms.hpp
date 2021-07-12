@@ -514,7 +514,7 @@ namespace algs {
         }
     };
 
-    static const long long nCr(int n, int r) {
+    static constexpr long long nCr(int n, int r) {
         long long c = 1;
         int k = std::min(n,n-r);
         for (int i = 1; i <= k; ++i) {
