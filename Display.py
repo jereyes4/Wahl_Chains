@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 import sys, json, linecache, tkinter
 
+
+INCLUDE_INTERSECTION_MATRIX = True
+
+
+
 def display_string(Str):
     root = tkinter.Tk()
     root.geometry("1280x720")
@@ -31,6 +36,94 @@ def display_string(Str):
     warning.pack(side = tkinter.RIGHT)
     root.bind("<Escape>",lambda e: root.destroy())
     tkinter.mainloop()
+
+def det(M):
+    M = [row[:] for row in M] # make a copy to keep original M unmodified
+    N, sign, prev = len(M), 1, 1
+    for i in range(N-1):
+        if M[i][i] == 0: # swap with another row having nonzero i's elem
+            swapto = next( (j for j in range(i+1,N) if M[j][i] != 0), None )
+            if swapto is None:
+                return 0 # all M[*][i] are zero => zero determinant
+            M[i], M[swapto], sign = M[swapto], M[i], -sign
+        for j in range(i+1,N):
+            for k in range(i+1,N):
+                # assert ( M[j][k] * M[i][i] - M[j][i] * M[i][k] ) % prev == 0
+                M[j][k] = ( M[j][k] * M[i][i] - M[j][i] * M[i][k] ) // prev
+        prev = M[i][i]
+    return sign * M[-1][-1]
+
+def get_base_used_and_intersection_matrix(graph_info, config_info):
+
+    real_graph = graph_info["graph"]
+    real_exceptionals = graph_info["blps"]
+    real_selfint = graph_info["selfint"]
+
+    selfint = list(real_selfint) #deep copy
+    exceptionals = list(real_exceptionals) #deep copy
+    Intersection_Matrix = [len(real_graph)*[0] for i in range(len(real_graph))]
+    count_graph = [len(real_graph)*[0] for i in range(len(real_graph))]
+    for i in range(len(real_graph)):
+        for x in real_graph[i]:
+            count_graph[i][x] += 1
+    for i in exceptionals[::-1]:
+        for a in range(len(real_graph)):
+            selfint[a] += count_graph[i][a]*count_graph[i][a]
+            for b in range(a+1,len(real_graph)):
+                count_graph[a][b] += count_graph[i][a]*count_graph[i][b]
+                count_graph[b][a] += count_graph[i][a]*count_graph[i][b]
+            count_graph[a][i] = 0
+            count_graph[i][a] = 0
+        selfint[i] = 0
+    for a in range(len(real_graph)):
+        for b in range(len(real_graph)):
+            if a == b:
+                Intersection_Matrix[a][b] = selfint[a]
+            else:
+                Intersection_Matrix[a][b] = count_graph[a][b]
+    
+    used = config_info["used"]
+    base_used = []
+    for i in used:
+        if i not in exceptionals:
+            base_used.append(i)
+    base_used = sorted(base_used)
+    a = 0
+    used_matrix = [len(base_used)*[0] for i in range(len(base_used))]
+    for x in range(len(Intersection_Matrix)):
+        if x not in base_used:
+            continue
+        b = 0
+        for y in range(len(Intersection_Matrix[x])):
+            if y not in base_used:
+                continue
+            used_matrix[a][b] = Intersection_Matrix[x][y]
+            b += 1
+        a += 1
+    return base_used, used_matrix
+
+def get_matrix_string(graph_info, config_info):
+    base_used, matrix = get_base_used_and_intersection_matrix(graph_info, config_info)
+    global_name_dict = graph_info["name"]
+    max_length = [
+        max(
+            len(global_name_dict[base_used[i]]),
+            *[len(str(matrix[j][i])) for j in range(len(base_used))]
+        )
+        for i in range(len(base_used))
+    ]
+    max_length_names = max([len(global_name_dict[base_used[i]]) for i in range(len(base_used))])
+    head_str = " - ".join(["{{:^{0}}}".format(max_length[j]) for j in range(len(base_used))]).format(*[global_name_dict[base_used[j]] for j in range(len(base_used))])
+    row_strs = ["   ".join(["{{:^{0}}}".format(max_length[j]) for j in range(len(base_used))]).format(*[str(matrix[i][j]) for j in range(len(base_used))]) for i in range(len(base_used))]
+    result = "    Intersection matrix of base curves:\n\n"
+    result += "        " + "{{:^{0}}}".format(max_length_names).format("") + "   " + head_str + "\n"
+    for i in range(len(base_used)):
+        result += "        " + "{{:^{0}}}".format(max_length_names).format(global_name_dict[base_used[i]]) + " | " + row_strs[i] + " | \n"
+    result += (
+    "\n"
+    "    Determinant: {0}."
+    ).format(det(matrix))
+    return result
 
 def print_single_chain(graph_info, config_info):
     graph = graph_info["graph"]
@@ -131,6 +224,15 @@ def print_single_chain(graph_info, config_info):
     "        d=[ {discrepancies} ]\n"
     )
 
+    string_matrix = ""
+
+    if INCLUDE_INTERSECTION_MATRIX:
+        S += (
+        "\n"
+        "{matrix}\n"
+        )
+        string_matrix = get_matrix_string(graph_info, config_info)
+
     display_string(S.format(
         K2 = config_info["K2"],
         n = n,
@@ -141,7 +243,8 @@ def print_single_chain(graph_info, config_info):
         extra_blowups = extra_blowups_string,
         chain_names = chain_string,
         self_int = self_int_string,
-        discrepancies = discrepancy_string
+        discrepancies = discrepancy_string,
+        matrix = string_matrix
     ))
 
 def print_double_chain(graph_info, config_info):
@@ -283,6 +386,15 @@ def print_double_chain(graph_info, config_info):
     "        d=[ {discrepancies1} ]\n"
     )
 
+    string_matrix = ""
+
+    if INCLUDE_INTERSECTION_MATRIX:
+        S += (
+        "\n"
+        "{matrix}\n"
+        )
+        string_matrix = get_matrix_string(graph_info, config_info)
+    
     display_string(S.format(
         K2 = config_info["K2"],
         n0 = n0,
@@ -299,7 +411,8 @@ def print_double_chain(graph_info, config_info):
         discrepancies0 = discrepancy_string0,
         chain_names1 = chain_string1,
         self_int1 = self_int_string1,
-        discrepancies1 = discrepancy_string1
+        discrepancies1 = discrepancy_string1,
+        matrix = string_matrix
     ))
 
 def print_p_extremal(graph_info, config_info):
@@ -463,6 +576,15 @@ def print_p_extremal(graph_info, config_info):
     "        d=[ {discrepancies1} ]\n"
     )
 
+    string_matrix = ""
+
+    if INCLUDE_INTERSECTION_MATRIX:
+        S += (
+        "\n"
+        "{matrix}\n"
+        )
+        string_matrix = get_matrix_string(graph_info, config_info)
+
     display_string(S.format(
         K2 = config_info["K2"],
         Delta = Delta,
@@ -483,7 +605,8 @@ def print_p_extremal(graph_info, config_info):
         discrepancies0 = discrepancy_string0,
         chain_names1 = chain_string1,
         self_int1 = self_int_string1,
-        discrepancies1 = discrepancy_string1
+        discrepancies1 = discrepancy_string1,
+        matrix = string_matrix
     ))
 
 def print_single_QHD(graph_info, config_info):
@@ -628,6 +751,15 @@ def print_single_QHD(graph_info, config_info):
     "        d=[ {discrepancies_2} ]\n"
     )
 
+    string_matrix = ""
+
+    if INCLUDE_INTERSECTION_MATRIX:
+        S += (
+        "\n"
+        "{matrix}\n"
+        )
+        string_matrix = get_matrix_string(graph_info, config_info)
+
     display_string(S.format(
         K2 = config_info["K2"],
         QHD_type = QHD_type,
@@ -648,7 +780,8 @@ def print_single_QHD(graph_info, config_info):
         chain_names_2 = fork_string[2],
         self_int_2 = self_int_string[2],
         discrepancies_2 = discrepancy_string[2],
-        vertical_line = vertical_line
+        vertical_line = vertical_line,
+        matrix = string_matrix
     ))
 
 def print_double_QHD(graph_info, config_info):
@@ -840,6 +973,15 @@ def print_double_QHD(graph_info, config_info):
     "        d=[ {chain_discrepancies} ]\n"
     )
 
+    string_matrix = ""
+
+    if INCLUDE_INTERSECTION_MATRIX:
+        S += (
+        "\n"
+        "{matrix}\n"
+        )
+        string_matrix = get_matrix_string(graph_info, config_info)
+
     display_string(S.format(
         K2 = config_info["K2"],
         QHD_type = QHD_type,
@@ -866,7 +1008,8 @@ def print_double_QHD(graph_info, config_info):
         vertical_line = vertical_line,
         chain_names = chain_string,
         chain_self_int = chain_self_int_string,
-        chain_discrepancies = chain_discrepancy_string
+        chain_discrepancies = chain_discrepancy_string,
+        matrix = string_matrix
     ))
 
 if __name__ == "__main__":
@@ -896,8 +1039,8 @@ if __name__ == "__main__":
             print("Error: Invalid index (Out of bounds).")
             exit(0)
 
-        try:
-        # if True:
+        # try:
+        if True:
             graph_info = json.loads(s1)
             config_info = json.loads(s2)
 
@@ -918,6 +1061,6 @@ if __name__ == "__main__":
                 else:
                     print_p_extremal(graph_info, config_info)
 
-        except:
-            print("Error: corrupted/incompatible jsonl file.")
-            exit(0)
+        # except:
+        #     print("Error: corrupted/incompatible jsonl file.")
+        #     exit(0)

@@ -1,6 +1,23 @@
 #!/usr/bin/env python3
+from os import name
 import sys, json, getopt
 from math import gcd
+
+def det(M):
+    M = [row[:] for row in M] # make a copy to keep original M unmodified
+    N, sign, prev = len(M), 1, 1
+    for i in range(N-1):
+        if M[i][i] == 0: # swap with another row having nonzero i's elem
+            swapto = next( (j for j in range(i+1,N) if M[j][i] != 0), None )
+            if swapto is None:
+                return 0 # all M[*][i] are zero => zero determinant
+            M[i], M[swapto], sign = M[swapto], M[i], -sign
+        for j in range(i+1,N):
+            for k in range(i+1,N):
+                # assert ( M[j][k] * M[i][i] - M[j][i] * M[i][k] ) % prev == 0
+                M[j][k] = ( M[j][k] * M[i][i] - M[j][i] * M[i][k] ) // prev
+        prev = M[i][i]
+    return sign * M[-1][-1]
 
 header =(
     "\\begin{{longtable}}{{{table_sep}}}\n"
@@ -21,8 +38,8 @@ header =(
 )
 
 if __name__ == "__main__":
-    options = ["All","Subsection", "Nef", "Obstruction", "Effective", "Gcd", "Chern", "PK", "Length_Sort","Fraction","Output ="]
-    options_short = "asnbegcpklfo:"
+    options = ["All","Subsection", "Nef", "Obstruction", "Effective", "Gcd", "Chern", "PK", "Length_Sort","Fraction","Determinant","Output ="]
+    options_short = "asnbegcpklfdo:"
     try:
         args, extra = getopt.gnu_getopt(sys.argv[1:],options_short,options)
     except:
@@ -46,6 +63,7 @@ if __name__ == "__main__":
         include_gcd = False
         include_chern = False
         include_pk = False
+        include_determinant = False
         chern_fraction = False
         by_length = False
         for arg, val in args:
@@ -65,6 +83,7 @@ if __name__ == "__main__":
                     print("No effective check in json")
                 include_gcd = True
                 include_chern = True
+                include_determinant = True
                 include_pk = True
             if arg in ["-s","--Subsection"]:
                 include_subsection = True
@@ -93,6 +112,8 @@ if __name__ == "__main__":
                 by_length = True
             if arg in ["-f","--Fraction"]:
                 chern_fraction = True
+            if arg in ["-d","--Determinant"]:
+                include_determinant = True
             if arg in ["-o","--Output"]:
                 outname = val
         try:
@@ -101,8 +122,6 @@ if __name__ == "__main__":
             print("Unable to open out file.")
             exit(0)
         
-        outfile.write("%\\usepackage{longtable}\n")
-
         prev_chain_amount = 0
         prevK = 0
         is_first = False
@@ -112,6 +131,34 @@ if __name__ == "__main__":
         real_exceptionals = graph_info["blps"]
         real_selfint = graph_info["selfint"]
 
+        Intersection_Matrix = None
+
+        if include_determinant:
+            selfint = list(real_selfint) #deep copy
+            exceptionals = list(real_exceptionals) #deep copy
+            Intersection_Matrix = [len(real_graph)*[0] for i in range(len(real_graph))]
+            count_graph = [len(real_graph)*[0] for i in range(len(real_graph))]
+            for i in range(len(real_graph)):
+                for x in real_graph[i]:
+                    count_graph[i][x] += 1
+            for i in exceptionals[::-1]:
+                for a in range(len(real_graph)):
+                    selfint[a] += count_graph[i][a]*count_graph[i][a]
+                    for b in range(a+1,len(real_graph)):
+                        count_graph[a][b] += count_graph[i][a]*count_graph[i][b]
+                        count_graph[b][a] += count_graph[i][a]*count_graph[i][b]
+                    count_graph[a][i] = 0
+                    count_graph[i][a] = 0
+                selfint[i] = 0
+            for a in range(len(real_graph)):
+                for b in range(len(real_graph)):
+                    if a == b:
+                        Intersection_Matrix[a][b] = selfint[a]
+                    else:
+                        Intersection_Matrix[a][b] = count_graph[a][b]
+
+        outfile.write("%\\usepackage{longtable}\n")
+
         for L in infile:
             config_info = json.loads(L)
             chain_amount = config_info["#"]
@@ -119,9 +166,6 @@ if __name__ == "__main__":
             used = config_info["used"]
 
             original_K2 = graph_info["K2"]
-            selfint = list(real_selfint) #deep copy
-            exceptionals = list(real_exceptionals) #deep copy
-            graph = [list(x) for x in real_graph] #deep copy
 
             if prev_chain_amount != chain_amount or prevK != K2:
                 if prev_chain_amount != 0:
@@ -154,6 +198,9 @@ if __name__ == "__main__":
                     columns += 1
                 if include_pk:
                     column_values += "$(P,K)$ & "
+                    columns += 1
+                if include_determinant:
+                    column_values += "Det & "
                     columns += 1
                 if chain_amount == 2:
                     column_values += "WH & "
@@ -270,6 +317,9 @@ if __name__ == "__main__":
                             complete_fibers += 1
                     outfile.write("NO({0}) & ".format(complete_fibers))
             if include_chern or include_pk:
+                selfint = list(real_selfint) #deep copy
+                exceptionals = list(real_exceptionals) #deep copy
+                graph = [list(x) for x in real_graph] #deep copy
                 blowdowns = config_info["blds"][::-1]
                 for curve in range(len(graph)):
                     if curve not in exceptionals and curve not in used:
@@ -349,6 +399,25 @@ if __name__ == "__main__":
                         outfile.write("$({0},{1})$ & ".format(c_1_tilde,c_2_tilde))
                 if include_pk:
                     outfile.write("$({0},{1})$ & ".format(Ptilde,Ktilde))
+            if include_determinant:
+                baseused = []
+                for i in used:
+                    if i not in exceptionals:
+                        baseused.append(i)
+                baseused = sorted(baseused)
+                a = 0
+                used_matrix = [len(baseused)*[0] for i in range(len(baseused))]
+                for x in range(len(Intersection_Matrix)):
+                    if x not in baseused:
+                        continue
+                    b = 0
+                    for y in range(len(Intersection_Matrix[x])):
+                        if y not in baseused:
+                            continue
+                        used_matrix[a][b] = Intersection_Matrix[x][y]
+                        b += 1
+                    a += 1
+                outfile.write("{0} & ".format(det(used_matrix)))
             if chain_amount == 2:
                 if config_info["WH"] == 0:
                     outfile.write("-- & ")
