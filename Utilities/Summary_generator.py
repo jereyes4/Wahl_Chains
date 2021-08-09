@@ -121,7 +121,7 @@ if __name__ == "__main__":
         except:
             print("Unable to open out file.")
             exit(0)
-        
+
         prev_chain_amount = 0
         prevK = 0
         is_first = False
@@ -170,13 +170,13 @@ if __name__ == "__main__":
             if prev_chain_amount != chain_amount or prevK != K2:
                 if prev_chain_amount != 0:
                     outfile.write("\n\\end{longtable}\n")
-            
+
                 is_first = True
                 prev_chain_amount = chain_amount
                 prevK = K2
                 columns = 2*chain_amount + 1
                 title = "1 chain" if chain_amount == 1 else "2 chains"
-                title += ", $K^2 = {0}$".format(K2)
+                title += ", \(K^2 = {0}\)".format(K2)
                 column_values = "$(n,a)$ & Len & "*chain_amount
                 if chain_amount == 2 and include_gcd:
                     column_values += "GCD & "

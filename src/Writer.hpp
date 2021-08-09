@@ -663,7 +663,7 @@ namespace Writer {
         f.close();
     }
 
-    // Writes a summary in a text file. (*) means that even though it says that the example is nef, it requires inspection. (**) means a counter example to the wormhole conjecture. 
+    // Writes a summary in a text file. (*) means that even though it says that the example is nef, it requires inspection. (**) means a counter example to the wormhole conjecture.
     static void export_summary_text(const Reader& reader, const std::vector<Example*>& ptr_examples) {
 
         std::string filename = reader.summary_filename + ".txt";
@@ -688,14 +688,14 @@ namespace Writer {
         for (Example* ptr : ptr_examples) {
             Example& ex = *ptr;
             int chain_amount = ex.type <= Example::QHD_single_j_ ? 1 : 2;
+            if (ex.K2 != prevK) {
+                f << "K^2 = " << ex.K2 << ":\n";
+                prevK = ex.K2;
+            }
             if (chain_amount != prev_chain_amount) {
-                f << "Examples with " << (chain_amount == 1 ? "1 chain" : "2 chains") << ":\n";
+                f << "  Examples with " << (chain_amount == 1 ? "1 chain" : "2 chains") << ":\n";
                 prev_chain_amount = chain_amount;
                 int prevK = -559038737;
-            }
-            if (ex.K2 != prevK) {
-                f << "  K^2 = " << ex.K2 << ":\n";
-                prevK = ex.K2;
             }
             if (chain_amount == 1) {
                 if (reader.summary_sort == Reader::sort_by_n_) {
@@ -784,7 +784,7 @@ namespace Writer {
                     }
                     f << '.';
                 }
-                f << "WH: " << (ex.type == Example::p_extremal_ ? (ex.worm_hole ? std::to_string(ex.worm_hole_id + 1) : "N") : "-") << '.';
+                f << " WH: " << (ex.type == Example::p_extremal_ ? (ex.worm_hole ? std::to_string(ex.worm_hole_id + 1) : "N") : "-") << '.';
                 f << " Index: " << ex.export_id << '.';
                 if (reader.nef_check != Reader::no_ and ex.nef_warning) {
                     f << " (*)";
@@ -798,7 +798,7 @@ namespace Writer {
     }
 
 
-    // Writes a summary in a tex file as a longtable. \dagger means that even though it says that the example is nef, it requires inspection. \ddagger means a counter example to the wormhole conjecture. 
+    // Writes a summary in a tex file as a longtable. \dagger means that even though it says that the example is nef, it requires inspection. \ddagger means a counter example to the wormhole conjecture.
     static void export_summary_latex(const Reader& reader, const std::vector<Example*>& ptr_examples) {
 
         std::string filename = reader.summary_filename + ".tex";
@@ -850,7 +850,7 @@ namespace Writer {
                 }
                 if (reader.nef_check == Reader::print_) {
                     header += "Nef & ";
-                    columns++; 
+                    columns++;
                 }
                 if (reader.effective_check == Reader::print_) {
                     header += "$\\mathbb Q$-ef & ";
@@ -865,9 +865,9 @@ namespace Writer {
                     columns++;
                 }
                 header += "Index";
-                
+
                 if (reader.latex_include_subsection) {
-                    f << "\\subsection{" << chain_amount_text << ", $K^2 = " << ex.K2 << "$}\n";
+                    f << "\\subsection{" << chain_amount_text << ", \\(K^2 = " << ex.K2 << "\\)}\n";
                 }
 
                 f << "\\begin{longtable}{|";
