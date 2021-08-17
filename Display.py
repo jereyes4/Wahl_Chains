@@ -1,41 +1,10 @@
 #!/usr/bin/env python3
 import sys, json, linecache, tkinter
-
+from tkinter import filedialog
+from tkinter.messagebox import showerror
 
 INCLUDE_INTERSECTION_MATRIX = True
-
-
-
-def display_string(Str):
-    root = tkinter.Tk()
-    root.geometry("1280x720")
-    frame = tkinter.Frame(root)
-    frame.pack(side=tkinter.BOTTOM,fill=tkinter.X)
-    SV = tkinter.Scrollbar(root)
-    SV.pack(side = tkinter.RIGHT, fill = tkinter.Y)
-    SH = tkinter.Scrollbar(frame, orient=tkinter.HORIZONTAL)
-    T = tkinter.Text(root, height=1000, width=1000, relief='flat',yscrollcommand=SV.set,xscrollcommand=SH.set,wrap=tkinter.NONE)
-    T.insert(tkinter.END, Str)
-    T.config(state=tkinter.DISABLED)
-    T.pack(side=tkinter.TOP,fill=tkinter.BOTH)
-    SV.config(command=T.yview)
-    SH.pack(side=tkinter.TOP, fill = tkinter.X)
-    SH.config(command=T.xview)
-
-    def copy():
-        root.clipboard_clear()
-        root.clipboard_append(Str)
-        B["text"] = "Copied!"
-        root.update()
-
-    frame2 = tkinter.Frame(frame)
-    frame2.pack(side=tkinter.BOTTOM)
-    B = tkinter.Button(frame2,text="Copy to clipboard", command=copy)
-    B.pack(side = tkinter.LEFT)
-    warning = tkinter.Label(frame2,text="Please paste before closing window. Esc to exit.")
-    warning.pack(side = tkinter.RIGHT)
-    root.bind("<Escape>",lambda e: root.destroy())
-    tkinter.mainloop()
+INTERSECTION_MATRIX_IN_LATEX = True
 
 def det(M):
     M = [row[:] for row in M] # make a copy to keep original M unmodified
@@ -81,7 +50,7 @@ def get_base_used_and_intersection_matrix(graph_info, config_info):
                 Intersection_Matrix[a][b] = selfint[a]
             else:
                 Intersection_Matrix[a][b] = count_graph[a][b]
-    
+
     used = config_info["used"]
     base_used = []
     for i in used:
@@ -105,27 +74,36 @@ def get_base_used_and_intersection_matrix(graph_info, config_info):
 def get_matrix_string(graph_info, config_info):
     base_used, matrix = get_base_used_and_intersection_matrix(graph_info, config_info)
     global_name_dict = graph_info["name"]
-    max_length = [
-        max(
-            len(global_name_dict[base_used[i]]),
-            *[len(str(matrix[j][i])) for j in range(len(base_used))]
-        )
-        for i in range(len(base_used))
-    ]
-    max_length_names = max([len(global_name_dict[base_used[i]]) for i in range(len(base_used))])
-    head_str = " - ".join(["{{:^{0}}}".format(max_length[j]) for j in range(len(base_used))]).format(*[global_name_dict[base_used[j]] for j in range(len(base_used))])
-    row_strs = ["   ".join(["{{:^{0}}}".format(max_length[j]) for j in range(len(base_used))]).format(*[str(matrix[i][j]) for j in range(len(base_used))]) for i in range(len(base_used))]
     result = "    Intersection matrix of base curves:\n\n"
-    result += "        " + "{{:^{0}}}".format(max_length_names).format("") + "   " + head_str + "\n"
-    for i in range(len(base_used)):
-        result += "        " + "{{:^{0}}}".format(max_length_names).format(global_name_dict[base_used[i]]) + " | " + row_strs[i] + " | \n"
-    result += (
-    "\n"
-    "    Determinant: {0}."
-    ).format(det(matrix))
+
+    if INTERSECTION_MATRIX_IN_LATEX:
+        result += "        In order: $" + ", ".join([global_name_dict[base_used[i]] for i in range(len(base_used))]) + "$\n"
+        result += "        \\left(\\begin{{array}}{{*{{{n}}}c}}\n".format(n=len(base_used))
+        for i in range(len(base_used)):
+            result += "            " + " & ".join([str(matrix[i][j]) for j in range(len(base_used))])
+            if i < len(base_used) - 1:
+                result += "\\\\"
+            result += "\n"
+        result += "        \\end{array}\\right)\n"
+    else:
+        max_length = [
+            max(
+                len(global_name_dict[base_used[i]]),
+                *[len(str(matrix[j][i])) for j in range(len(base_used))]
+            )
+            for i in range(len(base_used))
+        ]
+        max_length_names = max([len(global_name_dict[base_used[i]]) for i in range(len(base_used))])
+        head_str = " - ".join(["{{:^{0}}}".format(max_length[j]) for j in range(len(base_used))]).format(*[global_name_dict[base_used[j]] for j in range(len(base_used))])
+        row_strs = ["   ".join(["{{:^{0}}}".format(max_length[j]) for j in range(len(base_used))]).format(*[str(matrix[i][j]) for j in range(len(base_used))]) for i in range(len(base_used))]
+        result += "        " + "{{:^{0}}}".format(max_length_names).format("") + "   " + head_str + "\n"
+        for i in range(len(base_used)):
+            result += "        " + "{{:^{0}}}".format(max_length_names).format(global_name_dict[base_used[i]]) + " | " + row_strs[i] + " | \n"
+
+    result += "\n    Determinant: {0}.".format(det(matrix))
     return result
 
-def print_single_chain(graph_info, config_info):
+def string_of_single_chain(graph_info, config_info):
     graph = graph_info["graph"]
     global_name_dict = graph_info["name"]
     used_curves = config_info["used"]
@@ -142,21 +120,21 @@ def print_single_chain(graph_info, config_info):
     used_string = "      "
     for name in name_dict:
         used_string += "  {0}".format(name)
-        
+
     blowups_string = ""
     for ex in exceptionals:
         if ex not in contracted_ex:
             blowups_string += "        "
             intersect = []
-            
+
             maybe_missing = False
-            
+
             for curve in graph[ex]:
                 if curve in used_curves:
                     intersect.append(curve)
                 if curve in contracted_ex:
                     maybe_missing = True
-            
+
             blowups_string += " - ".join([global_name_dict[curve] for curve in intersect])
             blowups_string += " =: {0}".format(global_name_dict[ex])
             if maybe_missing:
@@ -173,7 +151,7 @@ def print_single_chain(graph_info, config_info):
             config_info["en"],
             name_dict[config_info["ea"]],
             name_dict[config_info["eb"]])
-            
+
     chain_list = [
         name_dict[curve] if curve < len(used_curves)
         else "*A_{0}".format(curve - len(used_curves) + 1)
@@ -233,7 +211,7 @@ def print_single_chain(graph_info, config_info):
         )
         string_matrix = get_matrix_string(graph_info, config_info)
 
-    display_string(S.format(
+    return S.format(
         K2 = config_info["K2"],
         n = n,
         a = a,
@@ -245,9 +223,9 @@ def print_single_chain(graph_info, config_info):
         self_int = self_int_string,
         discrepancies = discrepancy_string,
         matrix = string_matrix
-    ))
+    )
 
-def print_double_chain(graph_info, config_info):
+def string_of_double_chain(graph_info, config_info):
     graph = graph_info["graph"]
     global_name_dict = graph_info["name"]
     used_curves = config_info["used"]
@@ -266,21 +244,21 @@ def print_double_chain(graph_info, config_info):
     used_string = "      "
     for name in name_dict:
         used_string += "  {0}".format(name)
-        
+
     blowups_string = ""
     for ex in exceptionals:
         if ex not in contracted_ex:
             blowups_string += "        "
             intersect = []
-            
+
             maybe_missing = False
-            
+
             for curve in graph[ex]:
                 if curve in used_curves:
                     intersect.append(curve)
                 if curve in contracted_ex:
                     maybe_missing = True
-            
+
             blowups_string += " - ".join([global_name_dict[curve] for curve in intersect])
             blowups_string += " =: {0}".format(global_name_dict[ex])
             if maybe_missing:
@@ -302,12 +280,12 @@ def print_double_chain(graph_info, config_info):
             config_info["en1"],
             name_dict[config_info["ea1"]],
             name_dict[config_info["eb1"]])
-            
+
     chain_list0 = [
         name_dict[curve] if curve < len(used_curves)
         else "*A_{0}".format(curve - len(used_curves) + 1)
         for curve in chain0
-    ]       
+    ]
     chain_list1 = [
         name_dict[curve] if curve < len(used_curves)
         else "*A_{0}".format(curve - len(used_curves) + 1)
@@ -394,8 +372,8 @@ def print_double_chain(graph_info, config_info):
         "{matrix}\n"
         )
         string_matrix = get_matrix_string(graph_info, config_info)
-    
-    display_string(S.format(
+
+    return S.format(
         K2 = config_info["K2"],
         n0 = n0,
         a0 = a0,
@@ -413,9 +391,9 @@ def print_double_chain(graph_info, config_info):
         self_int1 = self_int_string1,
         discrepancies1 = discrepancy_string1,
         matrix = string_matrix
-    ))
+    )
 
-def print_p_extremal(graph_info, config_info):
+def string_of_p_extremal(graph_info, config_info):
     graph = graph_info["graph"]
     global_name_dict = graph_info["name"]
     used_curves = config_info["used"]
@@ -439,21 +417,21 @@ def print_p_extremal(graph_info, config_info):
     used_string = "      "
     for name in name_dict:
         used_string += "  {0}".format(name)
-        
+
     blowups_string = ""
     for ex in exceptionals:
         if ex not in contracted_ex:
             blowups_string += "        "
             intersect = []
-            
+
             maybe_missing = False
-            
+
             for curve in graph[ex]:
                 if curve in used_curves:
                     intersect.append(curve)
                 if curve in contracted_ex:
                     maybe_missing = True
-            
+
             blowups_string += " - ".join([global_name_dict[curve] for curve in intersect])
             blowups_string += " =: {0}".format(global_name_dict[ex])
             if maybe_missing:
@@ -470,7 +448,7 @@ def print_p_extremal(graph_info, config_info):
             config_info["en1"],
             name_dict[config_info["ea1"]],
             name_dict[config_info["eb1"]])
-    
+
     original_chain_list = [
         name_dict[curve] if curve < len(used_curves)
         else "*A_{0}".format(curve - len(used_curves) + 1)
@@ -585,7 +563,7 @@ def print_p_extremal(graph_info, config_info):
         )
         string_matrix = get_matrix_string(graph_info, config_info)
 
-    display_string(S.format(
+    return S.format(
         K2 = config_info["K2"],
         Delta = Delta,
         Omega = Omega,
@@ -607,9 +585,9 @@ def print_p_extremal(graph_info, config_info):
         self_int1 = self_int_string1,
         discrepancies1 = discrepancy_string1,
         matrix = string_matrix
-    ))
+    )
 
-def print_single_QHD(graph_info, config_info):
+def string_of_single_QHD(graph_info, config_info):
 
     graph = graph_info["graph"]
     global_name_dict = graph_info["name"]
@@ -632,21 +610,21 @@ def print_single_QHD(graph_info, config_info):
     used_string = "      "
     for name in name_dict:
         used_string += "  {0}".format(name)
-        
+
     blowups_string = ""
     for ex in exceptionals:
         if ex not in contracted_ex:
             blowups_string += "        "
             intersect = []
-            
+
             maybe_missing = False
-            
+
             for curve in graph[ex]:
                 if curve in used_curves:
                     intersect.append(curve)
                 if curve in contracted_ex:
                     maybe_missing = True
-            
+
             blowups_string += " - ".join([global_name_dict[curve] for curve in intersect])
             blowups_string += " =: {0}".format(global_name_dict[ex])
             if maybe_missing:
@@ -663,7 +641,7 @@ def print_single_QHD(graph_info, config_info):
             config_info["en"],
             name_dict[config_info["ea"]],
             name_dict[config_info["eb"]])
-    
+
     fork = [[],[],[]]
     branch = -1
     for curve in fork_raw:
@@ -760,7 +738,7 @@ def print_single_QHD(graph_info, config_info):
         )
         string_matrix = get_matrix_string(graph_info, config_info)
 
-    display_string(S.format(
+    return S.format(
         K2 = config_info["K2"],
         QHD_type = QHD_type,
         p = p,
@@ -782,9 +760,9 @@ def print_single_QHD(graph_info, config_info):
         discrepancies_2 = discrepancy_string[2],
         vertical_line = vertical_line,
         matrix = string_matrix
-    ))
+    )
 
-def print_double_QHD(graph_info, config_info):
+def string_of_double_QHD(graph_info, config_info):
 
     graph = graph_info["graph"]
     global_name_dict = graph_info["name"]
@@ -809,21 +787,21 @@ def print_double_QHD(graph_info, config_info):
     used_string = "      "
     for name in name_dict:
         used_string += "  {0}".format(name)
-        
+
     blowups_string = ""
     for ex in exceptionals:
         if ex not in contracted_ex:
             blowups_string += "        "
             intersect = []
-            
+
             maybe_missing = False
-            
+
             for curve in graph[ex]:
                 if curve in used_curves:
                     intersect.append(curve)
                 if curve in contracted_ex:
                     maybe_missing = True
-            
+
             blowups_string += " - ".join([global_name_dict[curve] for curve in intersect])
             blowups_string += " =: {0}".format(global_name_dict[ex])
             if maybe_missing:
@@ -845,7 +823,7 @@ def print_double_QHD(graph_info, config_info):
             config_info["en1"],
             name_dict[config_info["ea1"]],
             name_dict[config_info["eb1"]])
-    
+
     fork = [[],[],[]]
     branch = -1
     for curve in fork_raw:
@@ -982,7 +960,7 @@ def print_double_QHD(graph_info, config_info):
         )
         string_matrix = get_matrix_string(graph_info, config_info)
 
-    display_string(S.format(
+    return S.format(
         K2 = config_info["K2"],
         QHD_type = QHD_type,
         p = p,
@@ -1010,57 +988,191 @@ def print_double_QHD(graph_info, config_info):
         chain_self_int = chain_self_int_string,
         chain_discrepancies = chain_discrepancy_string,
         matrix = string_matrix
-    ))
+    )
 
-if __name__ == "__main__":
-    if len(sys.argv) <= 2:
-        print("Usage: {0} <jsonl filname> index".format(sys.argv[0]),file=sys.stderr)
-    
-    else:
-        filename = sys.argv[1]
+def main_window(default_filename="", default_param=""):
+    Str = ""
+    graph_info = None
+    config_info = None
+    filename = default_filename
+    root = tkinter.Tk()
+    root.geometry("1280x720")
+    frame = tkinter.Frame(root)
+    frame.pack(side=tkinter.BOTTOM,fill=tkinter.X)
+    SV = tkinter.Scrollbar(root)
+    SV.pack(side = tkinter.RIGHT, fill = tkinter.Y)
+    SH = tkinter.Scrollbar(frame, orient=tkinter.HORIZONTAL)
+    T = tkinter.Text(root, height=1000, width=1000, relief='flat',yscrollcommand=SV.set,xscrollcommand=SH.set,wrap=tkinter.NONE)
+    T.insert(tkinter.END, Str)
+    T.config(state=tkinter.DISABLED)
+    T.pack(side=tkinter.TOP,fill=tkinter.BOTH)
+    SV.config(command=T.yview)
+    SH.pack(side=tkinter.TOP, fill = tkinter.X)
+    SH.config(command=T.xview)
 
-        try:
-            index = int(sys.argv[2])
-        except:
-            print("Error: Invalid index.")
-            exit(0)
+    def copy():
+        root.clipboard_clear()
+        root.clipboard_append(Str)
+        copy_button["text"] = "Copied!"
+        root.update()
 
+    def load_file(temp_filename = ""):
+        nonlocal filename
+        nonlocal graph_info
+        if temp_filename == "":
+            temp_filename = filedialog.askopenfilename(
+                title="Open file",
+                filetypes=(
+                    ("jsonl files", "*.jsonl"),
+                    ("All files", "*.*")
+                )
+            )
+            if type(temp_filename) != str:
+                showerror(title="Error", message="Could not open file.")
+                return
+            s = linecache.getline(temp_filename,1)
+            if s == "":
+                showerror(title="Error", message="Could not open file.")
+                return
+            try:
+                temp = json.loads(s)
+            except:
+                showerror(title="Error", message="Corrupted/incompatible jsonl file.")
+                return
+        else:
+            if type(temp_filename) != str:
+                T.config(state=tkinter.NORMAL)
+                T.delete("1.0",tkinter.END)
+                T.insert(tkinter.END, "Error: Could not open file.")
+                T.config(state=tkinter.DISABLED)
+                return
+            s = linecache.getline(temp_filename,1)
+            if s == "":
+                T.config(state=tkinter.NORMAL)
+                T.delete("1.0",tkinter.END)
+                T.insert(tkinter.END, "Error: Could not open file.")
+                T.config(state=tkinter.DISABLED)
+                return
+            try:
+                temp = json.loads(s)
+            except:
+                T.config(state=tkinter.NORMAL)
+                T.delete("1.0",tkinter.END)
+                T.insert(tkinter.END, "Error: Corrupted/incompatible jsonl file.")
+                T.config(state=tkinter.DISABLED)
+                return
+
+        filename = temp_filename
+        graph_info = temp
+        number_input.delete(0,tkinter.END)
+        copy_button["text"] = "Copy to clipboard"
+        T.config(state=tkinter.NORMAL)
+        T.delete("1.0",tkinter.END)
+        T.insert(tkinter.END, "Loaded {}.".format(filename))
+        T.config(state=tkinter.DISABLED)
+        number_input.focus_set()
+
+    def load_example(initial = False):
+        nonlocal config_info
+        nonlocal Str
+        if filename == "":
+            showerror(title="Error", message="No file opened.")
+            return
+        index = number_input.get()
+        if index == "":
+            return
+        index = int(index)
         if index == 0:
-            print("Unimplemented.")
-            exit(0)
-        
-        s1 = linecache.getline(filename,1)
-        if s1 == '':
-            print("Error while opening file.")
-            exit(0)
-        
-        s2 = linecache.getline(filename,index+1)
-        if s2 == '':
-            print("Error: Invalid index (Out of bounds).")
-            exit(0)
-
-        # try:
-        if True:
-            graph_info = json.loads(s1)
-            config_info = json.loads(s2)
+            T.config(state=tkinter.NORMAL)
+            T.delete("1.0",tkinter.END)
+            T.insert(tkinter.END, "Loaded {}.".format(filename))
+            T.config(state=tkinter.DISABLED)
+            copy_button["text"] = "Copy to clipboard"
+            return
+        s = linecache.getline(filename,index + 1)
+        if s == "":
+            if initial:
+                T.config(state=tkinter.NORMAL)
+                T.delete("1.0",tkinter.END)
+                T.insert(tkinter.END, "Error: Invalid index (Out of bounds).")
+                T.config(state=tkinter.DISABLED)
+            else:
+                showerror(title="Error", message="Invalid index (Out of bounds).")
+            return
+        try:
+            config_info = json.loads(s)
 
             amount = config_info["#"]
+            S = ""
             if amount == 1:
                 if "type" in config_info:
-                    print_single_QHD(graph_info, config_info)
+                    S = string_of_single_QHD(graph_info, config_info)
                 else:
-                    print_single_chain(graph_info, config_info)
-            
+                    S = string_of_single_chain(graph_info, config_info)
+
             else:
                 p_extremal = config_info["WH"]
                 if p_extremal == 0:
                     if "type" in config_info:
-                        print_double_QHD(graph_info, config_info)
+                        S = string_of_double_QHD(graph_info, config_info)
                     else:
-                        print_double_chain(graph_info, config_info)
+                        S = string_of_double_chain(graph_info, config_info)
                 else:
-                    print_p_extremal(graph_info, config_info)
+                    S = string_of_p_extremal(graph_info, config_info)
+            Str = S
+            T.config(state=tkinter.NORMAL)
+            T.delete("1.0",tkinter.END)
+            T.insert(tkinter.END, Str)
+            T.config(state=tkinter.DISABLED)
+            copy_button["text"] = "Copy to clipboard"
 
-        # except:
-        #     print("Error: corrupted/incompatible jsonl file.")
-        #     exit(0)
+        except:
+            if initial:
+                T.config(state=tkinter.NORMAL)
+                T.delete("1.0",tkinter.END)
+                T.insert(tkinter.END, "Error: Corrupted/incompatible jsonl file.")
+                T.config(state=tkinter.DISABLED)
+            else:
+                showerror(title="Error", message="Corrupted/incompatible jsonl file.")
+            return
+
+    def validate_number(value):
+        return str.isdigit(value) or value == ""
+
+    bottomframe = tkinter.Frame(frame)
+    bottomframe.pack(side=tkinter.BOTTOM)
+    fileframe = tkinter.Frame(bottomframe)
+    fileframe.pack(side=tkinter.LEFT)
+    copyframe = tkinter.Frame(bottomframe)
+    copyframe.pack(side=tkinter.RIGHT)
+
+    open_button = tkinter.Button(fileframe,text="Open file", command=load_file)
+    open_button.pack(side=tkinter.LEFT)
+
+    number_input = tkinter.Entry(fileframe, validate="all", validatecommand=(root.register(validate_number), "%P"))
+    number_input.pack(side=tkinter.RIGHT)
+
+    copy_button = tkinter.Button(copyframe,text="Copy to clipboard", command=copy)
+    copy_button.pack(side = tkinter.LEFT)
+    warning = tkinter.Label(copyframe,text="Please paste before closing window. Esc to exit.")
+    warning.pack(side = tkinter.RIGHT)
+    root.bind("<Escape>",lambda e: root.destroy())
+    root.bind("<Return>",lambda e: load_example())
+    root.bind("<Control-o>",lambda e: load_file())
+
+    if default_filename != "":
+        load_file(default_filename)
+    if default_param != "" and str.isdigit(default_param):
+        if graph_info != None:
+            number_input.insert(tkinter.END,default_param)
+            load_example(True)
+    number_input.focus_set()
+    tkinter.mainloop()
+
+if __name__ == "__main__":
+    if len(sys.argv) >= 3:
+        main_window(sys.argv[1],sys.argv[2])
+    elif len(sys.argv) == 2:
+        main_window(sys.argv[1])
+    else:
+        main_window()
