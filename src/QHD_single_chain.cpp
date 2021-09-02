@@ -87,7 +87,7 @@ void Searcher::search_for_QHD3_single_chain() {
             // fork[0] now only has the frame
 
             G.blowup(fork[0].back(),fork[1].back());
-            
+
             fork[0].emplace_back(new_index);
             G.self_int.emplace_back(-2);
             G.self_int[fork[1].back()]--;

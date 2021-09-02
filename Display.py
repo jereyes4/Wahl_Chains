@@ -1010,6 +1010,15 @@ def main_window(default_filename="", default_param=""):
     SH.pack(side=tkinter.TOP, fill = tkinter.X)
     SH.config(command=T.xview)
 
+    def set_text(S):
+        nonlocal Str
+        T.config(state=tkinter.NORMAL)
+        T.delete("1.0",tkinter.END)
+        T.insert(tkinter.END, S)
+        T.config(state=tkinter.DISABLED)
+        copy_button["text"] = "Copy to clipboard"
+        Str = S
+
     def copy():
         root.clipboard_clear()
         root.clipboard_append(Str)
@@ -1041,35 +1050,22 @@ def main_window(default_filename="", default_param=""):
                 return
         else:
             if type(temp_filename) != str:
-                T.config(state=tkinter.NORMAL)
-                T.delete("1.0",tkinter.END)
-                T.insert(tkinter.END, "Error: Could not open file.")
-                T.config(state=tkinter.DISABLED)
+                set_text("Error: Could not open file.")
                 return
             s = linecache.getline(temp_filename,1)
             if s == "":
-                T.config(state=tkinter.NORMAL)
-                T.delete("1.0",tkinter.END)
-                T.insert(tkinter.END, "Error: Could not open file.")
-                T.config(state=tkinter.DISABLED)
+                set_text("Error: Could not open file.")
                 return
             try:
                 temp = json.loads(s)
             except:
-                T.config(state=tkinter.NORMAL)
-                T.delete("1.0",tkinter.END)
-                T.insert(tkinter.END, "Error: Corrupted/incompatible jsonl file.")
-                T.config(state=tkinter.DISABLED)
+                set_text("Error: Corrupted/incompatible jsonl file.")
                 return
 
         filename = temp_filename
         graph_info = temp
         number_input.delete(0,tkinter.END)
-        copy_button["text"] = "Copy to clipboard"
-        T.config(state=tkinter.NORMAL)
-        T.delete("1.0",tkinter.END)
-        T.insert(tkinter.END, "Loaded {}.".format(filename))
-        T.config(state=tkinter.DISABLED)
+        set_text("Loaded {}.".format(filename))
         number_input.focus_set()
 
     def load_example(initial = False):
@@ -1083,19 +1079,12 @@ def main_window(default_filename="", default_param=""):
             return
         index = int(index)
         if index == 0:
-            T.config(state=tkinter.NORMAL)
-            T.delete("1.0",tkinter.END)
-            T.insert(tkinter.END, "Loaded {}.".format(filename))
-            T.config(state=tkinter.DISABLED)
-            copy_button["text"] = "Copy to clipboard"
+            set_text("Loaded {}.".format(filename))
             return
         s = linecache.getline(filename,index + 1)
         if s == "":
             if initial:
-                T.config(state=tkinter.NORMAL)
-                T.delete("1.0",tkinter.END)
-                T.insert(tkinter.END, "Error: Invalid index (Out of bounds).")
-                T.config(state=tkinter.DISABLED)
+                set_text("Error: Invalid index (Out of bounds).")
             else:
                 showerror(title="Error", message="Invalid index (Out of bounds).")
             return
@@ -1119,19 +1108,11 @@ def main_window(default_filename="", default_param=""):
                         S = string_of_double_chain(graph_info, config_info)
                 else:
                     S = string_of_p_extremal(graph_info, config_info)
-            Str = S
-            T.config(state=tkinter.NORMAL)
-            T.delete("1.0",tkinter.END)
-            T.insert(tkinter.END, Str)
-            T.config(state=tkinter.DISABLED)
-            copy_button["text"] = "Copy to clipboard"
+            set_text(S)
 
         except:
             if initial:
-                T.config(state=tkinter.NORMAL)
-                T.delete("1.0",tkinter.END)
-                T.insert(tkinter.END, "Error: Corrupted/incompatible jsonl file.")
-                T.config(state=tkinter.DISABLED)
+                set_text("Error: Corrupted/incompatible jsonl file.")
             else:
                 showerror(title="Error", message="Corrupted/incompatible jsonl file.")
             return

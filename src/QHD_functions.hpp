@@ -304,7 +304,7 @@ namespace algs {
                     // There is a unique > 2 branch: q_index
                     for (int q_index = 0; q_index < 3; ++q_index) {
                         if (fork[q_index].size() == 2) continue;
-                        
+
                         // check if the others have length 2
                         for (int temp = q_index + 1; temp < 3; ++temp) {
                             if (fork[temp].size() != 2) {

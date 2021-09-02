@@ -139,13 +139,13 @@ public:
 
     //////////////////////////////////////////////////////
     // Result data
-    
+
     std::queue<Example> *results;
     std::unordered_set<single_invariant,ill_hash> single_found;
     std::unordered_set<double_invariant,illll_hash> double_found;
     std::unordered_set<P_extremal_invariant,ill_hash> P_extremal_found;
-    std::set<single_QHD_invariant> single_QHD_found; 
-    std::set<double_QHD_invariant> double_QHD_found; 
+    std::set<single_QHD_invariant> single_QHD_found;
+    std::set<double_QHD_invariant> double_QHD_found;
     Graph G;
 
     // A local copy to not access shared memory. Is this useful? IDK.
@@ -156,7 +156,7 @@ public:
 
     // Takes an index in the local example and gives its original index
     std::vector<int> curve_translate;
-    
+
     // Number of curves in the example
     int ex_number;
     void search();
@@ -179,7 +179,7 @@ public:
     std::map<int,std::multiset<int>> temp_included_curves;
     std::vector<int> temp_self_int;
     std::unordered_set<int> temp_ignored_exceptional;
-    
+
     // using vector as set for O(0) clear. True is current_test, False is anything else.
     std::vector<long long> temp_try_included_exceptional;
     std::vector<long long> temp_marked_exceptional;
@@ -268,7 +268,7 @@ public:
         const std::vector<int>& local_self_int, const std::vector<long long>& discrepancies,
         const std::vector<int>& location, long long n[2]
     );
-    
+
     //////////////////////////////////////////////////////
     // QHD_single_chain.cpp
 

@@ -210,7 +210,7 @@ bool Graph::next_candidate_QHD3(){
 
         // last_l should be the smallest index in the big degree set, since it was the first one in the set at this point in the stack
         int last_l = *big_degree_nodes.begin();
-        
+
         int a,b;
         a = -1;
         bool exit_loop = false;

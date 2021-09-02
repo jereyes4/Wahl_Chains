@@ -15,7 +15,7 @@ constexpr bool ignore_partial_resolution = true;
     Explore every way in which all but one nodes have degree at most 2, and the remaining one has degree at most 3.
     We call the node with degree 3 a central framing if it exists.
     If there is no central framing, split to normal double chain search.
-        Checking for QHD-partial resolutions (and another weird corner case involving (-2) branches in types 
+        Checking for QHD-partial resolutions (and another weird corner case involving (-2) branches in types
         is easier from double chain, so it can split back from there.
     The connected component containing the central framing is called a prefork.
     If the prefork is acyclic, we call it a fork.
@@ -104,7 +104,7 @@ void Searcher::search_for_QHD3_double_chain() {
             // Cases 1 and 2.
             chain.clear();
             if (cyclic) {
-                
+
                 // Case 1
 
                 /*
@@ -165,7 +165,7 @@ void Searcher::search_for_QHD3_double_chain() {
                         chain.emplace_back(fork[2].back());
                         fork[2].pop_back();
                         G.blowup(chain.back(),fork[2].back());
-                        
+
                         fork[2].emplace_back(new_index);
                         G.self_int.emplace_back(-2);
                         G.self_int[chain.back()]--;
@@ -200,7 +200,7 @@ void Searcher::search_for_QHD3_double_chain() {
                         chain.emplace_back(fork[0].back());
                         fork[0].pop_back();
                         G.blowup(chain.back(),fork[0].back());
-                        
+
                         fork[0].emplace_back(new_index);
                         G.self_int.emplace_back(-2);
                         G.self_int[chain.back()]--;
@@ -228,7 +228,7 @@ void Searcher::search_for_QHD3_double_chain() {
                 }
             }
             else {
-                
+
                 // Case 2
                 if (contains(G.disconnections[fork[0].back()],fork[1].back())) continue;
                 if (contains(G.disconnections[fork[0].back()],fork[2].back())) continue;
@@ -255,7 +255,7 @@ void Searcher::search_for_QHD3_double_chain() {
                     chain.emplace_back(fork[branch].back());
                     fork[branch].pop_back();
                     G.blowup(chain.back(),fork[branch].back());
-                    
+
                     fork[branch].emplace_back(new_index);
                     G.self_int.emplace_back(-2);
                     G.self_int[chain.back()]--;
@@ -287,7 +287,7 @@ void Searcher::search_for_QHD3_double_chain() {
 #endif
                     // Cases 3,5
                     if (cyclic) {
-                        
+
                         // Case 3
 
                         // new index for the possible extra (-2) curve.
@@ -345,7 +345,7 @@ void Searcher::search_for_QHD3_double_chain() {
                                 // fork[0] now only has the frame
 
                                 G.blowup(fork[0].back(),fork[1].back());
-                                
+
                                 fork[0].emplace_back(new_index);
                                 G.self_int.emplace_back(-2);
                                 G.self_int[fork[1].back()]--;
@@ -362,7 +362,7 @@ void Searcher::search_for_QHD3_double_chain() {
                         }
                     }
                     else {
-                        
+
                         // Case 5
                         if (contains(G.disconnections[fork[0].back()],fork[1].back())) continue;
                         if (contains(G.disconnections[fork[0].back()],fork[2].back())) continue;
@@ -408,7 +408,7 @@ void Searcher::search_for_QHD3_double_chain() {
 #endif
                 // Cases 4,6
                 if (cyclic) {
-                    
+
                     // Case 4
                     if (contains(G.disconnections[chain[0]],chain.back())) continue;
                     if (contains(G.disconnections[chain[0]],fork[2].back())) continue;
@@ -450,7 +450,7 @@ void Searcher::search_for_QHD3_double_chain() {
                     // fork[0] now only has the frame
 
                     G.blowup(fork[0].back(),fork[1].back());
-                    
+
                     fork[0].emplace_back(new_index);
                     G.self_int.emplace_back(-2);
                     G.self_int[fork[1].back()]--;
@@ -462,7 +462,7 @@ void Searcher::search_for_QHD3_double_chain() {
                     G.revert();
                 }
                 else {
-                    
+
                     // Case 6
                     if (contains(G.disconnections[fork[0].back()],fork[1].back())) continue;
                     if (contains(G.disconnections[fork[0].back()],fork[2].back())) continue;
@@ -566,7 +566,7 @@ void Searcher::get_fork_from_two_chains_for_double(vector<int> (&chain)[2]) {
 /*
     This is similar to the double chain algorithm, but quite a bit simpler.
     Since all borders of the fork are (-3) or lower, we can only append (-2) curves the chain.
-    
+
     First calculate Delta = - 3*L - 1 - S, where L is the length of the chain and S is the sum of
     its self intersections.
 
@@ -583,7 +583,7 @@ void Searcher::get_fork_from_two_chains_for_double(vector<int> (&chain)[2]) {
 */
 
 void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>& chain, int extra_id, int extra_n, int extra_orig, int extra_pos) {
-    
+
     static thread_local vector<int> location;
 
     location.assign(G.self_int.size(),0);
@@ -592,7 +592,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
         Delta -= G.self_int[curve];
         location[curve] = 1;
     }
-    
+
     if (Delta < 0) return;
 
     static thread_local vector<int> reduced_fork[3];
@@ -671,7 +671,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
 
                 // size variable used to give new id's to curves.
                 int size = reduced_self_int.size();
-                
+
                 // First case: A^2 > -2. Blowup to get A^2 = -2
                 if (reduced_self_int_2[A] > -2) {
                     // Blowup successively
@@ -879,7 +879,7 @@ void Searcher::verify_QHD3_double_candidate(const std::vector<int> (&fork)[3], c
     for (int i = 0; i < 3; ++i) for (int curve : fork[i]) location[curve] = 0;
     for (int curve : chain) location[curve] = 1;
     long long n[2] = {QHD_denominator,chain_invariants.first};
-    
+
     pair<bool,bool> nef_result;
     if (reader_copy.nef_check != Reader::no_) {
         int borders[2] = {extra_id,chain.back()};
@@ -926,7 +926,7 @@ void Searcher::verify_QHD3_double_candidate(const std::vector<int> (&fork)[3], c
     example.extra_orig[1] = extra_orig[1];
     example.extra_pos[0] = extra_pos[0];
     example.extra_pos[1] = extra_pos[1];
-    
+
     example.chain[0].reserve(fork[0].size() + fork[1].size() + fork[2].size());
     for (int i = 0; i < 3; ++i) {
         example.chain[0].insert(example.chain[0].end(),fork[i].begin(),fork[i].end());

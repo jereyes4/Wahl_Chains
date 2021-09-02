@@ -74,7 +74,7 @@ class Canonical_Divisor {
 public:
     int self_int;
     void blowup(int id, const std::map<int,int>& intersections);
-    
+
     // intersections is modified.
     int blowup_curve_self_int_delta(std::map<int,int>& intersections);
     int exceptional_intersection(std::map<int,int>& intersections);
@@ -83,7 +83,7 @@ public:
         int multiplicity;
         int left_parent;
         int right_parent;
-        Component(int id, int multiplicity, int left_parent, int right_parent) : 
+        Component(int id, int multiplicity, int left_parent, int right_parent) :
             id(id), multiplicity(multiplicity), left_parent(left_parent), right_parent(right_parent) {}
     };
     std::unordered_set<int> used_components;

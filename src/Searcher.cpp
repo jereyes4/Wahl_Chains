@@ -151,7 +151,7 @@ bool Searcher::contract_exceptional() {
                 if(temp_try_included_exceptional[comp.id] == current_test) {
                     return true;
                 }
-                
+
                 temp_included_curves[curve_a].erase(comp.id);
                 temp_included_curves[curve_b].erase(comp.id);
                 temp_included_curves[comp.left_parent].erase(comp.id);
@@ -312,7 +312,7 @@ void Searcher::search() {
                 temp_included_curves[i].erase(ignored_ex);
             }
         }
-        
+
         int sum_self_int = 0;
         int double_singularities = 0;
         int curve_number = 0;
@@ -325,13 +325,13 @@ void Searcher::search() {
         // P is the amount of Wahl chains that can be extracted from this example
         int P = sum_self_int + 5*curve_number - double_singularities;
 
-        if (!(P == 1 and (reader_copy.search_single_chain or reader_copy.search_single_QHD)) and 
+        if (!(P == 1 and (reader_copy.search_single_chain or reader_copy.search_single_QHD)) and
             !(P == 2 and (reader_copy.search_double_chain or reader_copy.search_double_QHD))) continue;
 
         // K is the K^2 of the resulting X
         int K = K2 - 3*curve_number - sum_self_int + double_singularities/2;
         current_K2 = K;
-        
+
         if (!contains(reader_copy.search_for,K)) continue;
 
         // Pretest passed.
@@ -461,7 +461,7 @@ bool Searcher::get_curves_from_mask_exact_curves(long long mask) {
     for (auto& choose_set : reader_copy.choose_curves[test_index]) {
         to_choose_from += choose_set.size();
     }
-    
+
     int to_choose = reader_copy.curves_used_exactly - reader_copy.fixed_curves[test_index].size();
     algs::ith_combination(to_choose_from, to_choose, mask, chosen_curves);
 

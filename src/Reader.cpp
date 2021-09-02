@@ -278,7 +278,7 @@ void Reader::parse(istream& input) {
                 }
                 else {
                     current_section_argument = -2;
-                } 
+                }
                 state = sections_;
                 continue;
             }
@@ -360,13 +360,13 @@ void Reader::parse(istream& input) {
         default:;
         }
     }
-    
+
     for (int i = 0; i < curve_no; ++i) {
         if (contains(adj_list[i],i)) {
             error("Curve \'" + curve_name[i] + "\' still has singularities.");
         }
     }
-    
+
     // For consistency, sort all fixed / ignored / try vectors
     for (auto& v : fixed_curves) {
         std::sort(v.begin(),v.end());
@@ -948,7 +948,7 @@ void Reader::parse_merge(const vector<string>& def_tokens, const vector<string>&
         }
     }
     K.blowup(this_id, intersections);
-    
+
     max_test_number = std::max(max_test_number,(int)def_tokens.size() - 1);
     string option = def_tokens.size() == 1 ? "T" : def_tokens.back();
     for (int t = 0; t < tests_no; ++t) {
@@ -1100,8 +1100,10 @@ void Reader::parse_forget_exceptional(const vector<string>& tokens) {
         if (contains(forgotten_exceptionals,id)) {
             warning("Curve \'" + curve + "\' is already forgotten.");
         }
-        sections.insert(id);
-        forgotten_exceptionals.insert(id);
+        else {
+            sections.insert(id);
+            forgotten_exceptionals.insert(id);
+        }
     }
 }
 

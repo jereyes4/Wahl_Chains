@@ -76,7 +76,7 @@ Wahl::Wahl(int argc, char** argv) {
     std::cout << "\e[s";
     long long mintest = 0;
     while (mintest < total_tests) {
-        
+
 #ifdef CATCH_SIGINT
         if (sigint_catched) {
             std::cout << "\n" "Abrupt close. Waiting for threads to finish..." << std::endl;
@@ -148,7 +148,7 @@ Wahl::Wahl(int argc, char** argv) {
 #endif // PRINT_STATUS
 
 #ifdef OVERFLOW_CHECK
-    
+
     std::ofstream error_file(ERROR_FILE);
     for (Searcher_Wrapper& searcher : searchers) {
         error_file << searcher.err.rdbuf();
@@ -169,7 +169,7 @@ Wahl::Wahl(int argc, char** argv) {
     std::cout << std::endl;
 #else // ndef PRINT_STATUS
     searcher.search();
-#endif // PRINT_STATUS 
+#endif // PRINT_STATUS
 
 #ifdef OVERFLOW_CHECK
 
@@ -366,13 +366,13 @@ void Wahl::Write(std::vector<Example>& example_vector) {
             // wormhole found. This example is paired with the next one in example_vector
             ex.worm_hole_id = example_vector[i+1].export_id;
             example_vector[i+1].worm_hole_id = ex.export_id;
-            
+
             // Skip next example as it's already paired with this one.
             i++;
         }
     }
     Writer::export_jsonl(reader,ptr_example_vector);
-    
+
     if (reader.summary_style == Reader::plain_text_) {
         Writer::export_summary_text(reader,ptr_example_vector);
     }

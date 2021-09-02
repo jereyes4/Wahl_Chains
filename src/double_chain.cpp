@@ -124,7 +124,7 @@ void Searcher::search_for_double_chain_inner_loop() {
             for (int i = 0; i < cycle[0].size(); ++i){
                 const int a = cycle[0][i];
                 const int b = cycle[0][(i+1)%cycle[0].size()];
-                
+
                 chain[0].resize(0);
                 G.blowup(a,b);
                 for (int j = 0; j < cycle[0].size(); ++j) {
@@ -133,7 +133,7 @@ void Searcher::search_for_double_chain_inner_loop() {
                 for (int i2 = 0; i2 < cycle[1].size(); ++i2) {
                     const int c = cycle[1][i2];
                     const int d = cycle[1][(i2+1)%cycle[1].size()];
-                    
+
                     if (contains(G.disconnections[a],c) or
                         contains(G.disconnections[a],d) or
                         contains(G.disconnections[b],c) or
@@ -168,7 +168,7 @@ void Searcher::search_for_double_chain_inner_loop() {
 #ifdef NO_REPEATED_SEARCH
         if (seen.check_and_add(chain[0])) return;
 #endif
-        
+
         if constexpr (chain_search) {
             explore_p_extremal_resolution(chain[0]);
         }
@@ -220,7 +220,7 @@ void Searcher::search_for_double_chain_inner_loop() {
             for(int i = 0; i < cycle[1].size(); ++i){
                 const int a = cycle[1][i];
                 const int b = cycle[1][(i+1)%cycle[1].size()];
-                
+
                 if (contains(G.disconnections[a],chain[0][0]) or
                     contains(G.disconnections[a],chain[0].back()) or
                     contains(G.disconnections[b],chain[0][0]) or
@@ -239,7 +239,7 @@ void Searcher::search_for_double_chain_inner_loop() {
                 if constexpr (QHD_search) {
                     get_fork_from_two_chains_for_double(chain);
                 }
-                
+
                 G.revert();
             }
             return;
@@ -258,7 +258,7 @@ void Searcher::search_for_double_chain_inner_loop() {
             // Taken care in 1,2,3 or 4.
             return;
         }
-        
+
 #ifdef NO_REPEATED_SEARCH
         if (seen.check_and_add(chain[0],chain[1])) return;
 #endif
@@ -318,7 +318,7 @@ Third case: C_0 -> C_0 and C_1 -> C_0 (or no connection C_0 -> C_0 (*)) and C_1 
 
 Fourth case: C_0 -> C_1 and C_1 -> C_0 and they don't end at the begining of the other.
     Let A be the curve in C_1 that intersect C_0 -> C_1 and B be the curve in C_0 that intersect C_1 -> C_0 The difference between the blowups of C_0 -> C_1 and C_1 -> C_0 should always be Delta, so if anywhere in the following analysis one of them should be non positive, discard that case (as either it is impossible or already taken care of).
-    
+
     Reduce both chains but don't blowdown A and B yet. Suppose wlog that A^2 - Delta >= B^2.
     There are several non exclusive cases:
         If A^2 > -1, then blowup A enough times as to make it a (-1). Reduce both chains and check if they are Wahl. Subsequently, undo this reduction.
@@ -750,7 +750,7 @@ void Searcher::verify_first_explore_independent_second(vector<int> (&chain)[2], 
     static thread_local vector<int> reduced_self_int;
 
     original_chain = std::move(chain[1]);
-    
+
     int extra_n[2] = {extra_n_0,0};
     int extra_orig[2] = {extra_orig_0,-1};
     int extra_pos[2] = {extra_pos_0,-1};
@@ -796,7 +796,7 @@ void Searcher::verify_first_explore_independent_second(vector<int> (&chain)[2], 
             bool admissible = algs::reduce(original_chain,reduced_self_int,chain[1],ignore);
             ignore.clear();
             if (!admissible) continue;
-            
+
             extra_pos[1] = A;
             // size after reducing chain.
             int local_size = chain[1].size();
@@ -908,7 +908,7 @@ void Searcher::explore_p_extremal_resolution(vector<int>& chain) {
 
                 // Add all (-2)'s
                 reduced_self_int.resize(size + extra_curves, -2);
-                
+
                 // The new id's
                 int index = size;
                 for (int i = 0; i < extra_curves; ++i) {
@@ -1006,7 +1006,7 @@ void Searcher::verify_double_candidate(const vector<int> (&chain)[2], const vect
     location.assign(local_self_int.size(),-1);
     for (int curve : chain[0]) location[curve] = 0;
     for (int curve : chain[1]) location[curve] = 1;
-    
+
     pair<bool,bool> nef_result;
     if (reader_copy.nef_check != Reader::no_) {
         int borders[2] = {chain[0].back(),chain[1].back()};
@@ -1138,7 +1138,7 @@ void Searcher::verify_p_extremal_resolution(const vector<int>& reduced_chain, co
         const int& beta = p.second;
         // We have alpha, beta (alpha <= beta) such that the dual chain with 1 added to those possitions represets zero.
         // The rational number representing the subchains [start,alpha-1], and [beta+1,end] are precisely (n0,a0) and (n1,a1^-1) respectively, where the representation as chain starts from the (-1)-curve connecting both chains.
-        
+
         std::pair<long long, long long> invariants[2];
         invariants[0] = algs::to_rational(dual_chain,0,alpha-1);
         invariants[1] = algs::to_rational(dual_chain,beta+1,-1);
@@ -1147,7 +1147,7 @@ void Searcher::verify_p_extremal_resolution(const vector<int>& reduced_chain, co
         long long a[2] = {invariants[0].second, invariants[1].second};
 
         a[1] = algs::gcd_invmod(n[1],a[1]).second;
-        
+
         const auto& n0 = n[0];
         const auto& n1 = n[1];
         const auto& a0 = a[0];
@@ -1165,7 +1165,7 @@ void Searcher::verify_p_extremal_resolution(const vector<int>& reduced_chain, co
 
         static thread_local algs::BlowDownLinkedList bd_linked_list;
 
-        // Use a structue that remembers blowdown and blowup order using the original un-reduced chain, which should be 
+        // Use a structue that remembers blowdown and blowup order using the original un-reduced chain, which should be
         bd_linked_list.reset(G.size,chain,G.self_int);
 
         // Add the curves at the end of the chain
@@ -1191,7 +1191,7 @@ void Searcher::verify_p_extremal_resolution(const vector<int>& reduced_chain, co
         bd_linked_list.get_chain_backward(end, Wahl_chains[1],1);
 
         assert(bd_linked_list.next_in_chain[Wahl_chains[0].back()] == bd_linked_list.prev_in_chain[Wahl_chains[1].back()]);
-        
+
         static thread_local vector<long long> discrepancies;
         discrepancies.assign(bd_linked_list.size,0);
 
@@ -1208,7 +1208,7 @@ void Searcher::verify_p_extremal_resolution(const vector<int>& reduced_chain, co
             int borders[2] = {Wahl_chains[0].back(), Wahl_chains[1].back()};
             nef_result = double_is_nef(bd_linked_list.self_int, discrepancies,
                 bd_linked_list.location,n,_temp_extra_n,_temp_extra_orig,_temp_extra_pos,borders);
-                
+
         }
         if (reader_copy.nef_check == Reader::skip_ and !nef_result.first) {
             if (pair_index == 1 and first_included) {
@@ -1284,7 +1284,7 @@ pair<bool,bool> Searcher::double_is_nef(const std::vector<int>& local_self_int, 
 
 
     // If there were extra blowups, the (-1) curve between the end of the chain and extra_pos will be 'moved' and intersect the new end of the chain.
-    // We must 'move' only one of these (-1) curves. 
+    // We must 'move' only one of these (-1) curves.
     bool seen_extra0 = !extra_n[0];
     bool seen_extra1 = !extra_n[1];
 
@@ -1382,7 +1382,7 @@ pair<bool,bool> Searcher::double_is_nef(const std::vector<int>& local_self_int, 
             nef_warning = true;
             continue;
         }
-        
+
         // Here K_X is waranteed not nef
         return {false,false};
     }

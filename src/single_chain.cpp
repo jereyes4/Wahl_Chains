@@ -313,7 +313,7 @@ pair<bool,bool> Searcher::single_is_nef(
 ) {
 
     // If there were extra blowups, the (-1) curve between the end of the chain and extra_pos will be 'moved' and intersect the new end of the chain.
-    // We must 'move' only one of these (-1) curves. 
+    // We must 'move' only one of these (-1) curves.
     bool seen_extra = !extra_n;
 
     for (auto& c : G.connections) {
@@ -398,7 +398,7 @@ pair<bool,bool> Searcher::single_is_nef(
             nef_warning = true;
             continue;
         }
-        
+
         // Here K_X is waranteed not nef
         return {false,false};
     }

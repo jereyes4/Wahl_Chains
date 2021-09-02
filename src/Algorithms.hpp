@@ -26,7 +26,7 @@ namespace algs {
         }
         return {b,x};
     }
-    
+
     // Assumes a >= 0, b > 0.
     template <typename T>
     static T gcd(T a, T b) {
@@ -159,7 +159,7 @@ namespace algs {
             q = temp;
         }
     }
-    
+
     // Assigns the discrepancies of the Wahl chain associated to (n,a) multipled by n (thus negative integers). Assumes 0 < a < n and gcd(a,n) = 1
     // This version takes a vector of references representing a chain. The length of the chain is assumed to be l(n,a). Modifies only discrepancies of the positions pointed at by the chain. The size of discrepancies is assumed to be enough.
     static void get_discrepancies(long long n, long long a, const std::vector<int>& chain, std::vector<long long>& discrepancies) {
@@ -302,7 +302,7 @@ namespace algs {
             }
             return found;
         }
-        
+
         // Adds fork and array to trie. If it was already added, return true. Otherwise return false.
         bool check_and_add(const std::vector<int> (&data1)[3], const std::vector<int>& data2) {
             bool found = true;
@@ -325,7 +325,7 @@ namespace algs {
             }
             return found;
         }
-        
+
         void reset(int N) {
             n = N;
             nodes.resize(1);
@@ -468,7 +468,7 @@ namespace algs {
             }
             return true;
         }
-        
+
         // The same as before, but the comparison is done backwards in the original chain.
         bool compare_backward(int start, const std::vector<int>& chain, int chain_index) {
             for(int value : chain){
@@ -483,7 +483,7 @@ namespace algs {
             }
             return true;
         }
-        
+
         // Adds curves to the right of the curve 'index'. Later only used to add tails of (-2)-curves. Assumes that the curve 'index' is the last curve. Returns index of the curve.
         int add_curve_end(int index, int curve_selfint) {
             int new_index = size++;
