@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 import sys, json, linecache, tkinter, os
-from typing import Tuple
 from math import gcd
 
-MAX_CHAIN_LENGTH_SINGLE = 10
-MAX_CHAIN_LENGTH_DOUBLE = 10
+MAX_CHAIN_LENGTH_SINGLE = 7
+MAX_CHAIN_LENGTH_DOUBLE = 7
 
-MAX_USED_LENGTH = 5
+MAX_USED_LENGTH = 4
 
 EXTRA_CURVE_NAME = "E^*_{{{0}}}"
 
-DRAWING_SCALE = 0.5
+DRAWING_SCALE = 0.45
 
 def display_string(Str):
     root = tkinter.Tk()
@@ -131,7 +130,7 @@ def single_chain(graph_info, config_info, use_gcd, use_det):
     na = "\\begin{{tabular}}{{c}}$({n},{a})$\\end{{tabular}}".format(n=n, a=a)
     length = "\\begin{{tabular}}{{c}}${0}$\\end{{tabular}}".format(len(chain))
     sep_used = (used_curves[i:i+MAX_USED_LENGTH] for i in range(0,len(used_curves), MAX_USED_LENGTH))
-    used = "\\begin{{tabular}}{{c}}{u}\\end{{tabular}}".format(
+    used = "\\begin{{footnotesize}}\\begin{{tabular}}{{c}}{u}\\end{{tabular}}\\end{{footnotesize}}".format(
     u=(
         "\\\\".join(("$" + ", ".join((global_name_dict[j] for j in X)) + "$" for X in sep_used))
     ))
@@ -205,7 +204,7 @@ def double_chain(graph_info, config_info, use_gcd, used_det):
     na = "\\begin{{tabular}}{{c}}$({n0},{a0})$\\\\$({n1},{a1})$\\end{{tabular}}".format(n0=n0, a0=a0, n1=n1, a1=a1)
     length = "\\begin{{tabular}}{{c}}${l0}$\\\\${l1}$\end{{tabular}}".format(l0=len(chain0), l1=len(chain1))
     sep_used = (used_curves[i:i+MAX_USED_LENGTH] for i in range(0,len(used_curves), MAX_USED_LENGTH))
-    used = "\\begin{{tabular}}{{c}}{u}\\end{{tabular}}".format(
+    used = "\\begin{{footnotesize}}\\begin{{tabular}}{{c}}{u}\\end{{tabular}}\\end{{footnotesize}}".format(
     u=(
         "\\\\".join(("$" + ", ".join((global_name_dict[j] for j in X)) + "$" for X in sep_used))
     ))
@@ -257,6 +256,12 @@ def double_chain(graph_info, config_info, use_gcd, used_det):
                 y = -2*i
             )
             body += node_string(j,-2*i,sep_chain_list0[i][j],sep_self_int_list0[i][j])
+        if i != len(sep_chain_list0) - 1:
+            body += "\\draw ({left},{y}) -- ({right},{y});\n".format(
+                left = MAX_CHAIN_LENGTH_DOUBLE - 0.8,
+                right = MAX_CHAIN_LENGTH_DOUBLE - 0.2,
+                y = -2*i
+            )
     for i in range(len(sep_chain_list1)):
         if i != 0:
             body += "\\draw ({left},{y}) -- ({right},{y});\n".format(
@@ -272,6 +277,12 @@ def double_chain(graph_info, config_info, use_gcd, used_det):
                 y = -2*(i + len(sep_chain_list0))
             )
             body += node_string(j,-2*(i + len(sep_chain_list0)),sep_chain_list1[i][j],sep_self_int_list1[i][j])
+        if i != len(sep_chain_list1) - 1:
+            body += "\\draw ({left},{y}) -- ({right},{y});\n".format(
+                left = MAX_CHAIN_LENGTH_DOUBLE - 0.8,
+                right = MAX_CHAIN_LENGTH_DOUBLE - 0.2,
+                y = -2*(i + len(sep_chain_list0))
+            )
     text = (
     "{na} &\n{length} &\n{used}{det}{opt_gcd} &\n"
     "{body}"
@@ -292,6 +303,7 @@ if __name__ == "__main__":
 
     S = (
     "%\\usepackage{{tikz}}\n"
+    "%\\usetikzlibrary{{fit}}\n"
     "\\begin{{table}}[]\n"
     "\\begin{{tabular}}{{|c|c|c|c|{opt_cols}}}\n"
     "\hline\n"

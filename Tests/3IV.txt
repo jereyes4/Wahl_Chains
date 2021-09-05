@@ -1,0 +1,77 @@
+
+Output: jsonl/3IV
+Summary_Output: summary/3IV
+Summary_Style: LaTeX_Table
+
+Single_Chain: Y
+Double_Chain: Y
+Single_QHD: Y
+Double_QHD: Y
+Keep_First: global
+Search_For: 1 2 3 4 5 6 7 8 9
+
+Nef_Check: print
+Effective_Check: print
+Obstruction_Check: print
+
+Summary_Include_GCD: Y
+LaTeX_Include_Subsection: Y
+
+Tests: 1
+
+
+#Trick the computer by thinking the I3 are IV
+
+
+Fibers:
+    I3 Fix
+        A B C
+    I3 Fix
+        D E F
+    I3 Fix
+        G H I
+Merge:
+    P_1 Try
+        A B C
+    P_2 Try
+        D E F
+    P_3 Try
+        G H I
+Sections:
+    S1 Try
+        A D G
+    S2 Try
+        A E H
+    S3 Try
+        A F I
+    S4 Try
+        B D I
+    S5 Try
+        B E G
+    S6 Try
+        B F H
+    S7 Try
+        C D H
+    S8 Try
+        C E I
+    S9 Try
+        C F G
+    
+    R16 Try
+        S1 S6 C E I
+    R24 Try
+        S2 S4 C F G R16
+    R35 Try
+        S3 S5 C D H R16 R24
+
+Merge:
+    T Try
+        R16 R24 R35
+Sections(1):
+    Q1 Try
+        P_1 P_2 S1 S6 S8 G H I R24 R35
+    Q2 Try
+        P_1 P_3 S1 S6 S8 D E F R24 R35
+    Q3 Try
+        P_2 P_3 S1 S6 S8 A B C R24 R35
+    

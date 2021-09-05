@@ -26,11 +26,14 @@
 !Tests/*.txt
 !jsonl/
 !jsonl/*.jsonl
-!summary/
-!summary/*.tex
-!summary/*.txt
+
+# Summaries are heavy and can be easily buildt from .jsonl
+# !summary/
+# !summary/*.tex
+# !summary/*.txt
 
 # pdf file
-!pdf/
-!pdf/*.tex
-!pdf/*.pdf
+# We don't want this yet
+# !pdf/
+# !pdf/*.tex
+# !pdf/*.pdf
