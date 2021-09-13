@@ -122,26 +122,58 @@ def single_chain(graph_info, config_info):
 
     K2 = config_info["K2"]
 
-    S = f"\\subsection{{Example with \\(K^2={K2}\\)}}\n"
+    S = (
+    "\\noindent\n"
+    "$\\rule{{12.5cm}}{{1.1pt}}\n"
+    "\\noindent\n"
+    "\n"
+    "\\textbf{{(...)}} "
+    "$K^2={K2}$ - "
+    "$\\{{{used_curves}\\}}$ - "
+    "$\\operatorname{{det}}={det}$ - "
+    "{intersections} - "
+    "{chains}\n\n"
+    "\\noindent\n"
+    "$\\rule{{12.5cm}}{{1.1pt}}\n"
+    "\\noindent\n"
+    )
 
-    S += "This example uses the following curves:\n"
-    S += "\\[" + ",~".join(name_dict) +".\\]\n"
+    COMMA = ",\\allowbreak "
 
-    S += f"The determinant of their intersection matrix is ${det(matrix)}$. Requires blow ups at the following points:\n"
+    used_curves_string = ",~\\allowbreak ".join(name_dict)
+    chains = "$({n},{a}) : [{SI}]$".format(n=n,a=a,SI=",\\allowbreak ".join([str(-self_int[i]) for i in chain]))
 
-    S += "\\[" + ",~".join((f"{name_dict[c[0]]} \\cap {name_dict[c[1]]}" for c in config_info["blps"])) + ".\\]\n"
+    ignored_blowups = []
+    if config_info["en"] != 0:
+        ignored_blowups = [(config_info["ea"], config_info["eb"]), (config_info["eb"], config_info["ea"])]
+
+    intersections = [f"$~{name_dict[x]} \\cap {name_dict[y]}$" for x,y in config_info["blps"] if (x,y) not in ignored_blowups and (y,x) not in ignored_blowups]
 
     if config_info["en"] != 0:
-        S += "It also needs extra blow ups at:\n"
-        S += "\\[{0} \\times ({1} \\cap {2})".format(
-                config_info["en"],
-                name_dict[config_info["ea"]],
-                name_dict[config_info["eb"]]
-            )
+        intersections.append(f"$[{COMMA.join(config_info['en']*[2])},1] \\times ~{name_dict[config_info['ea']]} \\cap {name_dict[config_info['eb']]}$")
 
-    S += f"The resulting chain is a $(n,a) = ({n},{a})$.\n"
+    return S.format(K2=K2, det=det(matrix), used_curves=used_curves_string, intersections=", ".join(intersections), chains=chains)
 
-    return S
+    # S = f"\\subsection{{Example with \\(K^2={K2}\\)}}\n"
+
+    # S += "This example uses the following curves:\n"
+    # S += "\\[" + ",~".join(name_dict) +".\\]\n"
+
+    # S += f"The determinant of their intersection matrix is ${det(matrix)}$. Requires blow ups at the following points:\n"
+
+    # S += "\\[" + ",~".join((f"{name_dict[c[0]]} \\cap {name_dict[c[1]]}" for c in config_info["blps"])) + ".\\]\n"
+
+    # if config_info["en"] != 0:
+    #     S += "It also needs extra blow ups at:\n"
+    #     S += "\\[{0} \\times ({1} \\cap {2})".format(
+    #             config_info["en"],
+    #             name_dict[config_info["ea"]],
+    #             name_dict[config_info["eb"]]
+    #         )
+
+    # S += f"The resulting chain is a $(n,a) = ({n},{a})$.\n"
+
+    # return S
 
 
 def double_chain(graph_info, config_info):
@@ -162,29 +194,91 @@ def double_chain(graph_info, config_info):
 
     K2 = config_info["K2"]
 
-    S = f"\\subsection{{Example with \\(K^2={K2}\\)}}\n"
 
-    S += "This example uses the following curves:\n"
-    S += "\\[" + ",~".join(name_dict) +".\\]\n"
+    S = (
+    "\\noindent\n"
+    "$\\rule{{12.5cm}}{{1.1pt}}$\n"
+    "\\noindent\n\n"
 
-    S += f"The determinant of their intersection matrix is ${det(matrix)}$. Requires blow ups at the following points:\n"
+    # "\\begin{{fcolorbox}}\n"
 
-    S += "\\[" + ",~".join((f"{name_dict[c[0]]} \\cap {name_dict[c[1]]}" for c in config_info["blps"])) + ".\\]\n"
+    "\\textbf{{(...)}} "
+    "$K^2={K2}$ - "
+    "$\\{{{used_curves}\\}}$ - "
+    "$\\operatorname{{det}}={det}$ - "
+    "{intersections} - "
+    "{chains}\n\n"
 
-    if config_info["en0"] != 0 or config_info["en1"] != 0:
-        S += "It also needs extra blow ups at:\n"
-        S += "\\[" + ",\\quad ".join(("{0} \\times ({1} \\cap {2})".format(
-                config_info[f"en{c}"],
-                name_dict[config_info[f"ea{c}"]],
-                name_dict[config_info[f"eb{c}"]]
-            ) for c in range(2) if config_info[f"en{c}"] != 0)
-        ) + ".\\]\n"
+    # "\\end{{fcolorbox}}\n"
 
-    S += f"The resulting chains are  $(n_1,a_1) = ({n0},{a0})$ and $(n_2,a_2) = ({n1},{a1})$. This example satisfies $\\gcd(n_1,n_2) = {gcd(n0,n1)}$.\n"
+    "\\noindent\n"
+    "$\\rule{{12.5cm}}{{1.1pt}}$\n"
+    "\\noindent\n"
+    )
 
-    return S
+    COMMA = ",\\allowbreak "
 
-if __name__ == "__main__":
+    used_curves_string = ",~\\allowbreak ".join(name_dict)
+    chains = "$({n},{a}) : [{SI}]$, ".format(n=n0,a=a0,SI=",\\allowbreak ".join([str(-self_int[i]) for i in chain0]))
+    chains += "$({n},{a}) : [{SI}]$".format(n=n1,a=a1,SI=",\\allowbreak ".join([str(-self_int[i]) for i in chain1]))
+
+    ignored_blowups = []
+    if config_info["en0"] != 0:
+        ignored_blowups = [(config_info["ea0"], config_info["eb0"]), (config_info["eb0"], config_info["ea0"])]
+    if config_info["en1"] != 0:
+        ignored_blowups = [(config_info["ea1"], config_info["eb1"]), (config_info["eb1"], config_info["ea1"])]
+
+    intersections = [f"$~{name_dict[x]} \\cap {name_dict[y]}$" for x,y in config_info["blps"] if (x,y) not in ignored_blowups and (y,x) not in ignored_blowups]
+
+    if config_info["en0"] != 0:
+        intersections.append(f"$[{COMMA.join(config_info['en0']*['2'])},1] \\times ~{name_dict[config_info['ea0']]} \\cap {name_dict[config_info['eb0']]}$")
+    if config_info["en1"] != 0:
+        intersections.append(f"$[{COMMA.join(config_info['en1']*['2'])},1] \\times ~{name_dict[config_info['ea1']]} \\cap {name_dict[config_info['eb1']]}$")
+
+    if config_info["WH"] != 0:
+        # P-extremal.
+        Left = []
+        for x in chain0[::-1]:
+            if x >= len(used_curves):
+                Left.append(str(-self_int[x]))
+            else:
+                A = name_dict[x]
+                break
+        Right = []
+        for x in chain1:
+            if x >= len(used_curves):
+                Right.append(str(-self_int[x]))
+            else:
+                B = name_dict[x]
+                break
+        Total_blowup = Left[::-1] + ['1'] + Right
+        intersections.append(f"$[{COMMA.join(Total_blowup)}] \\times ~{A} \\cap {B}$")
+
+    return S.format(K2=K2, det=det(matrix), used_curves=used_curves_string, intersections=", ".join(intersections), chains=chains)
+
+    # S = f"\\subsection{{Example with \\(K^2={K2}\\)}}\n"
+
+    # S += "This example uses the following curves:\n"
+    # S += "\\[" + ",~".join(name_dict) +".\\]\n"
+
+    # S += f"The determinant of their intersection matrix is ${det(matrix)}$. Requires blow ups at the following points:\n"
+
+    # S += "\\[" + ",~".join((f"{name_dict[c[0]]} \\cap {name_dict[c[1]]}" for c in config_info["blps"])) + ".\\]\n"
+
+    # if config_info["en0"] != 0 or config_info["en1"] != 0:
+    #     S += "It also needs extra blow ups at:\n"
+    #     S += "\\[" + ",\\quad ".join(("{0} \\times ({1} \\cap {2})".format(
+    #             config_info[f"en{c}"],
+    #             name_dict[config_info[f"ea{c}"]],
+    #             name_dict[config_info[f"eb{c}"]]
+    #         ) for c in range(2) if config_info[f"en{c}"] != 0)
+    #     ) + ".\\]\n"
+
+    # S += f"The resulting chains are  $(n_1,a_1) = ({n0},{a0})$ and $(n_2,a_2) = ({n1},{a1})$. This example satisfies $\\gcd(n_1,n_2) = {gcd(n0,n1)}$.\n"
+
+    # return S
+
+def main():
     filename = None
     if len(sys.argv) >= 2:
         filename = sys.argv[1]
@@ -194,6 +288,7 @@ if __name__ == "__main__":
     while True:
         if filename == None:
             filename = input("Give me a jsonl file: ")
+            print("Got", filename)
         s1 = linecache.getline(os.path.expanduser(filename),1)
         if s1 == '':
             print("Error while opening file.")
@@ -210,9 +305,11 @@ if __name__ == "__main__":
 
     while True:
         value = input("Give me an index of {fn} (0 to quit, c to change file): ".format(fn=filename))
+        print("Got", value)
         if value == 'c':
             while True:
                 filename = input("Give me a jsonl file: ")
+                print("Got", filename)
                 s1 = linecache.getline(os.path.expanduser(filename),1)
                 if s1 == '':
                     print("Error while opening file.")
@@ -266,4 +363,12 @@ if __name__ == "__main__":
                 body += double_chain(graph_info, config_info)
                 body += f"\nExample taken from \\verb|{filename} : {value}|\n\n"
 
+        reason = input("Give me a reason: ")
+        print("Got", reason)
+        body += "Reason: " + reason + "\n\n"
+    body += "\\noindent\n$\\rule{12.5cm}{1.1pt}$\n"
+
     display_string(body)
+
+if __name__ == "__main__":
+    main()
