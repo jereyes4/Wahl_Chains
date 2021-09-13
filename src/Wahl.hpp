@@ -1,3 +1,4 @@
+#pragma once
 #ifndef WAHL_HPP
 #define WAHL_HPP
 #include"Reader.hpp" // Reader, vector

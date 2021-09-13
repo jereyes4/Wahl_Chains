@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SEARCHER_HPP
 #define SEARCHER_HPP
 #include"config.hpp"

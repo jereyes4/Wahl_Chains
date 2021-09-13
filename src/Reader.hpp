@@ -1,3 +1,4 @@
+#pragma once
 #ifndef READER_HPP
 #define READER_HPP
 #include"config.hpp"

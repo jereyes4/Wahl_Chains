@@ -1,3 +1,4 @@
+#pragma once
 #ifndef QHD_FUNCTIONS_HPP
 #define QHD_FUNCTIONS_HPP
 

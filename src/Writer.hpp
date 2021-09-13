@@ -1,3 +1,4 @@
+#pragma once
 #ifndef WRITER_HPP
 #define WRITER_HPP
 
