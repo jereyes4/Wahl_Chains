@@ -18,6 +18,13 @@ class Wahl
 {
 public:
     Wahl(int argc, char** argv);
+
+    inline void init_tests() {
+#ifdef WAHL_MULTITHREAD
+        last_batch = total_tests - ((long long)(BULK_SIZE*MAX_THREADS) + total_tests%(long long)BULK_SIZE);
+#endif
+    }
+
     inline long long get_test(long long previous) {
 #ifndef WAHL_MULTITHREAD
         return current_test++;
@@ -29,7 +36,7 @@ public:
         }
 
         // index where the last batch starts
-        const long long last_batch = total_tests - ((long long)(BULK_SIZE*MAX_THREADS) + total_tests%(long long)BULK_SIZE);
+        // const long long last_batch = (...);
 
         if (++previous >= last_batch) {
             long long next = current_test.fetch_add(BULK_SIZE,std::memory_order_relaxed);
@@ -64,6 +71,7 @@ public:
 
 #ifdef WAHL_MULTITHREAD
     std::atomic<long long> current_test;
+    long long last_batch;
 #else
     long long current_test;
 #endif

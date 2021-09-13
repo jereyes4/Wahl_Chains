@@ -29,9 +29,15 @@ Wahl::Wahl(int argc, char** argv) {
         return;
     }
 
+    if (argc > 2 and std::string(argv[2]) == "D") {
+        reader.output_filename = "Debug";
+        reader.summary_filename = "Debug";
+    }
+
     // debugx(reader.tests_no);
 
     total_tests = reader.get_test_numbers(number_tests);
+    init_tests();
     current_test = 0;
 
     if (reader.subtest_end != -1) {
@@ -93,10 +99,25 @@ Wahl::Wahl(int argc, char** argv) {
         for (int i = 0; i < threads; ++i) {
             long long searcher_test = searchers[i].current_test;
             mintest = std::min(mintest, searcher_test);
-            std::cout << "Thread " << i << ": " << searcher_test << '\n';
+            std::cout << "Thread " << i << ": " << searcher_test;
+#ifdef PRINT_STATUS_EXTRA
+            std::cout << " PPT: " << searchers[i].passed_pretests << " Ex: " << searchers[i].total_examples;
+#endif //PRINT_STATUS_EXTRA
+            std::cout << '\n';
         }
         std::cout << double(mintest)*100./double(total_tests) << "% " << mintest << "/" << total_tests;
         std::cout << "\e[?25h";
+
+#ifdef PRINT_STATUS_EXTRA
+        long long pretests = 0;
+        long long examples = 0;
+        for (int i = 0; i < threads; ++i) {
+            pretests += searchers[i].passed_pretests;
+            examples += searchers[i].total_examples;
+        }
+        std::cout << " PPT: " << pretests << " Ex: " << examples;
+#endif //PRINT_STATUS_EXTRA
+
         std::cout.flush();
         std::this_thread::sleep_for(std::chrono::milliseconds(STATUS_WAIT));
     }
@@ -125,7 +146,18 @@ Wahl::Wahl(int argc, char** argv) {
         for (int i = 0; i < threads; ++i) {
             mintest = std::min(mintest,(long long) searchers[i].current_test);
         }
-        std::cout << '\r' << double(mintest)*100./double(total_tests) << "% " << mintest << "/" << total_tests;
+        std::cout << '\r' << double(mintest)*100./double(total_tests) << "% " << mintest << '/' << total_tests;
+
+#ifdef PRINT_STATUS_EXTRA
+        long long pretests = 0;
+        long long examples = 0;
+        for (int i = 0; i < threads; ++i) {
+            pretests += searchers[i].passed_pretests;
+            examples += searchers[i].total_examples;
+        }
+        std::cout << " PPT: " << pretests << " Ex: " << examples;
+#endif //PRINT_STATUS_EXTRA
+
         std::cout.flush();
         std::this_thread::sleep_for(std::chrono::milliseconds(STATUS_WAIT));
     }
@@ -139,12 +171,12 @@ Wahl::Wahl(int argc, char** argv) {
 #else // ndef PRINT_STATUS
     for(int i = 0; i < threads; ++i) {
         spawns[i].join();
-#ifdef CATCH_SIGINT
-        if (sigint_catched) {
-            std::cout << "\n" "Abrupt close." << std::endl;
-        }
-#endif
     }
+#ifdef CATCH_SIGINT
+    if (sigint_catched) {
+        std::cout << "\n" "Abrupt close." << std::endl;
+    }
+#endif
 #endif // PRINT_STATUS
 
 #ifdef OVERFLOW_CHECK

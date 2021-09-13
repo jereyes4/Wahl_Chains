@@ -120,14 +120,23 @@ public:
     int test_index;
     long long test_start;
     long long current_test;
+
     #ifdef WAHL_MULTITHREAD
         std::atomic<long long> *wrapper_current_test;
+        #if defined(PRINT_PASSED_PRETESTS_END) || defined(PRINT_STATUS_EXTRA)
+            std::atomic<long long> *wrapper_passed_pretests;
+        #endif
+        #ifdef PRINT_STATUS_EXTRA
+            std::atomic<long long> *wrapper_total_examples;
+        #endif
     #else
-        long long *wrapper_current_test;
-    #endif
-
-    #ifdef PRINT_PASSED_PRETESTS
-        long long *wrapper_passed_pretests;
+            long long *wrapper_current_test;
+        #if defined(PRINT_PASSED_PRETESTS_END) || defined(PRINT_STATUS_EXTRA)
+            long long *wrapper_passed_pretests;
+        #endif
+        #ifdef PRINT_STATUS_EXTRA
+            long long *wrapper_total_examples;
+        #endif
     #endif
 
     bool current_no_obstruction;
@@ -325,16 +334,24 @@ public:
     Wahl *parent;
     std::stringstream err;
 
-#ifdef PRINT_PASSED_PRETESTS
-    long long passed_pretests;
-#endif
-
     void search();
 
     #ifdef WAHL_MULTITHREAD
         std::atomic<long long> current_test;
+        #if defined(PRINT_PASSED_PRETESTS_END) || defined(PRINT_STATUS_EXTRA)
+            std::atomic<long long> passed_pretests;
+        #endif
+        #ifdef PRINT_STATUS_EXTRA
+            std::atomic<long long> total_examples;
+        #endif
     #else
-        long long current_test;
+            long long current_test;
+        #if defined(PRINT_PASSED_PRETESTS_END) || defined(PRINT_STATUS_EXTRA)
+            long long passed_pretests;
+        #endif
+        #ifdef PRINT_STATUS_EXTRA
+            long long total_examples;
+        #endif
     #endif
 };
 

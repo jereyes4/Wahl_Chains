@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
-import sys, json, linecache, tkinter
-from tkinter import filedialog
-from tkinter.messagebox import showerror
+try:
+    import sys, json, linecache, tkinter
+    from tkinter import filedialog
+    from tkinter.messagebox import showerror
+except:
+    print("Requires tkinter.")
+    exit(1)
 
 INCLUDE_INTERSECTION_MATRIX = True
 INTERSECTION_MATRIX_IN_LATEX = True

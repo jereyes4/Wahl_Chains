@@ -14,10 +14,15 @@ void Searcher_Wrapper::search() {
     worker.results = &results;
     worker.err = &err;
     worker.wrapper_current_test = &current_test;
-    #ifdef PRINT_PASSED_PRETESTS
+    #if defined(PRINT_PASSED_PRETESTS_END) || defined(PRINT_STATUS_EXTRA)
     worker.wrapper_passed_pretests = &passed_pretests;
     passed_pretests = 0;
     #endif
+    #ifdef PRINT_STATUS_EXTRA
+    worker.wrapper_total_examples = &total_examples;
+    total_examples = 0;
+    #endif
+
     worker.search();
 }
 
@@ -275,6 +280,11 @@ void Searcher::search() {
         auto this_time = std::chrono::steady_clock::now();
         if (this_time - last_time >= std::chrono::milliseconds(STATUS_WAIT)) {
             std::cout << '\r' << double(std::min((long long)current_test,parent->total_tests))*100./double(parent->total_tests) << "% " << std::min((long long)current_test,parent->total_tests) << "/" << parent->total_tests;
+
+#ifdef PRINT_STATUS_EXTRA
+            std::cout << " PPT: " << *wrapper_passed_pretests << " Ex: " << *wrapper_total_examples;
+#endif //PRINT_STATUS_EXTRA
+
             std::cout.flush();
             last_time = this_time;
         }
@@ -335,7 +345,7 @@ void Searcher::search() {
         if (!contains(reader_copy.search_for,K)) continue;
 
         // Pretest passed.
-        #ifdef PRINT_PASSED_PRETESTS
+        #ifdef PRINT_PASSED_PRETESTS_END
         (*wrapper_passed_pretests)++;
         #endif
 
@@ -373,6 +383,11 @@ void Searcher::search() {
             }
             if (reader_copy.search_single_QHD) search_for_QHD3_single_chain();
             else search_for_single_chain();
+#ifdef PRINT_STATUS_EXTRA
+            if (results->size() != *wrapper_total_examples) {
+                *wrapper_total_examples = results->size();
+            }
+#endif //PRINT_STATUS_EXTRA
         }
         else if (P == 2) {
             if (reader_copy.keep_first == Reader::keep_local_) {
@@ -382,6 +397,11 @@ void Searcher::search() {
             }
             if (reader_copy.search_double_QHD) search_for_QHD3_double_chain();
             else search_for_double_chain();
+#ifdef PRINT_STATUS_EXTRA
+            if (results->size() != *wrapper_total_examples) {
+                *wrapper_total_examples = results->size();
+            }
+#endif //PRINT_STATUS_EXTRA
         }
     }
 }

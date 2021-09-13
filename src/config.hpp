@@ -22,7 +22,12 @@
 
 // time to wait between status updates, in milliseconds
 
-#define STATUS_WAIT 1000
+#define STATUS_WAIT 2000
+
+// Used to print extra information such as curently found examples.
+// Do not define it if PRINT_STATUS is undefined.
+
+#define PRINT_STATUS_EXTRA
 
 
 // If multithread, we can print a nicer status if we allow ANSI escape characters
@@ -44,7 +49,7 @@
 
 // At the end, print the amount of pretests that passed P and K.
 
-#define PRINT_PASSED_PRETESTS
+#define PRINT_PASSED_PRETESTS_END
 
 // Define to catch SIGINT and export whatever examples where found until that point
 
@@ -61,7 +66,10 @@
 
 // On multithread mode, avoid cache sharing by giving threads bulks of tests.
 // The last MAX_THREADS*BULK_SIZE tests are checked one by one to avoid idle threads.
-#define BULK_SIZE 512
+
+#ifndef BULK_SIZE
+#define BULK_SIZE 2048
+#endif
 
 //////////////////////////////////////////////////////////
 
