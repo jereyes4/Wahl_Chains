@@ -9,6 +9,9 @@
 #include<unordered_set> // unordered_set
 #include<map> // map
 
+#ifdef NO_REPEATED_SEARCH
+#include"Algorithms.hpp" // Trie
+#endif
 
 #ifdef WAHL_MULTITHREAD
 #include<atomic> // atomic

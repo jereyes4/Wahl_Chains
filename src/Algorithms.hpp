@@ -526,6 +526,7 @@ namespace algs {
 
     /*
     Adaptation of python itertools nth_combination.
+    https://docs.python.org/3/library/itertools.html
     Assumes index between 0 and nCr(n,r)-1.
     Appends results to the vector result
     */
