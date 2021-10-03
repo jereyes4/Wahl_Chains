@@ -337,7 +337,7 @@ void Wahl::Write(std::vector<Searcher_Wrapper>& searchers) {
             }
         }
     }
-    #ifdef PRINT_PASSED_PRETESTS
+    #ifdef PRINT_PASSED_PRETESTS_END
     long long passed_pretests = 0;
     for (auto& s : searchers) {
         passed_pretests += s.passed_pretests;
@@ -359,7 +359,7 @@ void Wahl::Write(Searcher_Wrapper& searcher) {
         example_vector.push_back(std::move(searcher.results.front()));
         searcher.results.pop();
     }
-    #ifdef PRINT_PASSED_PRETESTS
+    #ifdef PRINT_PASSED_PRETESTS_END
     std::cout << "Done! " << searcher.passed_pretests << " pretests passed and found " << example_vector.size() << " examples." << std::endl;
     #else
     std::cout << "Done! Found " << example_vector.size() << " examples." << std::endl;
