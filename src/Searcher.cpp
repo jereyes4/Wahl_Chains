@@ -14,13 +14,16 @@ void Searcher_Wrapper::search() {
     worker.results = &results;
     worker.err = &err;
     worker.wrapper_current_test = &current_test;
+    #ifdef EXPORT_PRETEST_DATA
+        worker.passed_pretest_list = &passed_pretest_list;
+    #endif
     #if defined(PRINT_PASSED_PRETESTS_END) || defined(PRINT_STATUS_EXTRA)
-    worker.wrapper_passed_pretests = &passed_pretests;
-    passed_pretests = 0;
+        worker.wrapper_passed_pretests = &passed_pretests;
+        passed_pretests = 0;
     #endif
     #ifdef PRINT_STATUS_EXTRA
-    worker.wrapper_total_examples = &total_examples;
-    total_examples = 0;
+        worker.wrapper_total_examples = &total_examples;
+        total_examples = 0;
     #endif
 
     worker.search();
@@ -347,6 +350,13 @@ void Searcher::search() {
         // Pretest passed.
         #ifdef PRINT_PASSED_PRETESTS_END
         (*wrapper_passed_pretests)++;
+        #endif
+
+        #ifdef EXPORT_PRETEST_DATA
+        if (passed_pretest_list->size() < MAX_PRETEST_EXPORTED) {
+            passed_pretest_list->push(real_test);
+        }
+        if (reader_copy.export_pretests == Reader::only_) continue;
         #endif
 
         G.reset();

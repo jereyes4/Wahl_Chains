@@ -134,13 +134,17 @@ public:
             std::atomic<long long> *wrapper_total_examples;
         #endif
     #else
-            long long *wrapper_current_test;
+        long long *wrapper_current_test;
         #if defined(PRINT_PASSED_PRETESTS_END) || defined(PRINT_STATUS_EXTRA)
             long long *wrapper_passed_pretests;
         #endif
         #ifdef PRINT_STATUS_EXTRA
             long long *wrapper_total_examples;
         #endif
+    #endif
+
+    #ifdef EXPORT_PRETEST_DATA
+        std::queue<long long> *passed_pretest_list;
     #endif
 
     bool current_no_obstruction;
@@ -339,6 +343,10 @@ public:
     std::stringstream err;
 
     void search();
+
+    #ifdef EXPORT_PRETEST_DATA
+        std::queue<long long> passed_pretest_list;
+    #endif // EXPORT_PRETEST_DATA
 
     #ifdef WAHL_MULTITHREAD
         std::atomic<long long> current_test;

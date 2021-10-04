@@ -52,6 +52,16 @@
 
 #define PRINT_PASSED_PRETESTS_END
 
+// Export Passed Pretest Data
+
+#define EXPORT_PRETEST_DATA
+
+// Maximum amount of pretests to export
+
+#ifndef MAX_PRETEST_EXPORTED
+#define MAX_PRETEST_EXPORTED 10000
+#endif
+
 // Define to catch SIGINT and export whatever examples where found until that point
 
 #define CATCH_SIGINT
@@ -76,7 +86,7 @@
 
 #define DEFAULT_OUTPUT_NAME "OUT"
 #define DEFAULT_SUMMARY_NAME "SUMMARY"
-#define DEFAULT_PRETEST_NAME "PRETEST"
+#define DEFAULT_PRETEST_NAME "PRETESTS.txt"
 #define ERROR_FILE "ERRORS.log"
 
 #include<iostream>

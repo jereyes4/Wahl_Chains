@@ -218,10 +218,47 @@ Wahl::Wahl(int argc, char** argv) {
 }
 
 void Wahl::Write(std::vector<Searcher_Wrapper>& searchers) {
+
+    #ifdef EXPORT_PRETEST_DATA
+    if (reader.export_pretests != Reader::no_) {
+        int total_pretests = 0;
+        for (auto& s : searchers) {
+            total_pretests += s.passed_pretest_list.size();
+        }
+        std::vector<long long> pretests_to_export;
+        pretests_to_export.reserve(total_pretests);
+        for (auto& s : searchers) {
+            while (!s.passed_pretest_list.empty()) {
+                pretests_to_export.push_back(s.passed_pretest_list.front());
+                s.passed_pretest_list.pop();
+            }
+        }
+        std::sort(pretests_to_export.begin(),pretests_to_export.end());
+        pretests_to_export.resize(std::min((int) pretests_to_export.size(),MAX_PRETEST_EXPORTED));
+        Writer::export_pretest_data(reader, pretests_to_export);
+    }
+    if (reader.export_pretests == Reader::only_) {
+        // Only export graph data
+        #ifdef PRINT_PASSED_PRETESTS_END
+        long long passed_pretests = 0;
+        for (auto& s : searchers) {
+            passed_pretests += s.passed_pretests;
+        }
+        std::cout << "Done! " << passed_pretests << " pretests passed." << std::endl;
+        #else
+        std::cout << "Done!" << std::endl;
+        #endif
+        Writer::export_jsonl(reader);
+        return;
+    }
+    #endif
+
     // If keep_first is not global, we can push all examples from all threads in any order, and after sorting the result is deterministic.
     std::vector<Example> example_vector;
     size_t total_examples = 0;
-    for (Searcher_Wrapper& searcher : searchers) total_examples += searcher.results.size();
+    for (Searcher_Wrapper& searcher : searchers) {
+        total_examples += searcher.results.size();
+    }
     example_vector.reserve(total_examples);
 
     if (reader.keep_first != Reader::keep_global_) {
@@ -346,11 +383,34 @@ void Wahl::Write(std::vector<Searcher_Wrapper>& searchers) {
     #else
     std::cout << "Done! Found " << example_vector.size() << " examples." << std::endl;
     #endif
+
     Write(example_vector);
 }
 
 
 void Wahl::Write(Searcher_Wrapper& searcher) {
+
+    #ifdef EXPORT_PRETEST_DATA
+    if (reader.export_pretests != Reader::no_) {
+        std::vector<long long> pretests_to_export;
+        pretests_to_export.reserve(searcher.passed_pretest_list.size());
+        while (!searcher.passed_pretest_list.empty()) {
+            pretests_to_export.push_back(searcher.passed_pretest_list.front());
+            searcher.passed_pretest_list.pop();
+        }
+        Writer::export_pretest_data(reader, pretests_to_export);
+    }
+    if (reader.export_pretests == Reader::only_) {
+        // Only export graph data
+        #ifdef PRINT_PASSED_PRETESTS_END
+        std::cout << "Done! " << searcher.passed_pretests << " pretests passed." << std::endl;
+        #else
+        std::cout << "Done!" << std::endl;
+        #endif
+        Writer::export_jsonl(reader);
+        return;
+    }
+    #endif
 
     // Move all the results into a vector and also create another vector of references to it. We will sort the second one to export to the jsonl and summary files. Also, use the un sorted vector to recover the pairs of examples given by worm holes.
     std::vector<Example> example_vector;
@@ -364,6 +424,7 @@ void Wahl::Write(Searcher_Wrapper& searcher) {
     #else
     std::cout << "Done! Found " << example_vector.size() << " examples." << std::endl;
     #endif
+
     Write(example_vector);
 }
 

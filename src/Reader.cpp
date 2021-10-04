@@ -353,7 +353,7 @@ Reader::Reader() {
     obstruction_check = skip_;
     keep_first = keep_global_;
     section_input_mode = by_self_intersection_;
-    only_do_pretest = false;
+    export_pretests = no_;
     parse_only = false;
     search_single_chain = true;
     search_double_chain = false;
@@ -379,6 +379,7 @@ Reader::Reader() {
 #endif
     output_filename = DEFAULT_OUTPUT_NAME;
     summary_filename = DEFAULT_SUMMARY_NAME;
+    pretest_filename = DEFAULT_PRETEST_NAME;
     search_for.insert(1);
     search_for.insert(2);
     search_for.insert(3);
@@ -631,7 +632,9 @@ void Reader::parse_option(const vector<string>& tokens) {
         if (tokens.size() != 2) {
             error("Option \'Pretest_File\' must take exactly one argument.");
         }
-        warning("Only pretesting not yet implemented. This option does nothing");
+#ifndef EXPORT_PRETEST_DATA
+        warning("Build does not allow pretest options. This option does nothing");
+#endif
         pretest_filename = tokens[1];
         return;
     }
@@ -894,20 +897,25 @@ void Reader::parse_option(const vector<string>& tokens) {
         }
         return;
     }
-    else if (tokens[0] == "Only_Pretest:") {
+    else if (tokens[0] == "Export_Pretests:") {
         if (tokens.size() != 2) {
-            error("Option \'Only_Pretest\' must take exactly one argument.");
+            error("Option \'Export_Pretests\' must take exactly one argument.");
         }
         if (tokens[1] == "Y") {
-            only_do_pretest = true;
+            export_pretests = yes_;
         }
         else if (tokens[1] == "N") {
-            only_do_pretest = false;
+            export_pretests = no_;
+        }
+        else if (tokens[1] == "Only") {
+            export_pretests = only_;
         }
         else {
-            error("Invalid argument for \'Only_Pretest\': " + tokens[1]);
+            error("Invalid argument for \'Export_Pretests\': " + tokens[1]);
         }
-        warning("Only pretesting not yet implemented. This option does nothing");
+#ifndef EXPORT_PRETEST_DATA
+        warning("Build does not allow pretest options. This option does nothing");
+#endif
         return;
     }
     else if (tokens[0] == "Use_Exactly:") {

@@ -109,8 +109,9 @@ public:
     enum Setting : char {
         no_,
         yes_,
-        print_,
         skip_,
+        only_,
+        print_,
         keep_local_,
         keep_global_,
         by_self_intersection_,
@@ -128,7 +129,7 @@ public:
     Setting obstruction_check;
     Setting keep_first;
     Setting section_input_mode;
-    bool only_do_pretest;
+    Setting export_pretests;
     bool parse_only;
     bool search_single_chain;
     bool search_double_chain;

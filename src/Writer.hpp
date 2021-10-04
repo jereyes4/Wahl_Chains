@@ -634,8 +634,8 @@ namespace Writer {
             f.clear();
             f.open(filename);
             if (f.fail()) {
-                std::cout << "Also failed. Aborting." << std::endl;
-                exit(0);
+                std::cout << "Also failed. Aborting jsonl export." << std::endl;
+                return;
             }
         }
         export_graph_data(f,reader);
@@ -652,8 +652,8 @@ namespace Writer {
             f.clear();
             f.open(filename);
             if (f.fail()) {
-                std::cout << "Also failed. Aborting." << std::endl;
-                exit(0);
+                std::cout << "Also failed. Aborting jsonl export." << std::endl;
+                return;
             }
         }
 
@@ -676,8 +676,8 @@ namespace Writer {
             f.clear();
             f.open(filename);
             if (f.fail()) {
-                std::cout << "Also failed. Aborting." << std::endl;
-                exit(0);
+                std::cout << "Also failed. Aborting summary export." << std::endl;
+                return;
             }
         }
 
@@ -811,8 +811,8 @@ namespace Writer {
             f.clear();
             f.open(filename);
             if (f.fail()) {
-                std::cout << "Also failed. Aborting." << std::endl;
-                exit(0);
+                std::cout << "Also failed. Aborting summary export." << std::endl;
+                return;
             }
         }
 
@@ -998,6 +998,31 @@ namespace Writer {
         }
         f.close();
     }
+
+    #ifdef EXPORT_PRETEST_DATA
+    static void export_pretest_data(const Reader& reader, const std::vector<long long> passed_pretest_list) {
+
+        std::string filename = reader.pretest_filename;
+        std::ofstream f(filename);
+        if (f.fail()) {
+            std::cout << "Error while opening file \"" << filename << "\"." << std::endl;
+            filename = DEFAULT_PRETEST_NAME;
+            std::cout << "Attempting to open default file \"" << filename << "\"." << std::endl;
+            f.clear();
+            f.open(filename);
+            if (f.fail()) {
+                std::cout << "Also failed. Aborting pretest data export." << std::endl;
+                return;
+            }
+        }
+
+        for (long long x : passed_pretest_list) {
+            f << x << '\n';
+        }
+
+        f.close();
+    }
+    #endif //EXPORT_PRETEST_DATA
 }
 
 #endif
