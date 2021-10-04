@@ -220,12 +220,12 @@ Wahl::Wahl(int argc, char** argv) {
 void Wahl::Write(std::vector<Searcher_Wrapper>& searchers) {
 
     #ifdef EXPORT_PRETEST_DATA
+    std::vector<long long> pretests_to_export;
     if (reader.export_pretests != Reader::no_) {
         int total_pretests = 0;
         for (auto& s : searchers) {
             total_pretests += s.passed_pretest_list.size();
         }
-        std::vector<long long> pretests_to_export;
         pretests_to_export.reserve(total_pretests);
         for (auto& s : searchers) {
             while (!s.passed_pretest_list.empty()) {
@@ -235,7 +235,6 @@ void Wahl::Write(std::vector<Searcher_Wrapper>& searchers) {
         }
         std::sort(pretests_to_export.begin(),pretests_to_export.end());
         pretests_to_export.resize(std::min((int) pretests_to_export.size(),MAX_PRETEST_EXPORTED));
-        Writer::export_pretest_data(reader, pretests_to_export);
     }
     if (reader.export_pretests == Reader::only_) {
         // Only export graph data
@@ -249,6 +248,7 @@ void Wahl::Write(std::vector<Searcher_Wrapper>& searchers) {
         std::cout << "Done!" << std::endl;
         #endif
         Writer::export_jsonl(reader);
+        Writer::export_pretest_data(reader, pretests_to_export);
         return;
     }
     #endif
@@ -384,6 +384,12 @@ void Wahl::Write(std::vector<Searcher_Wrapper>& searchers) {
     std::cout << "Done! Found " << example_vector.size() << " examples." << std::endl;
     #endif
 
+    #ifdef EXPORT_PRETEST_DATA
+    if (reader.export_pretests != Reader::no_) {
+        Writer::export_pretest_data(reader,pretests_to_export);
+    }
+    #endif
+
     Write(example_vector);
 }
 
@@ -391,14 +397,13 @@ void Wahl::Write(std::vector<Searcher_Wrapper>& searchers) {
 void Wahl::Write(Searcher_Wrapper& searcher) {
 
     #ifdef EXPORT_PRETEST_DATA
+    std::vector<long long> pretests_to_export;
     if (reader.export_pretests != Reader::no_) {
-        std::vector<long long> pretests_to_export;
         pretests_to_export.reserve(searcher.passed_pretest_list.size());
         while (!searcher.passed_pretest_list.empty()) {
             pretests_to_export.push_back(searcher.passed_pretest_list.front());
             searcher.passed_pretest_list.pop();
         }
-        Writer::export_pretest_data(reader, pretests_to_export);
     }
     if (reader.export_pretests == Reader::only_) {
         // Only export graph data
@@ -408,6 +413,7 @@ void Wahl::Write(Searcher_Wrapper& searcher) {
         std::cout << "Done!" << std::endl;
         #endif
         Writer::export_jsonl(reader);
+        Writer::export_pretest_data(reader, pretests_to_export);
         return;
     }
     #endif
@@ -423,6 +429,12 @@ void Wahl::Write(Searcher_Wrapper& searcher) {
     std::cout << "Done! " << searcher.passed_pretests << " pretests passed and found " << example_vector.size() << " examples." << std::endl;
     #else
     std::cout << "Done! Found " << example_vector.size() << " examples." << std::endl;
+    #endif
+
+    #ifdef EXPORT_PRETEST_DATA
+    if (reader.export_pretests != Reader::no_) {
+        Writer::export_pretest_data(reader,pretests_to_export);
+    }
     #endif
 
     Write(example_vector);
