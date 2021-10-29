@@ -203,6 +203,8 @@ public:
 
     std::map<int,std::multiset<int>> original_adj_map;
 
+    void get_mask_and_real_test(long long& mask, long long& real_test);
+
     void get_curves_from_mask(long long mask);
 
     bool get_curves_from_mask_exact_curves(long long mask);
