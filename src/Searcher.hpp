@@ -208,6 +208,9 @@ public:
     void get_curves_from_mask(long long mask);
 
     bool get_curves_from_mask_exact_curves(long long mask);
+
+    // Helper function unused in main program
+    long long get_mask_from_real_test(long long real_test);
     //////////////////////////////////////////////////////
 
     void init();

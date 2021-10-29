@@ -1259,7 +1259,7 @@ void Reader::parse_forget_exceptional(const vector<string>& tokens) {
     }
 }
 
-long long Reader::get_test_numbers(vector<long long>& number_of_tests) {
+long long Reader::get_test_numbers(vector<long long>& number_of_tests) const {
     if (curves_used_exactly != -1) {
         return get_test_numbers_exact_curves(number_of_tests);
     }
@@ -1286,7 +1286,7 @@ long long Reader::get_test_numbers(vector<long long>& number_of_tests) {
     return total_tests;
 }
 
-long long Reader::get_test_numbers_exact_curves(vector<long long>& number_of_tests) {
+long long Reader::get_test_numbers_exact_curves(vector<long long>& number_of_tests) const {
     long long total_tests = 0;
     number_of_tests.resize(tests_no);
     for (int t = 0; t < tests_no; ++t) {

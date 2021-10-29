@@ -540,6 +540,18 @@ void Searcher::get_mask_and_real_test(long long& mask, long long& real_test) {
     mask = real_test - test_start;
 }
 
+long long Searcher::get_mask_from_real_test(long long real_test) {
+    int start = 0;
+    int index = 0;
+    std::vector<long long> number_tests;
+    reader_copy.get_test_numbers(number_tests);
+    while (number_tests[index] + start <= real_test) {
+        start += number_tests[index];
+        index++;
+    }
+    return real_test - test_start;
+}
+
 std::pair<bool,int> Searcher::check_obstruction() {
     // Two facts are sufficient to prove 0 obstruction:
     // That there are only two complete fibers (this assumes that they are of type I_n)

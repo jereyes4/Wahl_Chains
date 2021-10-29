@@ -173,13 +173,13 @@ public:
     std::vector<std::vector<std::vector<int>>> choose_curves;
     std::vector<std::vector<int>> ignored_curves;
 
-    std::ostream* error_stream;
+    mutable std::ostream* error_stream;
 
-    inline void error(const std::string msg, int where = -1) {
+    inline void error(const std::string msg, int where = -1) const {
         (*error_stream) << "Error(" << (where == -1 ? line_no : where) << "): " << msg << std::endl;
         exit(1);
     }
-    inline void warning(const std::string msg, int where = -1) {
+    inline void warning(const std::string msg, int where = -1) const {
         (*error_stream) << "Warning(" << (where == -1 ? line_no : where) << "): " << msg << std::endl;
     }
     Reader();
@@ -190,8 +190,8 @@ public:
     void parse_merge(const std::vector<std::string>& def_tokens, const std::vector<std::string>& content_tokens);
     void parse_make_fiber(const std::vector<std::string>& def_tokens, const std::vector<std::string>& content_tokens);
     void parse_forget_exceptional(const std::vector<std::string>& tokens);
-    long long get_test_numbers(std::vector<long long>& test_numbers);
-    long long get_test_numbers_exact_curves(std::vector<long long>& test_numbers);
+    long long get_test_numbers(std::vector<long long>& test_numbers) const;
+    long long get_test_numbers_exact_curves(std::vector<long long>& test_numbers) const;
 };
 
 #endif
