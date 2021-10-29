@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
     gp << "set yrange [" << min_Chern - 1 << ':' << max_Chern + 1 << "]\n";
     gp << "set xlabel \"Number of Curves\"\n";
     gp << "set ylabel \"Chern Slope\"\n";
-    gp << "plot '-' linetype 7 linecolor 7\n";
+    gp << "plot '-' title \"Pretests\" linetype 7 linecolor 7\n";
     for (auto data : sizeAndChern) {
         gp << data.first << ' ' << data.second << '\n';
     }
