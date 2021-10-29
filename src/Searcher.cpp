@@ -294,8 +294,16 @@ void Searcher::search() {
 #endif
         *wrapper_current_test = current_test = parent->get_test(current_test);
 
-        long long mask, real_test;
-        get_mask_and_real_test(mask,real_test);
+        long long real_test = current_test + reader_copy.subtest_start;
+        if (current_test >= parent->total_tests) {
+            return;
+        }
+        while (parent->number_tests[test_index] + test_start <= real_test) {
+            test_start += parent->number_tests[test_index];
+            test_index++;
+        }
+        //from this mask read in order first try_curves and then choose_curves
+        long long mask = real_test - test_start;
 
         K2 = reader_copy.K.self_int;
 
@@ -525,31 +533,6 @@ bool Searcher::get_curves_from_mask_exact_curves(long long mask) {
         if (included == choose_set.size()) return true;
     }
     return false;
-}
-
-void Searcher::get_mask_and_real_test(long long& mask, long long& real_test) {
-    real_test = current_test + reader_copy.subtest_start;
-    if (current_test >= parent->total_tests) {
-        return;
-    }
-    while (parent->number_tests[test_index] + test_start <= real_test) {
-        test_start += parent->number_tests[test_index];
-        test_index++;
-    }
-    //from this mask read in order first try_curves and then choose_curves
-    mask = real_test - test_start;
-}
-
-long long Searcher::get_mask_from_real_test(long long real_test) {
-    int start = 0;
-    int index = 0;
-    std::vector<long long> number_tests;
-    reader_copy.get_test_numbers(number_tests);
-    while (number_tests[index] + start <= real_test) {
-        start += number_tests[index];
-        index++;
-    }
-    return real_test - test_start;
 }
 
 std::pair<bool,int> Searcher::check_obstruction() {
