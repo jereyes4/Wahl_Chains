@@ -28,11 +28,11 @@ public:
         }
     }
     gnuplot& operator<<(const char* const s) {
-        fprintf(file, s);
+        fprintf(file, "%s", s);
         return *this;
     }
     gnuplot& operator<<(const std::string& s) {
-        fprintf(file, s.c_str());
+        fprintf(file, "%s", s.c_str());
         return *this;
     }
     gnuplot& operator<<(char c) {
@@ -43,7 +43,7 @@ public:
     gnuplot& operator<<(const T& i) {
         std::stringstream ss;
         ss << i;
-        fprintf(file, ss.str().c_str());
+        fprintf(file, "%s", ss.str().c_str());
         return *this;
     }
     void flush() {
@@ -122,8 +122,6 @@ int main(int argc, char** argv) {
         searcher.contract_exceptional();
 
         int used_base = 0;
-
-        int euler_config = 0;
 
         int double_intersections = 0;
         for (auto& fiber : searcher.reader_copy.fibers) {
