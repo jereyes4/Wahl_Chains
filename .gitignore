@@ -9,6 +9,8 @@
 !README.md
 
 !Utilities/
+!Utilities/Third_Party
+!Utilities/Third_Party/*.hpp
 !Utilities/*.cxx
 !Utilities/README.raw.md
 !Utilities/*.py
