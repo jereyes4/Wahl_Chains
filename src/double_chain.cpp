@@ -1163,7 +1163,7 @@ void Searcher::verify_p_extremal_resolution(const vector<int>& reduced_chain, co
         algs::to_chain(n0*n0,n0*(n0-a0)-1ll,expected_chain[0]);
         algs::to_chain(n1*n1,n1*(n1-a1)-1ll,expected_chain[1]);
 
-        static thread_local algs::BlowDownLinkedList bd_linked_list;
+        algs::BlowDownLinkedList bd_linked_list;
 
         // Use a structue that remembers blowdown and blowup order using the original un-reduced chain, which should be
         bd_linked_list.reset(G.size,chain,G.self_int);
