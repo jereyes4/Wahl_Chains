@@ -8,7 +8,7 @@ using std::pair;
 
 
 /*
-    Search for one QHD3 fork and a Wahl chain, or two Wahl chains.
+    Search for one QHD3 fork, or a Wahl chains.
 
     Explore every way in which all but one nodes have degree at most 2, and the remaining one has degree at most 3.
     We call the node with degree 3 a central framing if it exists.
