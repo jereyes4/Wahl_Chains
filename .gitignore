@@ -14,6 +14,7 @@
 !Utilities/*.cxx
 !Utilities/README.raw.md
 !Utilities/*.py
+!Utilities/*.sage
 
 # Source files,
 !src/
@@ -29,7 +30,7 @@
 !jsonl/
 !jsonl/*.jsonl
 
-# Summaries are heavy and can be easily buildt from .jsonl
+# Summaries are heavy and can be easily built from .jsonl
 # !summary/
 # !summary/*.tex
 # !summary/*.txt
