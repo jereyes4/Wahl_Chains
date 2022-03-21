@@ -20,9 +20,7 @@ The first step is to install a suitable `C++` compiler. For Linux `GNU C++` is u
 
     g++ --version
 
-For Windows, we recommend installing MinGW for 64-bit from
-
-    https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/
+For Windows, we recommend installing MinGW for 64-bit from [here](https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/).
 
 This installation includes `GNU C++`, which can be tested with the same command.
 
