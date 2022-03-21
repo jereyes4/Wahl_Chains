@@ -999,6 +999,7 @@ def main_window(default_filename="", default_param=""):
     graph_info = None
     config_info = None
     filename = default_filename
+    index = 0
     root = tkinter.Tk()
     root.geometry("1280x720")
     frame = tkinter.Frame(root)
@@ -1032,6 +1033,8 @@ def main_window(default_filename="", default_param=""):
     def load_file(temp_filename = ""):
         nonlocal filename
         nonlocal graph_info
+        nonlocal index
+        index = 0
         if temp_filename == "":
             temp_filename = filedialog.askopenfilename(
                 title="Open file",
@@ -1072,20 +1075,31 @@ def main_window(default_filename="", default_param=""):
         set_text("Loaded {}.".format(filename))
         number_input.focus_set()
 
-    def load_example(initial = False):
+    def load_example(initial = False, delta = 0):
         nonlocal config_info
         nonlocal Str
+        nonlocal index
         if filename == "":
             showerror(title="Error", message="No file opened.")
             return
-        index = number_input.get()
-        if index == "":
-            return
-        index = int(index)
-        if index == 0:
+
+        if delta == 0:
+            newindex = number_input.get()
+            if newindex == "":
+                return
+            newindex = int(newindex)
+        else:
+            newindex = index + delta
+            if newindex < 0:
+                return
+
+        if newindex == 0:
+            index = 0
+            number_input.delete(0,tkinter.END)
+            number_input.insert(0, str(0))
             set_text("Loaded {}.".format(filename))
             return
-        s = linecache.getline(filename,index + 1)
+        s = linecache.getline(filename,newindex + 1)
         if s == "":
             if initial:
                 set_text("Error: Invalid index (Out of bounds).")
@@ -1112,6 +1126,10 @@ def main_window(default_filename="", default_param=""):
                         S = string_of_double_chain(graph_info, config_info)
                 else:
                     S = string_of_p_extremal(graph_info, config_info)
+            index = newindex
+            number_input.delete(0,tkinter.END)
+            number_input.insert(0, str(newindex))
+
             set_text(S)
 
         except:
@@ -1144,6 +1162,8 @@ def main_window(default_filename="", default_param=""):
     root.bind("<Escape>",lambda e: root.destroy())
     root.bind("<Return>",lambda e: load_example())
     root.bind("<Control-o>",lambda e: load_file())
+    root.bind("<Right>", lambda e: load_example(False,1))
+    root.bind("<Left>", lambda e: load_example(False,-1))
 
     if default_filename != "":
         load_file(default_filename)
