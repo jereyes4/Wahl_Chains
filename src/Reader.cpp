@@ -374,7 +374,7 @@ Reader::Reader() {
     try_curves.resize(1);
     choose_curves.resize(1);
     ignored_curves.resize(1);
-#ifdef WAHL_MULTITHREAD
+#ifdef MULTITHREAD
     threads = MAX_THREADS;
 #endif
     output_filename = DEFAULT_OUTPUT_NAME;
@@ -871,7 +871,7 @@ void Reader::parse_option(const vector<string>& tokens) {
         if (!safe_stoi(tokens[1],value) or value < 1) {
             error("Invalid number for option \'Threads\': " + tokens[1]);
         }
-#ifdef WAHL_MULTITHREAD
+#ifdef MULTITHREAD
         if (value > MAX_THREADS) {
             warning("Build allows for " + to_string(MAX_THREADS) + ". Value capped.");
             value = MAX_THREADS;

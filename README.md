@@ -32,15 +32,15 @@ The second step is to compile the program. For example, using `GNU C++` with `-O
 
 The program has support for multi-threading. To use it with `GNU C++`, run
 
-    g++ -std=c++17 -Ofast -flto -pthread -D WAHL_MULTITHREAD src/*.cpp -o Search.exe
+    g++ -std=c++17 -Ofast -flto -pthread -D MULTITHREAD src/*.cpp -o Search.exe
 
 To set the maximum amount of threads, do for example
 
-    g++ -std=c++17 -Ofast -flto -pthread -D WAHL_MULTITHREAD -D MAX_THREADS=8 src/*.cpp -o Search.exe
+    g++ -std=c++17 -Ofast -flto -pthread -D MULTITHREAD -D MAX_THREADS=8 src/*.cpp -o Search.exe
 
 Alternatively, in the file `config.hpp` uncomment the line
 
-    #define WAHL_MULTITHREAD
+    #define MULTITHREAD
 
 optionally set the maximum number of threads by modifying
 

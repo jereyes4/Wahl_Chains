@@ -10,9 +10,9 @@
 
 // #define NDEBUG
 
-// Uncomment for multi thread executable, or use flag -D WAHL_MULTITHREAD
+// Uncomment for multi thread executable, or use flag -D MULTITHREAD
 
-// #define WAHL_MULTITHREAD
+// #define MULTITHREAD
 
 
 // Status is printed in Wahl::Wahl() if compiled with multithread support.
@@ -33,7 +33,7 @@
 
 // If multithread, we can print a nicer status if we allow ANSI escape characters
 
-// #define WAHL_MULTITHREAD_STATUS_ANSI
+// #define MULTITHREAD_STATUS_ANSI
 
 
 // Add some sort of overflow check in calculating continued fractions.
@@ -134,12 +134,12 @@ do {                                            \
 #endif
 
 #ifdef NO_MULTITHREAD
-#ifdef WAHL_MULTITHREAD
-#undef WAHL_MULTITHREAD
+#ifdef MULTITHREAD
+#undef MULTITHREAD
 #endif
 #endif
 
-#ifndef WAHL_MULTITHREAD
+#ifndef MULTITHREAD
 // on single thread, disable thread_local storages.
 #define thread_local
 #endif

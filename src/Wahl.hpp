@@ -3,7 +3,7 @@
 #define WAHL_HPP
 #include"Reader.hpp" // Reader, vector
 
-#if defined(WAHL_MULTITHREAD) || defined(CATCH_SIGINT)
+#if defined(MULTITHREAD) || defined(CATCH_SIGINT)
 #include<atomic> // atomic
 #endif
 
@@ -21,13 +21,13 @@ public:
     Wahl(int argc, char** argv);
 
     inline void init_tests() {
-#ifdef WAHL_MULTITHREAD
+#ifdef MULTITHREAD
         last_batch = total_tests - ((long long)(BULK_SIZE*MAX_THREADS) + total_tests%(long long)BULK_SIZE);
 #endif
     }
 
     inline long long get_test(long long previous) {
-#ifndef WAHL_MULTITHREAD
+#ifndef MULTITHREAD
         return current_test++;
 #else
         // The last bunch if tests should be done one by one, not in bulk.
@@ -70,7 +70,7 @@ public:
     Reader reader;
     std::vector<long long> number_tests;
 
-#ifdef WAHL_MULTITHREAD
+#ifdef MULTITHREAD
     std::atomic<long long> current_test;
     long long last_batch;
 #else

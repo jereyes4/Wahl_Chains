@@ -4,7 +4,7 @@
 #include<fstream> // ifstream
 #include"Writer.hpp" // export_jsonl, less_by_n, less_by_length, stable_sort
 
-#ifdef WAHL_MULTITHREAD
+#ifdef MULTITHREAD
 #include<chrono> // milliseconds
 #include<thread> // thread, sleep_for
 #endif
@@ -64,7 +64,7 @@ Wahl::Wahl(int argc, char** argv) {
     );
     #endif // CATCH_SIGINT
 
-#ifdef WAHL_MULTITHREAD
+#ifdef MULTITHREAD
     int threads = reader.threads;
     std::vector<std::thread> spawns;
     std::vector<Searcher_Wrapper> searchers(threads);
@@ -76,7 +76,7 @@ Wahl::Wahl(int argc, char** argv) {
         spawns.emplace_back(&Searcher_Wrapper::search,&searchers[i]);
     }
 #ifdef PRINT_STATUS
-#ifdef WAHL_MULTITHREAD_STATUS_ANSI
+#ifdef MULTITHREAD_STATUS_ANSI
     std::cout << std::fixed;
     std::cout.precision(1);
     std::cout << "\e[s";
@@ -125,7 +125,7 @@ Wahl::Wahl(int argc, char** argv) {
         spawns[i].join();
     }
     std::cout << '\r' << 100. << "% " << total_tests << '/' << total_tests << std::endl;
-#else // ndef WAHL_MULTITHREAD_STATUS_ANSI
+#else // ndef MULTITHREAD_STATUS_ANSI
 
     std::cout << std::fixed;
     std::cout.precision(1);
@@ -166,7 +166,7 @@ Wahl::Wahl(int argc, char** argv) {
     }
     std::cout << '\r' << 100. << "% " << total_tests << '/' << total_tests << std::endl;
 
-#endif // WAHL_MULTITHREAD_STATUS_ANSI
+#endif // MULTITHREAD_STATUS_ANSI
 
 #else // ndef PRINT_STATUS
     for(int i = 0; i < threads; ++i) {
@@ -191,7 +191,7 @@ Wahl::Wahl(int argc, char** argv) {
 
     Write(searchers);
 
-#else // ndef WAHL_MULTITHREAD
+#else // ndef MULTITHREAD
     Searcher_Wrapper searcher;
     searcher.parent = this;
 #ifdef PRINT_STATUS
@@ -213,7 +213,7 @@ Wahl::Wahl(int argc, char** argv) {
 
     Write(searcher);
 
-#endif // WAHL_MULTITHREAD
+#endif // MULTITHREAD
 
 }
 

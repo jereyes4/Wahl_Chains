@@ -3,7 +3,7 @@
 #include"Algorithms.hpp" // algs::ith_combination
 #include<climits> // INT_MAX
 
-#if !defined(WAHL_MULTITHREAD) && defined(PRINT_STATUS)
+#if !defined(MULTITHREAD) && defined(PRINT_STATUS)
 #include<chrono> // steady_clock, milliseconds
 #endif
 
@@ -270,14 +270,14 @@ void Searcher::search() {
 #ifdef CATCH_SIGINT
         if (sigint_catched) {
 
-#ifndef WAHL_MULTITHREAD
+#ifndef MULTITHREAD
             std::cout << "\n" "Abrupt close.";
 #endif
             return;
         }
 #endif
 
-#if !defined(WAHL_MULTITHREAD) && defined(PRINT_STATUS)
+#if !defined(MULTITHREAD) && defined(PRINT_STATUS)
         //print here status.
         static auto last_time = std::chrono::steady_clock::now();
         auto this_time = std::chrono::steady_clock::now();

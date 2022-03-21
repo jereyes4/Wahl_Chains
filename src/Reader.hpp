@@ -139,7 +139,7 @@ public:
     bool latex_include_subsection;
     std::set<int> search_for;
 
-#ifdef WAHL_MULTITHREAD
+#ifdef MULTITHREAD
     int threads;
 #endif
 

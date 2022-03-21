@@ -13,7 +13,7 @@
 #include"Algorithms.hpp" // Trie
 #endif
 
-#ifdef WAHL_MULTITHREAD
+#ifdef MULTITHREAD
 #include<atomic> // atomic
 #endif
 
@@ -125,7 +125,7 @@ public:
     long long test_start;
     long long current_test;
 
-    #ifdef WAHL_MULTITHREAD
+    #ifdef MULTITHREAD
         std::atomic<long long> *wrapper_current_test;
         #if defined(PRINT_PASSED_PRETESTS_END) || defined(PRINT_STATUS_EXTRA)
             std::atomic<long long> *wrapper_passed_pretests;
@@ -351,7 +351,7 @@ public:
         std::queue<long long> passed_pretest_list;
     #endif // EXPORT_PRETEST_DATA
 
-    #ifdef WAHL_MULTITHREAD
+    #ifdef MULTITHREAD
         std::atomic<long long> current_test;
         #if defined(PRINT_PASSED_PRETESTS_END) || defined(PRINT_STATUS_EXTRA)
             std::atomic<long long> passed_pretests;
