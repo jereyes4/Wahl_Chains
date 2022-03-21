@@ -1,7 +1,7 @@
 from sage.all_cmdline import *
 load("global_log_resolution.sage")
 
-def make_test_file(filename : str, curve_dict : list):
+def make_test_file(filename : str, curve_dict : list, outname : str = "out"):
     base = len(curve_dict)
 
     curves = [u for _,u in curve_dict]
@@ -39,8 +39,8 @@ def make_test_file(filename : str, curve_dict : list):
         dfs({},x,-1)
 
     configtext = (
-        "Output: jsonl/out\n"
-        "Summary_Output: summary/out\n"
+        "Output: jsonl/{name}\n"
+        "Summary_Output: summary/{name}\n"
         "Summary_Style: LaTeX_Table\n\n"
         "Single_Chain: Y\n"
         "Double_Chain: Y\n"
@@ -55,7 +55,7 @@ def make_test_file(filename : str, curve_dict : list):
         "LaTeX_Include_Subsection: Y\n\n"
         "Tests: 1\n"
         "K2: 9\n\n"
-    )
+    ).format(name=outname)
     exctext = "Name:\n"
     basetext = ""
 
