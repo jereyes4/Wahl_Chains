@@ -1325,8 +1325,8 @@ pair<bool,bool> Searcher::double_is_nef(const std::vector<int>& local_self_int, 
             If E isn't a (-1) ignore.
             If E.D' >= 1 for D' < D the curves we knew it intersected before, then we safely ignore. Either the intersection blows up, so E^2 <= -2, or it doesn't in which case E.D >= 1.
             Else issue a nef warning. This is because if the intersection is not blown up then E.K = -1 and E.D < 1.
-    Else if the curve is not marked and a curve it intersects gets contracted, ignore.
-        In this case the self intersection is always < -1.
+    Else if the curve is not marked and a curve it intersects gets contracted, issue a nef warning.
+        Same as before.
     Else if the curve is a (-1):
         If E.D >= 1 ignore.
         Else discard this example. K_X not nef.
@@ -1349,17 +1349,9 @@ pair<bool,bool> Searcher::double_is_nef(const std::vector<int>& local_self_int, 
             if (local_curve_iter == curve_dict.end()) continue;
             int local_curve_id = local_curve_iter->second;
             if (local_self_int[local_curve_id] == INT_MAX) {
-                if (temp_marked_exceptional[exceptional.id] != current_test) {
-                    // not marked and contraction
-                    skip_this = true;
-                    break;
-                }
-                else {
-                    // marked and contraction
-                    nef_warning = true;
-                    skip_this = true;
-                    break;
-                }
+                nef_warning = true;
+                skip_this = true;
+                break;
             }
             else if (location[local_curve_id] != -1) {
                 disc_sum -= discrepancies[local_curve_id]*n[1-location[local_curve_id]];
