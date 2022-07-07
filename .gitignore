@@ -40,3 +40,7 @@
 # !pdf/
 # !pdf/*.tex
 # !pdf/*.pdf
+
+# Thesis data
+!Thesis/
+!Thesis/**
