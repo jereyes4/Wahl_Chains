@@ -1,0 +1,43 @@
+
+Output: data/4s11
+Summary_Style: skip
+
+Single_Chain: Y
+Double_Chain: Y
+Search_For: 1 2 3 4
+
+Tests: 1
+
+#A = z
+#B = y
+
+#M = A^2 B
+
+#N = (x^2y + z^3 + y^2z)
+
+#Pencil = N + aM
+
+Fibers:
+    I4* Dis
+        E_7 A E_1 E_2 E_3 E_6 E_8 B E_4
+    I1 Fix
+        F_1
+    I1 Fix
+        F_2
+Name:
+    G_1 Try
+        F_1 F_1
+    G_2 Try
+        F_2 F_2
+Sections:
+    E_5 Try
+        E_4 F_1 F_2
+    E_9 Try
+        E_8 F_1 F_2
+Sections(0):
+    H Try
+        G_1 G_2 E_6 B
+    V Try
+        G_1 F_2 F_2 E_1
+    W Try
+        F_1 F_1 G_2 E_1

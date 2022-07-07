@@ -1,0 +1,41 @@
+
+Output: data/1s41
+Summary_Style: skip
+
+Single_Chain: Y
+Double_Chain: Y
+Search_For: 1 2 3 4
+
+Tests: 1
+
+#I_1* : XY(X-Y)
+#I_4 : Z(XY - Y^2 + XZ)
+#I_1 : Z(XY - Y^2 + XZ) + 1/16 XY(X-Y)
+
+
+Fibers:
+    I1* Dis
+        E_1 E_2 Y L X E_3
+    I4  Fix
+        Z E_6 C E_8
+    I1  Fix
+        F
+Name:
+    G Try
+        F F
+Sections:
+    E_4 Try
+        E_3 C F
+    E_5 Try
+        Z X F
+    E_7 Try
+        E_6 C F
+    E_9 Try
+        E_8 C F
+Sections(0):
+    W Try
+        G E_1 C Z
+    R Try
+        G X L E_6 C
+    S Try
+        G X Y E_8 C

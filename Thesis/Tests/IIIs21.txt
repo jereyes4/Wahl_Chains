@@ -1,0 +1,53 @@
+
+Output: data/IIIs21
+Summary_Style: skip
+
+Single_Chain: Y
+Double_Chain: Y
+Search_For: 1 2 3 4
+
+Tests: 1
+
+#Pencil = (YZ-X^2)(X-Z) + aY^3
+
+#Double section through infinity and origin
+#H_1 = X
+
+#Double section through (1,1,1) and origin
+#H_2 = Y - X
+
+#Double  section through (4,8,3) and origin
+#S = Y - 2X
+
+#T Double section through (4,8,3) and (1,0,1)
+#T = 8X - Y - 8Z
+
+
+Fibers:
+    III* Dis
+        E_2 E_1 E_3 E_4 E_5 A E_7 E_8
+    I2   Fix
+        C L
+    I1   Fix
+        F_1
+Name:
+    G_1 Try
+        F_1 F_1
+    T_1 Try
+        C L
+    T_2 Try
+        C L
+Sections:
+    E_6 Try
+        E_5 C F_1
+    E_9 Try
+        E_8 L F_1
+Sections(0):
+    H_1 Try
+        E_1 T_1 F_1 F_1
+    H_2 Try
+        E_1 T_2 F_1 F_1
+    S Try
+        E_1 C L G_1
+    T Try
+        E_7 C C G_1 H_1 H_2

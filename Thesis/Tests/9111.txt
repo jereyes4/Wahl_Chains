@@ -1,0 +1,80 @@
+
+Output: data/9111
+Summary_Style: skip
+
+Single_Chain: Y
+Double_Chain: Y
+Search_For: 1 2 3 4
+
+Tests: 2
+
+#M = XYZ
+#N = Y^3 - ZX^2 + Z^2X
+
+
+#Pencil: F_a = N + 3aM
+
+#Let w = e^{2 i pi / 3}
+#F_{w^i} has a node at [-1,-w^{2i},1]
+#H = X + 1
+#K = X - 1
+
+#E_1 - E_4: Blowup at [0,0,1]
+#E_5 - E_8: Blowup at [1,0,0]
+#E_9: Blowup at [1,0,1]
+
+#T_i: Line through [-1,-w^{2i},1] and [0,0,1]
+#S_i: Line through [-1,-w^{2i},1] and [1,0,0]
+#R_i: Line through [-1,-w^{2i},1] and [1,0,1]
+
+
+
+Fibers:
+    I9 Fix Dis
+        Y E_1 E_2 E_3 X Z E_7 E_6 E_5
+    I1 Fix Fix
+        F_1
+    I1 Try Fix
+        F_2
+    I1 Try Try
+        F_3
+Name:
+    G_1 Try
+        F_1 F_1
+    G_2 Try
+        F_2 F_2
+    G_3 Try
+        F_3 F_3
+    Inf Try
+        X Z
+Sections:
+    E_4 Try
+        E_3 F_1 F_2 F_3
+    E_8 Try
+        E_7 F_1 F_2 F_3
+    E_9 Try
+        Y F_1 F_2 F_3
+Sections(1):
+    H Try
+        Inf Y G_1 F_1 G_2 F_2 G_3 F_3
+Sections(0):
+    K Try
+        Inf E_9 F_1 F_1 F_2 F_2 F_3 F_3
+    T_1 Try
+        E_1 Z G_1 F_2 F_2 F_3 F_3 K
+    S_1 Try
+        X E_5 G_1 F_2 F_2 F_3 F_3 K
+    R_1 Try
+        X Z G_1 F_2 F_2 F_3 F_3 E_9
+    T_2 Try
+        E_1 Z F_1 F_1 G_2 F_3 F_3 K S_1 R_1
+    S_2 Try
+        X E_5 F_1 F_1 G_2 F_3 F_3 K T_1 R_1
+    R_2 Try
+        X Z F_1 F_1 G_2 F_3 F_3 E_9 T_1 S_1
+    T_3 Try
+        E_1 Z F_1 F_1 F_2 F_2 G_3 K S_1 R_1 S_2 R_2
+    S_3 Try
+        X E_5 F_1 F_1 F_2 F_2 G_3 K T_1 R_1 T_2 R_2
+    R_3 Try
+        X Z F_1 F_1 F_2 F_2 G_3 E_9 T_1 S_1 T_2 S_2

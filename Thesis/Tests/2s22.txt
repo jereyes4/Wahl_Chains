@@ -1,0 +1,43 @@
+
+Output: data/2s22
+Summary_Style: skip
+
+Single_Chain: Y
+Double_Chain: Y
+Search_For: 1 2 3 4
+
+Tests: 1
+
+#A = X
+#B = X+Z
+#C = Z
+
+#Pencil = Y^2Z - X(X+Z)(X+aZ)
+
+#I_2 fibers: Y^2Z - X^2(X+Z) and Y^2Z - X(X+Z)^2
+
+#I_2* fiber: XZ(X+Z)
+
+#Section W(a): Y
+
+#A double section is S = Y^2Z + X(X+Z)^2
+
+Fibers:
+    I2* Dis
+        E_1 E_2 E_3 A B C E_4
+    I2  Fix
+        F_1 E_6
+    I2  Fix
+        F_2 E_8
+Sections:
+    E_5 Try
+        E_4 F_1 F_2
+    E_7 Try
+        A E_6 F_2
+    E_9 Try
+        B F_1 E_8
+    W   Try
+        C E_6 E_8
+Sections(0):
+    S Try
+        E_3 E_7 E_8 E_8 F_1 F_1

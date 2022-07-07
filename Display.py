@@ -3,6 +3,7 @@ try:
     import sys, json, linecache, tkinter
     from tkinter import filedialog
     from tkinter.messagebox import showerror
+    from tkinter import font
 except:
     print("Requires tkinter.")
     exit(1)
@@ -1008,6 +1009,9 @@ def main_window(default_filename="", default_param=""):
     SV.pack(side = tkinter.RIGHT, fill = tkinter.Y)
     SH = tkinter.Scrollbar(frame, orient=tkinter.HORIZONTAL)
     T = tkinter.Text(root, height=1000, width=1000, relief='flat',yscrollcommand=SV.set,xscrollcommand=SH.set,wrap=tkinter.NONE)
+    font_data = font.nametofont("TkFixedFont")
+    font_name = font_data.actual()["family"]
+    font_size = font_data.actual()["size"]
     T.insert(tkinter.END, Str)
     T.config(state=tkinter.DISABLED)
     T.pack(side=tkinter.TOP,fill=tkinter.BOTH)
@@ -1142,6 +1146,17 @@ def main_window(default_filename="", default_param=""):
     def validate_number(value):
         return str.isdigit(value) or value == ""
 
+    def increase_size():
+        nonlocal font_size
+        font_size += 2
+        T.configure(font=(font_name,font_size))
+
+    def decrease_size():
+        nonlocal font_size
+        font_size -= 2
+        font_size = max(1,font_size)
+        T.configure(font=(font_name,font_size))
+
     bottomframe = tkinter.Frame(frame)
     bottomframe.pack(side=tkinter.BOTTOM)
     fileframe = tkinter.Frame(bottomframe)
@@ -1164,6 +1179,8 @@ def main_window(default_filename="", default_param=""):
     root.bind("<Control-o>",lambda e: load_file())
     root.bind("<Right>", lambda e: load_example(False,1))
     root.bind("<Left>", lambda e: load_example(False,-1))
+    root.bind("<Control-equal>",lambda e: increase_size())
+    root.bind("<Control-minus>",lambda e: decrease_size())
 
     if default_filename != "":
         load_file(default_filename)

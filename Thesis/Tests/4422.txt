@@ -1,0 +1,80 @@
+
+Output: data/4422
+Summary_Style: skip
+
+Single_Chain: Y
+Double_Chain: Y
+Search_For: 1 2 3 4
+
+Tests: 4
+
+# L_X = X
+# L_Y = Y
+# L_Z = Z
+# A = X - Z
+# B = X + Y + Z
+# C = X - Y + Z
+# Q_1 = (X + Z)^2 - Y(X - Z)
+# L_1 = X + Y - Z
+# Q_2 = (X + Z)^2 + Y(X - Z)
+# L_2 = X - Y - Z
+# H = X + Z
+
+# E_1, E_2 blowups at [0:1:0]
+# E_3, E_4 blowups at [-1:0:1]
+# E_5 blowup at [1:0:1]
+# E_6 blowup at [0:1:1]
+# E_7 blowup at [0:-1:1]
+# E_8 blowup at [1:1:0]
+# E_9 blowup at [-1:1:0]
+
+#N = (2 + i)X + iZ + iY
+
+
+
+Fibers:
+    I4 Try Try Try Fix
+        L_Z L_Y L_X E_1
+    I4 Try Fix Fix Fix
+        B A C E_3
+    I2 Fix Fix Dis Dis
+        Q_1 L_1
+    I2 Fix Dis Fix Dis
+        Q_2 L_2
+Sections:
+    E_2 Try
+        E_1 A Q_1 Q_2
+    E_4 Try
+        L_Y E_3 Q_1 Q_2
+    E_5 Try
+        L_Y A L_1 L_2
+    E_6 Try
+        L_X C L_1 Q_2
+    E_7 Try
+        L_X B Q_1 L_2
+    E_8 Try
+        L_Z C Q_1 L_2
+    E_9 Try
+        L_Z B L_1 Q_2
+    H Try
+        E_1 E_3 L_1 L_2
+Name:
+    T_1 Try
+        Q_1 L_1
+    B_1 Try
+        Q_1 L_1
+    T_2 Try
+        Q_2 L_2
+    B_2 Try
+        Q_2 L_2
+Sections(0):
+    BT Try
+        B_1 T_2 E_3 L_Z L_X A
+    TB Try
+        T_1 B_2 E_3 L_Z L_X A
+    BB Try
+        B_1 B_2 L_Y E_1 B C
+    TT Try
+        T_1 T_2 L_Y E_1 B C
+    N Try
+        T_1 Q_2 Q_2 L_Y L_Z E_7 H A C

@@ -1,0 +1,35 @@
+
+Output: data/IIs11
+Summary_Style: skip
+
+Single_Chain: Y
+Double_Chain: Y
+Search_For: 1 2 3 4
+
+Tests: 1
+
+#Pencil = y^2z - x^3 - x^2z - az^3
+
+Fibers:
+    II* Dis
+        E_3 A E_2 E_1 E_4 E_5 E_6 E_7 E_8
+    I1  Fix
+        F_1
+    I1  Fix
+        F_2
+Name:
+    G_1 Try
+        F_1 F_1
+    G_2 Try
+        F_2 F_2
+Sections:
+    E_9 Try
+        E_8 F_1 F_2
+Sections(0):
+    R_1 Try
+        E_1 G_1 F_2 F_2
+    R_2 Try
+        E_1 F_1 F_1 G_2
+Sections(1):
+    T Try
+        A F_1 G_1 F_2 G_2

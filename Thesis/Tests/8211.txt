@@ -1,0 +1,56 @@
+
+Output: data/8211
+Summary_Style: skip
+
+Single_Chain: Y
+Double_Chain: Y
+Search_For: 1 2 3 4
+
+Tests: 6
+Fibers:
+    I8 Try Try Fix Try Fix Fix
+        L_2 E_7 E_8 L_3 E_4 L_1 E_2 E_1
+    I2 Try Fix Dis Fix Dis Fix
+        C L
+    I1 Fix Fix Fix Ign Ign Ign
+        F_1
+    I1 Fix Ign Ign Fix Fix Ign
+        F_2
+Merge:
+    G_1 Try
+        F_1 F_1
+    G_2 Try
+        F_2 F_2
+    P_1 Try
+        C L
+    P_2 Try
+        C L
+Sections:
+    E_3 Try
+        E_2 F_1 C F_2
+    E_5 Try
+        E_4 F_1 L F_2
+    E_6 Try
+        L_2 F_1 L F_2
+    E_9 Try
+        E_8 F_1 C F_2
+DoubleSections:
+    S_1 Try
+        L_3 L_1 C C G_1 E_6 F_2 F_2
+    S_2 Try
+        L_3 L_1 C C G_2 E_6 F_1 F_1
+Sections(0):
+    Q_1 Try
+        L_3 E_1 P_1 G_1 F_2 F_2 S_2
+    T_1 Try
+        L_1 E_7 P_2 G_1 F_2 F_2 S_2
+    Q_2 Try
+        L_1 E_7 P_1 F_1 F_1 G_2 S_1
+    T_2 Try
+        L_3 E_1 P_2 F_1 F_1 G_2 S_1
+Name:
+    Ay Try
+        S_1 Q_2
+Sections(0):
+    M Try
+        L_1 E_1 L L F_2 F_2 E_9 Ay S_2 S_2 G_1 T_2

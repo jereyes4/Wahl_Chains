@@ -1,0 +1,38 @@
+
+Output: data/6321
+Summary_Style: skip
+
+Single_Chain: Y
+Double_Chain: Y
+Search_For: 1 2 3 4
+
+Tests: 6
+
+Fibers:
+    I3 Fix Fix Fix Dis Dis Dis
+        x+z x+y y+z
+    I6 Fix Dis Dis Fix Fix Dis
+        z E_1 x E_3 y E_5
+    I2 Try Fix Dis Fix Dis Fix
+        C L
+    I1 Try Try Fix Try Fix Fix
+        F_1
+Name:
+    G_1 Try
+        F_1 F_1
+Sections:
+    E_2 Try
+        E_1 x+z C F_1
+    E_4 Try
+        E_3 x+y C F_1
+    E_6 Try
+        E_5 y+z C F_1
+    E_7 Try
+        y x+z L F_1
+    E_8 Try
+        x y+z L F_1
+    E_9 Try
+        z x+y L F_1
+DoubleSections:
+    S Try
+        E_9 x+z y+z x y C C G_1

@@ -1,0 +1,100 @@
+
+Output: data/3333
+Summary_Style: skip
+
+Single_Chain: Y
+Double_Chain: Y
+Search_For: 1 2 3 4
+
+
+# Given a cubic root of unity, s^2 + s + 1 = 0,
+# L_X = X
+# L_Y = Y
+# L_Z = Z
+# L_{i,j} = X + s^i Y + s^j Z
+# P_{X,i} = [ 0 : -1 : s^i ]
+# P_{Y,i} = [ s^i : 0 : -1 ]
+# P_{Z,i} = [ -1 : s^i : 0 ]
+
+# Q_{XY,i} = X - s^i Y
+# Q_{YZ,i} = Y - s^i Z
+# Q_{ZX,i} = Z - s^i X
+
+# N_{i,j} : Intersection of Q_{XY,i}, Q_{YZ,j}, Q_{ZX,-i-j}
+
+# E_{W,i} : Section of blow up at P_{W,i}
+
+Tests: 20
+
+Fibers:
+    I3 Fix
+        L_X L_Y L_Z
+    I3 Fix
+        L_{0,1} L_{1,0} L_{2,2}
+    I3 Try
+        L_{0,2} L_{1,1} L_{2,0}
+    I3 Try
+        L_{0,0} L_{1,2} L_{2,1}
+Sections:
+    E_{X,0} Ign Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix
+        L_X L_{0,0} L_{1,1} L_{2,2}
+    E_{X,1} Ign Ign Ign Ign Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix
+        L_X L_{0,2} L_{1,0} L_{2,1}
+    E_{X,2} Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Fix Fix Fix Fix Fix Fix Fix Fix Fix Fix
+        L_X L_{0,1} L_{1,2} L_{2,0}
+    E_{Y,0} Ign Ign Fix Fix Ign Fix Fix Fix Fix Fix Ign Fix Fix Fix Fix Fix Fix Fix Fix Fix
+        L_Y L_{0,0} L_{1,0} L_{2,0}
+    E_{Y,1} Ign Ign Ign Ign Ign Ign Ign Fix Fix Fix Ign Ign Ign Fix Fix Fix Fix Fix Fix Fix
+        L_Y L_{0,1} L_{1,1} L_{2,1}
+    E_{Y,2} Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Fix Fix Fix Fix
+        L_Y L_{0,2} L_{1,2} L_{2,2}
+    E_{Z,0} Ign Ign Ign Fix Ign Ign Fix Ign Fix Fix Ign Ign Fix Ign Fix Fix Ign Fix Fix Fix
+        L_Z L_{0,0} L_{0,1} L_{0,2}
+    E_{Z,1} Ign Ign Ign Ign Ign Ign Ign Ign Ign Fix Ign Ign Ign Ign Ign Fix Ign Ign Fix Fix
+        L_Z L_{2,0} L_{2,1} L_{2,2}
+    E_{Z,2} Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Ign Fix
+        L_Z L_{1,0} L_{1,1} L_{1,2}
+Sections(1):
+    Q_{XY,0} Try
+        L_X L_Y L_Z L_{0,0} L_{0,1} L_{0,2} L_{1,0} L_{1,1} L_{1,2} L_{2,0} L_{2,1} L_{2,2}
+    Q_{XY,1} Try
+        L_X L_Y L_Z L_{0,0} L_{0,1} L_{0,2} L_{1,0} L_{1,1} L_{1,2} L_{2,0} L_{2,1} L_{2,2} Q_{XY,0}
+    Q_{XY,2} Try
+        L_X L_Y L_Z L_{0,0} L_{0,1} L_{0,2} L_{1,0} L_{1,1} L_{1,2} L_{2,0} L_{2,1} L_{2,2} Q_{XY,0} Q_{XY,1}
+    Q_{YZ,0} Try
+        L_X L_Y L_Z L_{0,0} L_{0,1} L_{0,2} L_{1,0} L_{1,1} L_{1,2} L_{2,0} L_{2,1} L_{2,2} Q_{XY,0} Q_{XY,1} Q_{XY,2}
+    Q_{YZ,1} Try
+        L_X L_Y L_Z L_{0,0} L_{0,1} L_{0,2} L_{1,0} L_{1,1} L_{1,2} L_{2,0} L_{2,1} L_{2,2} Q_{XY,0} Q_{XY,1} Q_{XY,2} Q_{YZ,0}
+    Q_{YZ,2} Try
+        L_X L_Y L_Z L_{0,0} L_{0,1} L_{0,2} L_{1,0} L_{1,1} L_{1,2} L_{2,0} L_{2,1} L_{2,2} Q_{XY,0} Q_{XY,1} Q_{XY,2} Q_{YZ,0} Q_{YZ,1}
+    Q_{ZX,0} Try
+        L_X L_Y L_Z L_{0,0} L_{0,1} L_{0,2} L_{1,0} L_{1,1} L_{1,2} L_{2,0} L_{2,1} L_{2,2} Q_{XY,0} Q_{XY,1} Q_{XY,2} Q_{YZ,0} Q_{YZ,1} Q_{YZ,2}
+    Q_{ZX,1} Try
+        L_X L_Y L_Z L_{0,0} L_{0,1} L_{0,2} L_{1,0} L_{1,1} L_{1,2} L_{2,0} L_{2,1} L_{2,2} Q_{XY,0} Q_{XY,1} Q_{XY,2} Q_{YZ,0} Q_{YZ,1} Q_{YZ,2} Q_{ZX,0}
+    Q_{ZX,2} Try
+        L_X L_Y L_Z L_{0,0} L_{0,1} L_{0,2} L_{1,0} L_{1,1} L_{1,2} L_{2,0} L_{2,1} L_{2,2} Q_{XY,0} Q_{XY,1} Q_{XY,2} Q_{YZ,0} Q_{YZ,1} Q_{YZ,2} Q_{ZX,0} Q_{ZX,1}
+Merge:
+    XY Try
+        L_X L_Y Q_{XY,0} Q_{XY,1} Q_{XY,2}
+    YZ Try
+        L_Y L_Z Q_{YZ,0} Q_{YZ,1} Q_{YZ,2}
+    ZX Try
+        L_Z L_X Q_{ZX,0} Q_{ZX,1} Q_{ZX,2}
+    N_{0,0} Try
+        L_{1,2} L_{2,1} Q_{XY,0} Q_{YZ,0} Q_{ZX,0}
+    N_{0,1} Try
+        L_{1,0} L_{2,2} Q_{XY,0} Q_{YZ,1} Q_{ZX,2}
+    N_{0,2} Try
+        L_{1,1} L_{2,0} Q_{XY,0} Q_{YZ,2} Q_{ZX,1}
+    N_{1,0} Try
+        L_{0,2} L_{2,0} Q_{XY,1} Q_{YZ,0} Q_{ZX,2}
+    N_{1,1} Try
+        L_{0,0} L_{2,1} Q_{XY,1} Q_{YZ,1} Q_{ZX,1}
+    N_{1,2} Try
+        L_{0,1} L_{2,2} Q_{XY,1} Q_{YZ,2} Q_{ZX,0}
+    N_{2,0} Try
+        L_{0,1} L_{1,0} Q_{XY,2} Q_{YZ,0} Q_{ZX,1}
+    N_{2,1} Try
+        L_{1,1} L_{0,2} Q_{XY,2} Q_{YZ,1} Q_{ZX,0}
+    N_{2,2} Try
+        L_{0,0} L_{1,2} Q_{XY,2} Q_{YZ,2} Q_{ZX,2}
