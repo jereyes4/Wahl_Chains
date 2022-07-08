@@ -55,8 +55,8 @@ void Searcher::search_for_double_chain() {
 template<bool chain_search, bool QHD_search>
 void Searcher::search_for_double_chain_inner_loop() {
     G.reset_extraction();
-    static thread_local vector<int> chain[2];
-    static thread_local vector<int> cycle[2];
+    THREAD_STATIC vector<int> chain[2];
+    THREAD_STATIC vector<int> cycle[2];
     G.extract_chain(chain[0]);
     if (chain[0].empty()) {
         // Graph is only cycles. Cases 1, 3, 6.
@@ -341,9 +341,9 @@ Fifth case: The connection C_0 -> C_1 ends at the begining of C_1
 
 void Searcher::explore_double_candidate(vector<int> (&chain)[2]) {
     // to which chain belongs a curve.
-    static thread_local vector<int> location;
+    THREAD_STATIC vector<int> location;
     // For swapping chains in O(1)
-    static thread_local vector<int> Swap_location;
+    THREAD_STATIC vector<int> Swap_location;
 
     const int size = G.size;
 
@@ -357,13 +357,13 @@ void Searcher::explore_double_candidate(vector<int> (&chain)[2]) {
     }
 
     // Reversed chains for swapping in O(1)
-    static thread_local vector<int> Rev_chain[2];
+    THREAD_STATIC vector<int> Rev_chain[2];
     Rev_chain[0].assign(chain[0].rbegin(),chain[0].rend());
     Rev_chain[1].assign(chain[1].rbegin(),chain[1].rend());
 
-    static thread_local vector<int> reduced_chain[2];
-    static thread_local vector<int> reduced_self_int;
-    static thread_local unordered_set<int> ignore;
+    THREAD_STATIC vector<int> reduced_chain[2];
+    THREAD_STATIC vector<int> reduced_self_int;
+    THREAD_STATIC unordered_set<int> ignore;
 
 
     if (Delta == 0) { // Case 1.
@@ -443,7 +443,7 @@ void Searcher::explore_double_candidate(vector<int> (&chain)[2]) {
 
                 if (reduced_self_int[A] + extra_curves > -1) {
                     // temporary new chain.
-                    static thread_local vector<int> reduced_chain_2;
+                    THREAD_STATIC vector<int> reduced_chain_2;
                     reduced_chain_2 = std::move(reduced_chain[0]);
                     extra_curves = reduced_self_int[A] + extra_curves + 1;
                     reduced_self_int.resize(local_size + extra_curves);
@@ -694,7 +694,7 @@ void Searcher::explore_double_candidate(vector<int> (&chain)[2]) {
                         reduced_self_int[A] -= extra_n[0];
                         reduced_self_int[B] -= extra_n[1];
 
-                        static thread_local vector<int> reduced_chain_2[2];
+                        THREAD_STATIC vector<int> reduced_chain_2[2];
                         reduced_chain_2[0] = std::move(reduced_chain[0]);
                         reduced_chain_2[1] = std::move(reduced_chain[1]);
 
@@ -743,11 +743,11 @@ void Searcher::verify_first_explore_independent_second(vector<int> (&chain)[2], 
         if (invariants.first == 0) return;
     }
 
-    static thread_local unordered_set<int> ignore;
+    THREAD_STATIC unordered_set<int> ignore;
 
     // original chain will keep the contents of chain[1], so we can modify chain[1] without worrying, which will be used as the local reduced_chain of explore_double_candidate.
-    static thread_local vector<int> original_chain;
-    static thread_local vector<int> reduced_self_int;
+    THREAD_STATIC vector<int> original_chain;
+    THREAD_STATIC vector<int> reduced_self_int;
 
     original_chain = std::move(chain[1]);
 
@@ -848,7 +848,7 @@ void Searcher::verify_first_explore_independent_second(vector<int> (&chain)[2], 
 
             if (reduced_self_int[A] + extra_curves > -1) {
                 // temporary new chain.
-                static thread_local vector<int> reduced_chain_2;
+                THREAD_STATIC vector<int> reduced_chain_2;
                 reduced_chain_2 = std::move(chain[1]);
                 extra_curves = reduced_self_int[A] + extra_curves + 1;
 
@@ -871,9 +871,9 @@ void Searcher::verify_first_explore_independent_second(vector<int> (&chain)[2], 
 void Searcher::explore_p_extremal_resolution(vector<int>& chain) {
     const int size = G.size;
 
-    static thread_local vector<int> reduced_self_int;
-    static thread_local vector<int> reduced_chain;
-    static thread_local unordered_set<int> ignore;
+    THREAD_STATIC vector<int> reduced_self_int;
+    THREAD_STATIC vector<int> reduced_chain;
+    THREAD_STATIC unordered_set<int> ignore;
 
     // First no blow ups
     if (!contains(G.disconnections[chain[0]],chain.back())) {
@@ -945,7 +945,7 @@ void Searcher::explore_p_extremal_resolution(vector<int>& chain) {
 
             // Try making A a (-1)
             if (reduced_self_int[A] + extra_curves > -1) {
-                static thread_local vector<int> reduced_chain_2;
+                THREAD_STATIC vector<int> reduced_chain_2;
                 extra_curves = reduced_self_int[A] + extra_curves + 1;
                 reduced_self_int.resize(size + extra_curves);
                 reduced_chain.resize(local_size + extra_curves);
@@ -997,12 +997,12 @@ void Searcher::verify_double_candidate(const vector<int> (&chain)[2], const vect
 
     // Chain is Wahl, and we haven't seen these invariants before.
 
-    static thread_local vector<long long> discrepancies;
+    THREAD_STATIC vector<long long> discrepancies;
     discrepancies.assign(local_self_int.size(),0);
     algs::get_discrepancies(n[0], a[0], chain[0], discrepancies);
     algs::get_discrepancies(n[1], a[1], chain[1], discrepancies);
 
-    static thread_local vector<int> location;
+    THREAD_STATIC vector<int> location;
     location.assign(local_self_int.size(),-1);
     for (int curve : chain[0]) location[curve] = 0;
     for (int curve : chain[1]) location[curve] = 1;
@@ -1071,8 +1071,8 @@ If it does, the invariants of both singularities can be obtained from this dual 
 */
 void Searcher::verify_p_extremal_resolution(const vector<int>& reduced_chain, const vector<int>& reduced_self_int, const vector<int>& chain, int extra_n, int extra_orig, int extra_pos) {
 
-    static thread_local vector<int> dual_chain;
-    static thread_local vector<pair<int,int>> pairs;
+    THREAD_STATIC vector<int> dual_chain;
+    THREAD_STATIC vector<pair<int,int>> pairs;
 
     const auto fraction = algs::to_rational(reduced_chain,reduced_self_int);
 
@@ -1158,12 +1158,12 @@ void Searcher::verify_p_extremal_resolution(const vector<int>& reduced_chain, co
         int _temp_extra_pos[2] = {-1,extra_pos};
 
         // We want the Wahl chains starting from the ends of the big chain, tht is, we construct them with (n0,n0-a0) and (n1,n1-a1)
-        static thread_local vector<int> expected_chain[2];
+        THREAD_STATIC vector<int> expected_chain[2];
 
         algs::to_chain(n0*n0,n0*(n0-a0)-1ll,expected_chain[0]);
         algs::to_chain(n1*n1,n1*(n1-a1)-1ll,expected_chain[1]);
 
-        algs::BlowDownLinkedList bd_linked_list;
+        THREAD_STATIC algs::BlowDownLinkedList bd_linked_list;
 
         // Use a structue that remembers blowdown and blowup order using the original un-reduced chain, which should be
         bd_linked_list.reset(G.size,chain,G.self_int);
@@ -1182,7 +1182,7 @@ void Searcher::verify_p_extremal_resolution(const vector<int>& reduced_chain, co
         assert(x);
         assert(y);
 
-        static thread_local vector<int> Wahl_chains[2];
+        THREAD_STATIC vector<int> Wahl_chains[2];
 
         Wahl_chains[0].reserve(expected_chain[0].size());
         Wahl_chains[1].reserve(expected_chain[1].size());
@@ -1192,7 +1192,7 @@ void Searcher::verify_p_extremal_resolution(const vector<int>& reduced_chain, co
 
         assert(bd_linked_list.next_in_chain[Wahl_chains[0].back()] == bd_linked_list.prev_in_chain[Wahl_chains[1].back()]);
 
-        static thread_local vector<long long> discrepancies;
+        THREAD_STATIC vector<long long> discrepancies;
         discrepancies.assign(bd_linked_list.size,0);
 
         // Swap a0 with n0 - a0 to correctly represent the chain starting at the begining.

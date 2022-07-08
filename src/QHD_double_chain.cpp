@@ -91,8 +91,8 @@ void Searcher::search_for_QHD3_double_chain() {
         }
         G.reset_extraction();
 
-        static thread_local vector<int> fork[3];
-        static thread_local vector<int> chain;
+        THREAD_STATIC vector<int> fork[3];
+        THREAD_STATIC vector<int> chain;
 
         bool cyclic = G.extract_fork(fork);
         if ((!cyclic and fork[0].size() + fork[1].size() + fork[2].size() - 2 == G.size)
@@ -277,7 +277,7 @@ void Searcher::search_for_QHD3_double_chain() {
             G.extract_chain(chain);
             if (chain.empty()) {
                 // Cases 3,5,7
-                static thread_local vector<int> cycle;
+                THREAD_STATIC vector<int> cycle;
                 G.extract_chain(cycle);
                 if ((!cyclic and fork[0].size() + fork[1].size() + fork[2].size() - 2 + cycle.size() == G.size)
                     or (cyclic and fork[0].size() + fork[2].size() - 1 + cycle.size() == G.size)) {
@@ -492,7 +492,7 @@ void Searcher::get_fork_from_one_chain_for_double(const vector<int>& chain) {
 
     // Actually this is (almost) the same as the one for single chain.
 
-    static thread_local vector<int> fork[3];
+    THREAD_STATIC vector<int> fork[3];
 
     // Add a new curve with new id corresponding to the new (-2) we will add
     const int new_id = G.size;
@@ -528,7 +528,7 @@ void Searcher::get_fork_from_two_chains_for_double(vector<int> (&chain)[2]) {
 
     // Actually this is quite similar to the one for single chain.
 
-    static thread_local vector<int> fork[3];
+    THREAD_STATIC vector<int> fork[3];
 
     // Add a new curve with new id corresponding to the new (-2) we will add
     const int new_id = G.size;
@@ -584,7 +584,7 @@ void Searcher::get_fork_from_two_chains_for_double(vector<int> (&chain)[2]) {
 
 void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>& chain, int extra_id, int extra_n, int extra_orig, int extra_pos) {
 
-    static thread_local vector<int> location;
+    THREAD_STATIC vector<int> location;
 
     location.assign(G.self_int.size(),0);
     int Delta = -3*chain.size() - 1;
@@ -595,10 +595,10 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
 
     if (Delta < 0) return;
 
-    static thread_local vector<int> reduced_fork[3];
-    static thread_local vector<int> reduced_chain;
-    static thread_local vector<int> reduced_self_int;
-    static thread_local unordered_set<int> ignore;
+    THREAD_STATIC vector<int> reduced_fork[3];
+    THREAD_STATIC vector<int> reduced_chain;
+    THREAD_STATIC vector<int> reduced_self_int;
+    THREAD_STATIC unordered_set<int> ignore;
 
     if (Delta == 0) {
         reduced_self_int = G.self_int;
@@ -624,7 +624,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
                     and !contains(G.disconnections[end],fork[2].back())
                 )
             ) {
-                static thread_local vector<int> reduced_self_int_2;
+                THREAD_STATIC vector<int> reduced_self_int_2;
                 reduced_self_int_2 = reduced_self_int;
                 admissible = algs::reduce(chain,reduced_self_int_2,reduced_chain,ignore);
                 if (admissible) {
@@ -657,7 +657,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
             for (int A : G.disconnections[end]) if (location[A] == 1 and A != last_seen and A != start) {
 
                 last_seen = A;
-                static thread_local vector<int> reduced_self_int_2;
+                THREAD_STATIC vector<int> reduced_self_int_2;
                 reduced_self_int_2 = reduced_self_int;
                 ignore.insert(A);
                 admissible = algs::reduce(chain,reduced_self_int_2,reduced_chain,ignore);
@@ -722,7 +722,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
 
                 if (reduced_self_int_2[A] + extra_curves > -1) {
                     // temporary new chain.
-                    static thread_local vector<int> reduced_chain_2;
+                    THREAD_STATIC vector<int> reduced_chain_2;
                     extra_curves = reduced_self_int_2[A] + extra_curves + 1;
 
                     reduced_self_int_2.resize(size + extra_curves);
@@ -815,7 +815,7 @@ void Searcher::explore_QHD3_double_candidate(vector<int> (&fork)[3], vector<int>
                     // Skip, since this is a partial resolution.
                     continue;
                 }
-                static thread_local vector<int> reduced_self_int_2;
+                THREAD_STATIC vector<int> reduced_self_int_2;
                 reduced_self_int_2 = reduced_self_int;
                 reduced_self_int_2[A] -= Delta;
                 admissible = algs::reduce(fork[0],reduced_self_int_2,reduced_fork[0],ignore)
@@ -868,13 +868,13 @@ void Searcher::verify_QHD3_double_candidate(const std::vector<int> (&fork)[3], c
         std::min(chain_invariants.second, chain_invariants.first - chain_invariants.second)
     );
     if (reader_copy.keep_first != Reader::no_ and contains(double_QHD_found,unif_invariants)) return;
-    static thread_local vector<long long> discrepancies;
+    THREAD_STATIC vector<long long> discrepancies;
     discrepancies.resize(local_self_int.size(),0);
     long long QHD_denominator = algs::get_QHD_discrepancies(fork,local_self_int,QHD_invariants,discrepancies);
     algs::get_discrepancies(chain_invariants.first,chain_invariants.second,chain,discrepancies);
 
 
-    static thread_local vector<int> location;
+    THREAD_STATIC vector<int> location;
     location.assign(local_self_int.size(),-1);
     for (int i = 0; i < 3; ++i) for (int curve : fork[i]) location[curve] = 0;
     for (int curve : chain) location[curve] = 1;

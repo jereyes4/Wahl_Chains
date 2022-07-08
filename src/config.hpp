@@ -139,9 +139,19 @@ do {                                            \
 #endif
 #endif
 
+
 #ifndef MULTITHREAD
 // on single thread, disable thread_local storages.
-#define thread_local
+#define THREAD_STATIC static
+
+#else
+#ifdef __MINGW32__
+// On mingw-g++, do not use thread_local storage because bugs???
+// These statics are only used to reserve memory, so not keeping them is ok.
+#define THREAD_STATIC
+#else
+#define THREAD_STATIC static thread_local
+#endif
 #endif
 
 #endif

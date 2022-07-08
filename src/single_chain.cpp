@@ -45,8 +45,8 @@ void Searcher::search_for_single_chain() {
 template<bool chain_search, bool QHD_search>
 void Searcher::search_for_single_chain_inner_loop() {
     G.reset_extraction();
-    static thread_local vector<int> chain;
-    static thread_local vector<int> cycle;
+    THREAD_STATIC vector<int> chain;
+    THREAD_STATIC vector<int> cycle;
     G.extract_chain(chain);
     if (chain.size() < G.size) {
         if (chain.size() == 0) {
@@ -133,9 +133,9 @@ void Searcher::explore_single_candidate(vector<int>& chain) {
     /////////////////////////////////////////////////
     // Temporary stuff for reducing chains
 
-    static thread_local vector<int> reduced_chain;
-    static thread_local vector<int> reduced_self_int;
-    static thread_local unordered_set<int> ignore;
+    THREAD_STATIC vector<int> reduced_chain;
+    THREAD_STATIC vector<int> reduced_self_int;
+    THREAD_STATIC unordered_set<int> ignore;
 
     // At this point, ignore is assumed to be empty.
 
@@ -213,7 +213,7 @@ void Searcher::explore_single_candidate(vector<int>& chain) {
 
             if (reduced_self_int[A] + extra_curves > -1) {
                 // temporary new chain.
-                static thread_local vector<int> reduced_chain_2;
+                THREAD_STATIC vector<int> reduced_chain_2;
                 extra_curves = reduced_self_int[A] + extra_curves + 1;
 
                 reduced_self_int.resize(size + extra_curves);
@@ -250,7 +250,7 @@ void Searcher::verify_single_candidate(const vector<int>& chain, const vector<in
     if (reader_copy.keep_first != Reader::no_ and contains(single_found,unif_invariants)) return;
 
     // Chain is Wahl, and we haven't seen these invariants before.
-    static thread_local vector<long long> discrepancies;
+    THREAD_STATIC vector<long long> discrepancies;
     discrepancies.assign(local_self_int.size(),0);
     algs::get_discrepancies(invariants.first, invariants.second, chain, discrepancies);
 

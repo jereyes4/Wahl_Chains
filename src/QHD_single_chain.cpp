@@ -47,7 +47,7 @@ void Searcher::search_for_QHD3_single_chain() {
             }
             continue;
         }
-        static thread_local vector<int> fork[3];
+        THREAD_STATIC vector<int> fork[3];
         G.reset_extraction();
         bool cyclic = G.extract_fork(fork);
         if (!cyclic and fork[0].size() + fork[1].size() + fork[2].size() - 2 != G.size) continue;
@@ -109,7 +109,7 @@ void Searcher::get_fork_from_one_chain_for_single(const vector<int>& chain) {
     // Playing a bit with fire: These changes kinda invalidate G
     // if left unchecked.
 
-    static thread_local vector<int> fork[3];
+    THREAD_STATIC vector<int> fork[3];
 
     // Add a new curve with new id corresponding to the new (-2) we will be adding
     const int new_id = G.size;
@@ -142,10 +142,10 @@ void Searcher::get_fork_from_one_chain_for_single(const vector<int>& chain) {
 
 void Searcher::verify_QHD3_single_candidate(const vector<int> (&fork)[3], int extra_id, int extra_n, int extra_orig, int extra_pos) {
 
-    static thread_local std::vector<int> reduced_self_int;
+    THREAD_STATIC std::vector<int> reduced_self_int;
     reduced_self_int = G.self_int;
-    static thread_local std::vector<int> reduced_fork[3];
-    static thread_local std::unordered_set<int> empty_set;
+    THREAD_STATIC std::vector<int> reduced_fork[3];
+    THREAD_STATIC std::unordered_set<int> empty_set;
     bool admissible = algs::reduce(fork[0],reduced_self_int,reduced_fork[0],empty_set)
                       && algs::reduce(fork[1],reduced_self_int,reduced_fork[1],empty_set)
                       && algs::reduce(fork[2],reduced_self_int,reduced_fork[2],empty_set);
@@ -157,7 +157,7 @@ void Searcher::verify_QHD3_single_candidate(const vector<int> (&fork)[3], int ex
     if (reader_copy.keep_first != Reader::no_ and contains(single_QHD_found,invariant)) return;
 
     // QHD found and not seen before.
-    static thread_local std::vector<long long> discrepancies;
+    THREAD_STATIC std::vector<long long> discrepancies;
     discrepancies.assign(reduced_self_int.size(),0);
     long long n = algs::get_QHD_discrepancies(reduced_fork,reduced_self_int,data,discrepancies);
 

@@ -485,7 +485,7 @@ bool Searcher::get_curves_from_mask_exact_curves(long long mask) {
         }
     }
 
-    static thread_local std::vector<int> chosen_curves;
+    THREAD_STATIC std::vector<int> chosen_curves;
     chosen_curves.resize(0);
     int to_choose_from = reader_copy.try_curves[test_index].size();
     for (auto& choose_set : reader_copy.choose_curves[test_index]) {
