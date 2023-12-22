@@ -5,10 +5,10 @@ This is a program that given a configuration of rational curves on an elliptic s
 Specifically, it blows up exhaustively to obtain all possible* configurations of:
 - one Wahl chain,
 - two Wahl chains,
-- one <img src="https://render.githubusercontent.com/render/math?math=\mathbb Q \mathcal H \mathcal D^3"> plumbing graph,
-- one <img src="https://render.githubusercontent.com/render/math?math=\mathbb Q \mathcal H \mathcal D^3"> plumbing graph and one Wahl chain.
+- one $\mathbb Q \mathcal H \mathcal D^3$ plumbing graph,
+- one $\mathbb Q \mathcal H \mathcal D^3$ plumbing graph and one Wahl chain.
 
-An example is just a configuration of curves on a surface <img src="https://render.githubusercontent.com/render/math?math=X"> obtained after successive blowups and blowdowns starting from an elliptic surface <img src="https://render.githubusercontent.com/render/math?math=Y">. After contracting the curves in that configuration, a singular surface <img src="https://render.githubusercontent.com/render/math?math=S"> is obtained. Several invariants are obtained from <img src="https://render.githubusercontent.com/render/math?math=S">, such as <img src="https://render.githubusercontent.com/render/math?math=K_S^2">, global obstruction for smoothing the singularities, and effectiveness and nef-ness of <img src="https://render.githubusercontent.com/render/math?math=K_S">.
+An example is just a configuration of curves on a surface $X$ obtained after successive blowups and blowdowns starting from an elliptic surface $Y$. After contracting the curves in that configuration, a singular surface $S$ is obtained. Several invariants are obtained from $S$, such as $K_S^2$, global obstruction for smoothing the singularities, and effectiveness and nef-ness of $K_S$.
 
 The assumption of working on an elliptic surface is only used to calculate obstructions and nef-ness of the canonical class. As such, this program works in any abstract setting, for configurations of curves in arbitrary surfaces, with the disclaimer that both nef-ness and the obstruction calculation may not give correct results.
 
@@ -20,7 +20,9 @@ The first step is to install a suitable `C++` compiler. For Linux `GNU C++` is u
 
     g++ --version
 
-As for Windows, we have only tested the program using the 64-bit version of MinGW from [here](https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/). This installation includes `GNU C++`, which can be tested with the same command. We have seen some inconsistent behavior and occasional crashes with this version when compiled with multithread support, so it is not recommended.
+For Windows, we recommend installing MinGW for 64-bit from [here](https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/).
+
+This installation includes `GNU C++`, which can be tested with the same command.
 
 The second step is to compile the program. For example, using `GNU C++` with `-Ofast` and `-flto` optimizations, run from the terminal the line:
 
@@ -158,14 +160,14 @@ Following is the full list of settings and their possible options:
   - `By_Length`: Sorts by size of the chains in increasing order.
 
   Defaults to `By_N`.
-- `Nef_Check`: Determines wether to check for nef-ness of the canonical class <img src="https://render.githubusercontent.com/render/math?math=K_S">. Takes four possible options:
+- `Nef_Check`: Determines wether to check for nef-ness of the canonical class $K_S$. Takes four possible options:
   - `Y`: Tests for nef-ness. It the test fails, discard the example.
   - `skip`: Same as `Y`.
   - `N`: Does not test for nef-ness.
   - `print`: Tests for nef-ness, but does not discard examples. Instead adds the result of this test to the summary file.
 
   Defaults to `Y`.
-- `Effective_Check`: Determines wether to check for <img src="https://render.githubusercontent.com/render/math?math=\mathbb Q">-effectiveness of the canonical class <img src="https://render.githubusercontent.com/render/math?math=K_S">. Takes the same options as `Nef_Check` that act analogously.
+- `Effective_Check`: Determines wether to check for $\mathbb Q$-effectiveness of the canonical class $K_S$. Takes the same options as `Nef_Check` that act analogously.
   Defaults to `Y`.
 - `Obstruction_Check`: Determines wether to check if the examples have no global obstruction for smoothing. Takes the same options as `Nef_Check` that act analogously.
   Defaults to `Y`.
@@ -173,11 +175,11 @@ Following is the full list of settings and their possible options:
   Defaults to `Y`.
 - `Double_Chain`: Determines wether to search for two Wahl chain. Takes `Y` as yes and `N` as no.
   Defaults to `N`.
-- `Single_QHD`: Determines wether to search for one <img src="https://render.githubusercontent.com/render/math?math=\mathbb Q \mathcal H \mathcal D^3"> plumbing graph. Takes `Y` as yes and `N` as no.
+- `Single_QHD`: Determines wether to search for one $\mathbb Q \mathcal H \mathcal D^3$ plumbing graph. Takes `Y` as yes and `N` as no.
   Defaults to `N`.
-- `Double_QHD`: Determines wether to search for one <img src="https://render.githubusercontent.com/render/math?math=\mathbb Q \mathcal H \mathcal D^3"> plumbing graph and one Wahl chain. Takes `Y` as yes and `N` as no.
+- `Double_QHD`: Determines wether to search for one $\mathbb Q \mathcal H \mathcal D^3$ plumbing graph and one Wahl chain. Takes `Y` as yes and `N` as no.
   Defaults to `N`.
-- `Search_For`: Takes a space-separated list of numbers. Those are the <img src="https://render.githubusercontent.com/render/math?math=K_X^2"> that the program will aim for. For example,
+- `Search_For`: Takes a space-separated list of numbers. Those are the $K_X^2$ that the program will aim for. For example,
 
       Search_For: 3 4
 
@@ -196,10 +198,10 @@ Following is the full list of settings and their possible options:
 - `Threads`: The amount of threads to spawn with multi thread support. Has a hard limit given by the macro `MAX_THREADS` in `config.hpp`, which is `4` unless modified.
   Defaults to `MAX_THREADS`.
 - `Sections_Input`: Determines the meaning of the parameter when adding curves. Takes two options:
-  - `By_Self_Intersection`: The parameter for sections correspond to their self intersection in the original surface <img src="https://render.githubusercontent.com/render/math?math=Y">.
-  - `By_Canonical_Intersection`: The parameter corresponds to the intersection of the section with the canonical class in the original surface <img src="https://render.githubusercontent.com/render/math?math=Y">.
+  - `By_Self_Intersection`: The parameter for sections correspond to their self intersection in the original surface $Y$.
+  - `By_Canonical_Intersection`: The parameter corresponds to the intersection of the section with the canonical class in the original surface $Y$.
 
-  This option is useful when dealing with highly singular multiple sections. For example if a curve <img src="https://render.githubusercontent.com/render/math?math=C"> is sextuple section, then <img src="https://render.githubusercontent.com/render/math?math=C.K_Y = -6">, but if it is too singular, perhaps it is not immediate knowing <img src="https://render.githubusercontent.com/render/math?math=C^2">.
+  This option is useful when dealing with highly singular multiple sections. For example if a curve $C$ is sextuple section, then $C.K_Y = -6$, but if it is too singular, perhaps it is not immediate knowing $C^2$.
 
 - `Use_Exactly`: Takes a non-negative number or `-1`. If `-1` is used, nothing happens. Otherwise, every sub-test must have this exact number of curves to be tested.
 
@@ -207,7 +209,7 @@ Some debugging options are:
 - `SubTests`: Takes a range of positive integers, for example "`2 - 5`". It tests only in that range of sub-tests, which is useful for separating the load if there are too many sub-tests.
 
   Defaults to running the whole range.
-- `Export_Pretests`: This allows the program to also print a list of pre-tests that pass the <img src="https://render.githubusercontent.com/render/math?math=K^2"> and number of chains tests. The maximum amount of tests exported is given by the macro `MAX_PRETEST_EXPORTED`, which defaults to `10000`. Takes three possible options:
+- `Export_Pretests`: This allows the program to also print a list of pre-tests that pass the $K^2$ and number of chains tests. The maximum amount of tests exported is given by the macro `MAX_PRETEST_EXPORTED`, which defaults to `10000`. Takes three possible options:
   - `Y`: Export pre-tests.
   - `N`: Do not export pre-tests.
   - `only`: Only export pre-tests, do not actually test them.
@@ -225,15 +227,15 @@ Each curve must be declared with a name, and each name must be unique.
 - `Fiber` block: Within a `Fiber` block, fibers are declared. Each fiber declaration consists of two lines. Empty lines or comments are ignored, but the two lines of a fiber declaration must be contiguous, that is, no empty lines or comments may appear in between.
 
   The first line consists of the fiber type followed by a possibly empty list of space-separated test options. Fiber types follow Kodaira's notation of normal crossing singular elliptic fibers, namely,
-  - `I1` for a singular node of self intersection <img src="https://render.githubusercontent.com/render/math?math=0">. Note that this fiber is special in that the curve has a double point.
-  - `In` for a cycle of <img src="https://render.githubusercontent.com/render/math?math=n"> curves, each with self intersection <img src="https://render.githubusercontent.com/render/math?math=-2">, for <img src="https://render.githubusercontent.com/render/math?math=n = 2,\ldots,18">.
-  - `In*` for X-shaped trees of <img src="https://render.githubusercontent.com/render/math?math=n %2B 5"> curves, each with self intersection <img src="https://render.githubusercontent.com/render/math?math=-2">, for <img src="https://render.githubusercontent.com/render/math?math=n = 0,1,2,3,4">.
-  - `IV*`, `III*` and `II*` for the rest of the tree-shaped fibers, where each curve has also self intersection <img src="https://render.githubusercontent.com/render/math?math=-2">.
+  - `I1` for a singular node of self intersection $0$. Note that this fiber is special in that the curve has a double point.
+  - `In` for a cycle of $n$ curves, each with self intersection $-2$, for $n = 2,\ldots,18$.
+  - `In*` for X-shaped trees of $n + 5$ curves, each with self intersection $-2$, for $n = 0,1,2,3,4$.
+  - `IV*`, `III*` and `II*` for the rest of the tree-shaped fibers, where each curve has also self intersection $-2$.
 
   (Types `II`, `III` and `IV` may still be declared, but require special treatment discussed later)
 
   The next line contains a space-separated list of names, used to identify the curves in the fiber. For cyclical fibers of type `In`, they are given in order. For non cyclical fibers, the order is as follows:
-    - `In*`: The first <img src="https://render.githubusercontent.com/render/math?math=n%2B1"> curves correspond to the chain in the interior of the X-shape in order. The next two curves are the ones intersecting the first curve of the chain. The last two curves are the ones intersecting the last curve of the chain.
+    - `In*`: The first $n+1$ curves correspond to the chain in the interior of the X-shape in order. The next two curves are the ones intersecting the first curve of the chain. The last two curves are the ones intersecting the last curve of the chain.
     - `IV*`, `III*` and `II*`: The first curve is the one with order 3 at the middle. Then come the branches in order from smallest branch to largest branch. Within each branch, the curves are ordered starting from the one intersecting the order 3 curve in the middle.
 
   The options for the fiber in the first line are as follows:
@@ -260,7 +262,7 @@ Each curve must be declared with a name, and each name must be unique.
                   |
       E - D - C - A - F - G - H
 
-  In the first test, all possibilities for the curves in `III*` and `I1`, and only those possibilities including <img src="https://render.githubusercontent.com/render/math?math=0"> or <img src="https://render.githubusercontent.com/render/math?math=1"> curve from the `I2` are tested.
+  In the first test, all possibilities for the curves in `III*` and `I1`, and only those possibilities including $0$ or $1$ curve from the `I2` are tested.
   Assuming there are no more curves defined, the second test does two sub-tests: One including all curves, and other including all curves except for `Z`.
   The third and further tests always include `X` and `Y`, tries both possibilities for `Z`, and all possibilities for the `III*`, except the case including all of its curves.
 
@@ -277,7 +279,7 @@ Each curve must be declared with a name, and each name must be unique.
 
   The second line contains a possibly empty list of space-separated names, all of which must correspond to curves already declared, be them part of fibers, other sections or exceptionals, all of which can be repeated. The section itself can be included in the list. Each time it appears, it represents a general double point in the curve, and increase its arithmetic genus by one.
 
-  The parameter `n` represents either the self intersection of all sections in the block, or their intersection with the canonical class, depending on `Sections_Input`. **This value is calculated in the original surface** <img src="https://render.githubusercontent.com/render/math?math=Y">.
+  The parameter `n` represents either the self intersection of all sections in the block, or their intersection with the canonical class, depending on `Sections_Input`. **This value is calculated in the original surface** $Y$.
 
   For simplicity reasons, `DoubleSections` is a synonym of `Sections(0)` (resp. `Sections(-2)`) when `Sections_Input` is `By_Self_Intersection` (resp. `By_Canonical_Intersection`).
 
@@ -303,8 +305,8 @@ Each curve must be declared with a name, and each name must be unique.
   This process is generalized to include more curves by means of a *merge* operation. Essentially declares that through a point there pass precisely the curves in the list with multiplicities given by the amount of times they appear in the list, where before the operation, those intersections were assumed to be in general position. This declaration makes it so that after blowing up the point and naming the exceptional, all curves in the list intersect the exceptional in general points instead of intersecting each other.
 
   This operation specializes a configuration that was in a more general position, and so we ask that the intersection between the total transforms of pairs of curves remain the same. Thus,
-  - For every curve <img src="https://render.githubusercontent.com/render/math?math=C"> that appears <img src="https://render.githubusercontent.com/render/math?math=a"> times in the list, <img src="https://render.githubusercontent.com/render/math?math=C"> must have at least <img src="https://render.githubusercontent.com/render/math?math=\frac{a(a-1)}{2}"> double points, which will be solved after the operation. It will end up intersecting the exceptional <img src="https://render.githubusercontent.com/render/math?math=a"> times in general points.
-  - For every curve <img src="https://render.githubusercontent.com/render/math?math=C"> that appears <img src="https://render.githubusercontent.com/render/math?math=a"> times in the list and every curve <img src="https://render.githubusercontent.com/render/math?math=D"> that appears <img src="https://render.githubusercontent.com/render/math?math=b"> times, they must intersect at least <img src="https://render.githubusercontent.com/render/math?math=a \cdot b"> times. After the operation, they will intersect each other <img src="https://render.githubusercontent.com/render/math?math=a \cdot b"> less times.
+  - For every curve $C$ that appears $a$ times in the list, $C$ must have at least $\frac{a(a-1)}{2}$ double points, which will be solved after the operation. It will end up intersecting the exceptional $a$ times in general points.
+  - For every curve $C$ that appears $a$ times in the list and every curve $D$ that appears $b$ times, they must intersect at least $a \cdot b$ times. After the operation, they will intersect each other $a \cdot b$ less times.
 
   By realizing the merge operation multiple times, any resolution of plane curve singularity can be achieved. As an example, we can simulate `II`, `III` and `IV` fibers in the following way:
 
@@ -370,7 +372,7 @@ Each curve must be declared with a name, and each name must be unique.
 
   Disclaimer: This simulation is still just a trick that fools the computer into working with these fibers. In reality it keeps believing the fibers are of types `I3`, `I2` or `I1`. A consequence of this is that it will probably give false positives for the effective check in the case of `IV`.
 
-  **Even after blowing up, the parameter** `n` **of** `Sections(n)` **is a value calculated in the original surface** <img src="https://render.githubusercontent.com/render/math?math=Y">, **not in the surface after blowups done in** `Name`.
+  **Even after blowing up, the parameter** `n` **of** `Sections(n)` **is a value calculated in the original surface** $Y$, **not in the surface after blowups done in** `Name`.
 
 - `MakeFibers` block: Within a `MakeFiber` block, one can declare that a set of previously defined curves form a fiber. Each Make fiber declaration consists of two lines. Empty lines or comments are ignored, but the two lines of a name declaration must be contiguous, that is, no empty lines or comments may appear in between. The contents of these lines have analogous meanings as the contents of a `Fiber` block declaration.
   For example, doing
@@ -405,20 +407,20 @@ Several test files are provided in this repository as examples of test files.
 
 # Effective check
 
-This checks for <img src="https://render.githubusercontent.com/render/math?math=\mathbb Q"> effectiveness of <img src="https://render.githubusercontent.com/render/math?math=K_S">. Assuming there are no fibers with triple points, this does the following: Consider only those fibers whose every curve is either included on the configuration or contracted. For each fiber, calculate the minimum discrepancy of all curves in the fiber, and take minimum again so this value is at most <img src="https://render.githubusercontent.com/render/math?math=-1/2">. Sum over all these values. Then <img src="https://render.githubusercontent.com/render/math?math=K_S"> is considered effective if this sum is at most <img src="https://render.githubusercontent.com/render/math?math=-1">.
+This checks for $\mathbb Q$ effectiveness of $K_S$. Assuming there are no fibers with triple points, this does the following: Consider only those fibers whose every curve is either included on the configuration or contracted. For each fiber, calculate the minimum discrepancy of all curves in the fiber, and take minimum again so this value is at most $-1/2$. Sum over all these values. Then $K_S$ is considered effective if this sum is at most $-1$.
 
 As long as every complete fiber is of type `In`, this should not give false positives.
 
 # Nef check
 
-This checks for nef-ness of <img src="https://render.githubusercontent.com/render/math?math=K_S">. It assumes that <img src="https://render.githubusercontent.com/render/math?math=K_S"> is effective, so to verify that for each exceptional <img src="https://render.githubusercontent.com/render/math?math=(-1)">-curve, the sum of discrepancies over all curves it intersects is at most <img src="https://render.githubusercontent.com/render/math?math=-1">.
+This checks for nef-ness of $K_S$. It assumes that $K_S$ is effective, so to verify that for each exceptional $(-1)$-curve, the sum of discrepancies over all curves it intersects is at most $-1$.
 Due to some limitations of the program, this check may fail if the original configuration had infinitely near blowups. If this happens, a warning is added to the problematic example.
 
 # Obstruction check
 
-This checks if the global obstruction for smoothing the singularities in <img src="https://render.githubusercontent.com/render/math?math=S"> is zero. This checks for the following:
+This checks if the global obstruction for smoothing the singularities in $S$ is zero. This checks for the following:
 - At most two complete fibers are included in the example.
-- after all blowups as declared by `Merge` operations, every curve that is not exceptional or fiber has self intersection at least <img src="https://render.githubusercontent.com/render/math?math=-1">.
+- after all blowups as declared by `Merge` operations, every curve that is not exceptional or fiber has self intersection at least $-1$.
 
 Sometimes it is useful to know why the discrepancy is not zero. Therefore if `Obstruction_Check` is set to `print`, whenever an example fails this check, the number of complete fibers in the configuration is also included in the summary.
 
