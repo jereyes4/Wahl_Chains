@@ -16,7 +16,7 @@ The assumption of working on an elliptic surface is only used to calculate obstr
 
 The program is written in standard `C++17`.
 
-The first step is to install a suitable `C++` compiler. For Linux `GNU C++` is usually installed by default, and for OSX, `clang` is installed by default. Both can be tested in the command line by running
+The first step is to install a suitable `C++` compiler. For Linux `GNU C++` is usually installed by default, and for macOS, `clang` is installed by default. Both can be tested in the command line by running
 
     g++ --version
 
@@ -52,7 +52,7 @@ To test a configuration, a test file must be provided. For example, if the test 
 
     Search.exe test.txt
 
-or if using Linux or OSX,
+or if using Linux or macOS,
 
     ./Search.exe test.txt
 
@@ -64,7 +64,7 @@ To view the complete information of an example and how to recover it from the or
 
     Display.py
 
-or on Linux or OSX,
+or on Linux or macOS,
 
     ./Display.py
 
