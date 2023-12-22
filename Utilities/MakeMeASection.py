@@ -2,15 +2,6 @@
 import sys, json, linecache, tkinter, os
 from math import gcd
 
-MAX_CHAIN_LENGTH_SINGLE = 7
-MAX_CHAIN_LENGTH_DOUBLE = 7
-
-MAX_USED_LENGTH = 4
-
-EXTRA_CURVE_NAME = "E^*_{{{0}}}"
-
-DRAWING_SCALE = 0.45
-
 def display_string(Str):
     root = tkinter.Tk()
     root.geometry("1280x720")
@@ -42,6 +33,8 @@ def display_string(Str):
     root.bind("<Escape>",lambda e: root.destroy())
     tkinter.mainloop()
 
+# Extracted from
+# https://stackoverflow.com/questions/66192894/precise-determinant-of-integer-nxn-matrix
 def det(M):
     M = [row[:] for row in M] # make a copy to keep original M unmodified
     N, sign, prev = len(M), 1, 1
@@ -147,7 +140,13 @@ def single_chain(graph_info, config_info):
     if config_info["en"] != 0:
         ignored_blowups = [(config_info["ea"], config_info["eb"]), (config_info["eb"], config_info["ea"])]
 
-    intersections = [f"$~{name_dict[x]} \\cap {name_dict[y]}$" for x,y in config_info["blps"] if (x,y) not in ignored_blowups and (y,x) not in ignored_blowups]
+    intersections = []
+    for x,y in config_info["blps"]:
+        if (x,y) not in ignored_blowups and (y,x) not in ignored_blowups:
+            intersections.append(f"$~{name_dict[x]} \\cap {name_dict[y]}$")
+        else:
+            ignored_blowups.remove((x,y))
+            ignored_blowups.remove((y,x))
 
     if config_info["en"] != 0:
         intersections.append(f"$[{COMMA.join(config_info['en']*[2])},1] \\times ~{name_dict[config_info['ea']]} \\cap {name_dict[config_info['eb']]}$")
@@ -226,9 +225,15 @@ def double_chain(graph_info, config_info):
     if config_info["en0"] != 0:
         ignored_blowups = [(config_info["ea0"], config_info["eb0"]), (config_info["eb0"], config_info["ea0"])]
     if config_info["en1"] != 0:
-        ignored_blowups = [(config_info["ea1"], config_info["eb1"]), (config_info["eb1"], config_info["ea1"])]
+        ignored_blowups += [(config_info["ea1"], config_info["eb1"]), (config_info["eb1"], config_info["ea1"])]
 
-    intersections = [f"$~{name_dict[x]} \\cap {name_dict[y]}$" for x,y in config_info["blps"] if (x,y) not in ignored_blowups and (y,x) not in ignored_blowups]
+    intersections = []
+    for x,y in config_info["blps"]:
+        if (x,y) not in ignored_blowups and (y,x) not in ignored_blowups:
+            intersections.append(f"$~{name_dict[x]} \\cap {name_dict[y]}$")
+        else:
+            ignored_blowups.remove((x,y))
+            ignored_blowups.remove((y,x))
 
     if config_info["en0"] != 0:
         intersections.append(f"$[{COMMA.join(config_info['en0']*['2'])},1] \\times ~{name_dict[config_info['ea0']]} \\cap {name_dict[config_info['eb0']]}$")
@@ -366,7 +371,7 @@ def main():
         reason = input("Give me a reason: ")
         print("Got", reason)
         body += "Reason: " + reason + "\n\n"
-    body += "\\noindent\n$\\rule{12.5cm}{1.1pt}$\n"
+    # body += "\\noindent\n$\\rule{12.5cm}{1.1pt}$\n"
 
     display_string(body)
 
