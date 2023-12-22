@@ -20,9 +20,7 @@ The first step is to install a suitable `C++` compiler. For Linux `GNU C++` is u
 
     g++ --version
 
-For Windows, we recommend installing MinGW for 64-bit from [here](https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/).
-
-This installation includes `GNU C++`, which can be tested with the same command.
+As for Windows, we have only tested the program using the 64-bit version of MinGW from [here](https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/). This installation includes `GNU C++`, which can be tested with the same command. We have seen some inconsistent behavior and occasional crashes with this version when compiled with multithread support, so it is not recommended.
 
 The second step is to compile the program. For example, using `GNU C++` with `-Ofast` and `-flto` optimizations, run from the terminal the line:
 
